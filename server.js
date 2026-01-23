@@ -1,10 +1,10 @@
-import pdf from 'pdf-parse';
 import express from 'express';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import PDFParser from 'pdf-parse';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -12,179 +12,246 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
-const DATA_DIR = path.join(__dirname, 'data');
+const STORAGE_DIR = path.join(__dirname, '.mastra', 'output', '.data');
 
-// Ensure data directory exists
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-// Serve static files from public
-app.use(express.static('public'));
-
-// Extract booking IDs from roster text
-function extractBookingIds(text) {
-  const matches = [...text.matchAll(/Booking #:\s*(\S+)/g)];
-  return matches.map(m => m[1]);
-}
-
-// Extract detailed booking info
-function extractBookings(rosterText) {
-  const bookings = new Map();
-  const blocks = rosterText.split(/(?=Booking #:)/);
-  
-  for (const block of blocks) {
-    if (!block.includes('Booking #:')) continue;
-    
-    const bookingMatch = block.match(/Booking #:\s*(\S+)/);
-    if (!bookingMatch) continue;
-    const id = bookingMatch[1];
-    
-    const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,'-]+?)(?=\s*Name Number:|$)/i);
-    let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, ' ') : 'Unknown';
-    
-    const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
-    const bookDate = bookDateMatch ? bookDateMatch[2] + ' ' + bookDateMatch[1] : 'Unknown';
-    
-    const relDateMatch = block.match(/Rel Date:\s*(No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
-    let releaseDate = 'Not Released';
-    if (relDateMatch && relDateMatch[1] !== 'No Rel Date' && relDateMatch[2] && relDateMatch[3]) {
-      releaseDate = relDateMatch[3] + ' ' + relDateMatch[2];
-    }
-    
-    const charges = [];
-    const lines = block.split('\n');
-    let inCharges = false;
-    for (const line of lines) {
-      const t = line.trim();
-      if (t.includes('Statute') && t.includes('Offense')) {
-        inCharges = true;
-        continue;
-      }
-      if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol/)) {
-        const m = t.match(/^\S+\s+(.+?)\s+(DIST|SUPR|MUNI)/);
-        if (m) charges.push(m[1].trim());
-      }
-    }
-    
-    bookings.set(id, {
-      id,
-      name,
-      bookDate,
-      releaseDate,
-      charges: [...new Set(charges)]
-    });
+// Ensure storage directory exists
+function ensureStorageDir() {
+  if (!fs.existsSync(STORAGE_DIR)) {
+    fs.mkdirSync(STORAGE_DIR, { recursive: true });
   }
-  return bookings;
 }
+ensureStorageDir();
 
-function formatBooked(b) {
-  return b.name + ' | Booked: ' + b.bookDate + ' | Charges: ' + (b.charges.join(', ') || 'None listed');
-}
+// Redirect root to status
+app.get('/', (req, res) => {
+  res.redirect('/api/status');
+});
 
-function formatReleased(b) {
-  return b.name + ' | Released: ' + b.releaseDate + ' | Charges: ' + (b.charges.join(', ') || 'None listed');
-}
-
-// Status endpoint
+// Status page
 app.get('/api/status', (req, res) => {
-  let lastCheck = 'Never';
+  const dataDir = STORAGE_DIR;
+  let lastCheck = "Never";
   let inmateCount = 0;
   let changeCount = 0;
   let viewCount = 0;
-  
+
   try {
-    const hashFile = path.join(DATA_DIR, 'prev_hash.txt');
+    const hashFile = path.join(dataDir, "prev_hash.txt");
     if (fs.existsSync(hashFile)) {
       const stats = fs.statSync(hashFile);
       lastCheck = stats.mtime.toISOString();
     }
-    
-    const rosterFile = path.join(DATA_DIR, 'prev_roster.txt');
+
+    const rosterFile = path.join(dataDir, "prev_roster.txt");
     if (fs.existsSync(rosterFile)) {
-      const content = fs.readFileSync(rosterFile, 'utf-8');
+      const content = fs.readFileSync(rosterFile, "utf-8");
       const bookingMatches = content.match(/Booking #:/g);
       inmateCount = bookingMatches ? bookingMatches.length : 0;
     }
-    
-    const logFile = path.join(DATA_DIR, 'change_log.txt');
+
+    const logFile = path.join(dataDir, "change_log.txt");
     if (fs.existsSync(logFile)) {
-      const content = fs.readFileSync(logFile, 'utf-8');
+      const content = fs.readFileSync(logFile, "utf-8");
       changeCount = (content.match(/Change detected at:/g) || []).length;
     }
-    
-    const metricsFile = path.join(DATA_DIR, 'metrics.json');
-    let metrics = { statusViews: 0, historyViews: 0 };
-    
+
+    const metricsFile = path.join(dataDir, "metrics.json");
+    let metrics = { statusViews: 0, historyViews: 0, emailViews: 0 };
+
     if (fs.existsSync(metricsFile)) {
       try {
-        metrics = JSON.parse(fs.readFileSync(metricsFile, 'utf-8'));
+        metrics = JSON.parse(fs.readFileSync(metricsFile, "utf-8"));
       } catch (e) {}
     }
     metrics.statusViews = (metrics.statusViews || 0) + 1;
     viewCount = metrics.statusViews;
-    
+
     try {
       fs.writeFileSync(metricsFile, JSON.stringify(metrics));
     } catch (e) {
-      console.error('Failed to write metrics:', e);
+      console.error("Failed to write metrics:", e);
     }
-  } catch (e) {
-    console.error('Status error:', e);
-  }
-  
-  res.json({
-    lastCheck,
-    inmateCount,
-    changeCount,
-    viewCount,
-    status: 'active'
-  });
+  } catch (e) {}
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Mason County Jail Roster Monitor</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0f172a; color: #e2e8f0; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { max-width: 500px; padding: 2rem; }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #38bdf8; letter-spacing: 1px; }
+    .status { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
+    .status-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .status-title { font-weight: 600; }
+    .stats { display: grid; gap: 1rem; }
+    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #334155; }
+    .stat:last-child { border-bottom: none; }
+    .stat-label { color: #94a3b8; }
+    .stat-value { font-weight: 500; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #22c55e; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn:hover { background: #16a34a; }
+    .footer { text-align: center; color: #64748b; font-size: 0.875rem; margin-top: 1.5rem; }
+    a { color: #38bdf8; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Mason County Jail Roster Monitor</h1>
+    <div class="status">
+      <div class="status-header">
+        <div class="status-dot"></div>
+        <span class="status-title">System Active</span>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-label">Last Check</span>
+          <span class="stat-value">${lastCheck !== "Never" ? new Date(lastCheck).toLocaleString("en-US", { timeZone: "America/Los_Angeles", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }) + " PST" : "Never"}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Current Inmates</span>
+          <span class="stat-value">${inmateCount}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Changes Detected</span>
+          <span class="stat-value">${changeCount}</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Notifications</span>
+          <span class="stat-value">Enabled</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Page Views</span>
+          <span class="stat-value">${viewCount.toLocaleString()}</span>
+        </div>
+      </div>
+      <a href="/api/run" class="run-btn">Run Check Now</a>
+    </div>
+    <div class="footer">
+      <p><a href="/api/history">View Change History</a> | <a href="/api/emails">View Email History</a></p>
+      <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  res.send(html);
 });
 
-// Check roster endpoint
-app.get('/api/check-roster', async (req, res) => {
+// Run check
+app.get('/api/run', async (req, res) => {
   try {
-    console.log('Downloading PDF...');
+    ensureStorageDir();
+
     const response = await fetch(PDF_URL);
     if (!response.ok) {
-      throw new Error(`Failed to download PDF: ${response.status}`);
+      throw new Error("Failed to download PDF: " + response.status);
     }
-    
+
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
-    // Parse PDF properly
-    console.log('Parsing PDF...');
-    const pdfData = await pdf(buffer);
-    const text = pdfData.text;
-    
-    console.log(`Extracted ${text.length} characters from PDF`);
-    
-    const currentHash = crypto.createHash('md5').update(text).digest('hex');
+
+    const pdfPath = path.join(STORAGE_DIR, "current.pdf");
+    fs.writeFileSync(pdfPath, buffer);
+
+    const result = await PDFParser(buffer);
+    const text = result.text;
+
+    const textPath = path.join(STORAGE_DIR, "current_text.txt");
+    fs.writeFileSync(textPath, text);
+
+    const currentHash = crypto.createHash("md5").update(text).digest("hex");
     const timestamp = new Date().toISOString();
-    
-    const hashFile = path.join(DATA_DIR, 'prev_hash.txt');
-    const rosterFile = path.join(DATA_DIR, 'prev_roster.txt');
-    const logFile = path.join(DATA_DIR, 'change_log.txt');
-    
-    let previousHash = '';
-    let previousText = '';
+
+    const hashFile = path.join(STORAGE_DIR, "prev_hash.txt");
+    const rosterFile = path.join(STORAGE_DIR, "prev_roster.txt");
+    const logFile = path.join(STORAGE_DIR, "change_log.txt");
+
+    let previousHash;
+    let previousText;
     let hasChanged = false;
     let isFirstRun = false;
     let addedLines = [];
     let removedLines = [];
-    
+
+    function extractBookings(rosterText) {
+      const bookings = new Map();
+      const blocks = rosterText.split(/(?=Booking #:)/);
+
+      for (const block of blocks) {
+        if (!block.includes("Booking #:")) continue;
+
+        const bookingMatch = block.match(/Booking #:\s*(\S+)/);
+        if (!bookingMatch) continue;
+        const id = bookingMatch[1];
+
+        const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,'-]+?)(?=\s*Name Number:|$)/i);
+        let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, " ") : "Unknown";
+        if (name.endsWith(",")) {
+          const nextLine = block.match(/Name:\s*[^\n]+\n([A-Z][A-Z\s'-]*)/i);
+          if (nextLine) name = name + " " + nextLine[1].trim();
+        }
+
+        const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+        const bookDate = bookDateMatch ? bookDateMatch[2] + " " + bookDateMatch[1] : "Unknown";
+
+        const relDateMatch = block.match(/Rel Date:\s*(No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
+        let releaseDate = "Not Released";
+        if (relDateMatch && relDateMatch[1] !== "No Rel Date" && relDateMatch[2] && relDateMatch[3]) {
+          releaseDate = relDateMatch[3] + " " + relDateMatch[2];
+        }
+
+        const charges = [];
+        const lines = block.split("\n");
+        let inCharges = false;
+        for (const line of lines) {
+          const t = line.trim();
+          if (t.includes("Statute") && t.includes("Offense")) {
+            inCharges = true;
+            continue;
+          }
+          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol/)) {
+            const m = t.match(/^\S+\s+(.+?)\s+(DIST|SUPR|MUNI)/);
+            if (m) charges.push(m[1].trim());
+          }
+        }
+
+        bookings.set(id, {
+          id,
+          name,
+          bookDate,
+          releaseDate,
+          charges: [...new Set(charges)]
+        });
+      }
+      return bookings;
+    }
+
+    function formatBooked(b) {
+      return b.name + " | Booked: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
+    }
+
+    function formatReleased(b) {
+      return b.name + " | Released: " + b.releaseDate + " | Charges: " + (b.charges.join(", ") || "None listed");
+    }
+
     if (fs.existsSync(hashFile) && fs.existsSync(rosterFile)) {
-      previousHash = fs.readFileSync(hashFile, 'utf-8').trim();
-      previousText = fs.readFileSync(rosterFile, 'utf-8');
+      previousHash = fs.readFileSync(hashFile, "utf-8").trim();
+      previousText = fs.readFileSync(rosterFile, "utf-8");
       hasChanged = currentHash !== previousHash;
-      
+
       if (hasChanged) {
-        console.log('Change detected! Extracting bookings...');
         const currentBookings = extractBookings(text);
         const previousBookings = extractBookings(previousText);
-        
+
         for (const [id, booking] of currentBookings) {
           if (!previousBookings.has(id)) {
             addedLines.push(formatBooked(booking));
@@ -197,78 +264,75 @@ app.get('/api/check-roster', async (req, res) => {
         }
         addedLines = addedLines.slice(0, 30);
         removedLines = removedLines.slice(0, 30);
-        
-        console.log(`Found ${addedLines.length} bookings, ${removedLines.length} releases`);
       }
     } else {
       isFirstRun = true;
-      console.log('First run - capturing initial state');
     }
-    
+
     fs.writeFileSync(hashFile, currentHash);
     fs.writeFileSync(rosterFile, text);
-    
-    const logEntry = '\n' + '='.repeat(80) + '\n' +
-      (isFirstRun ? 'Initial capture' : hasChanged ? 'Change detected' : 'No change') +
-      ' at: ' + timestamp + '\n' + '='.repeat(80) + '\n' +
-      (isFirstRun ? 'Initial roster state captured.\n' :
-       hasChanged ? 
-         'BOOKED (' + addedLines.length + '):\n' +
-         addedLines.map(l => '  + ' + l).join('\n') + '\n\n' +
-         'RELEASED (' + removedLines.length + '):\n' +
-         removedLines.map(l => '  - ' + l).join('\n') + '\n'
-         : 'No changes detected.\n');
-    
+
+    const logEntry =
+      "\n================================================================================\n" +
+      (isFirstRun ? "Initial capture" : hasChanged ? "Change detected" : "No change") +
+      " at: " + timestamp +
+      "\n================================================================================\n" +
+      (isFirstRun ? "Initial roster state captured.\n" :
+       hasChanged ?
+         "BOOKED (" + addedLines.length + "):\n" +
+         addedLines.map(l => "  + " + l).join("\n") +
+         "\n\nRELEASED (" + removedLines.length + "):\n" +
+         removedLines.map(l => "  - " + l).join("\n") + "\n"
+         : "No changes detected.\n");
+
     fs.appendFileSync(logFile, logEntry);
-    
-    const message = isFirstRun ? 'Initial roster captured successfully!' :
-      hasChanged ? 'Changes detected! ' + addedLines.length + ' new bookings, ' + removedLines.length + ' releases.' :
-      'No changes detected.';
-    
-    console.log('Check complete:', message);
-    
-    res.json({
-      success: true,
-      timestamp,
-      isFirstRun,
-      hasChanged,
-      bookings: addedLines.length,
-      releases: removedLines.length,
-      message
-    });
-    
+
+    const message = isFirstRun
+      ? "Initial roster captured successfully!"
+      : hasChanged
+        ? "Changes detected! " + addedLines.length + " new bookings, " + removedLines.length + " releases."
+        : "No changes detected.";
+
+    const html =
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/status"><style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#22c55e;font-size:3rem;margin-bottom:1rem;}h1{color:#38bdf8;margin-bottom:1rem;}p{color:#94a3b8;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+      message +
+      "</p><p>Redirecting to status page...</p></div></body></html>";
+
+    res.send(html);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message
-    });
+    console.error('Error in /api/run:', error);
+    const html =
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#94a3b8;}a{color:#38bdf8;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
+      (error.message || "Unknown error") +
+      '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
+    res.send(html);
   }
 });
 
-// History endpoint
+// History page
 app.get('/api/history', (req, res) => {
-  const logFile = path.join(DATA_DIR, 'change_log.txt');
-  let changeLog = '';
+  const dataDir = STORAGE_DIR;
+  let changeLog = "";
   let entries = [];
-  
+
   try {
+    const logFile = path.join(dataDir, "change_log.txt");
     if (fs.existsSync(logFile)) {
-      changeLog = fs.readFileSync(logFile, 'utf-8');
-      
-      const sections = changeLog.split('='.repeat(80)).filter(s => s.trim());
+      changeLog = fs.readFileSync(logFile, "utf-8");
+
+      const sections = changeLog.split("================================================================================").filter(s => s.trim());
       for (let i = 0; i < sections.length; i += 2) {
-        const header = sections[i] || '';
-        const content = sections[i + 1] || '';
-        
+        const header = sections[i] || "";
+        const content = sections[i + 1] || "";
+
         const timestampMatch = header.match(/(?:Change detected at|Initial capture at|No change at): (.+)/);
         if (timestampMatch) {
-          const addedMatch = content.match(/BOOKED \((\d+)\):\n([\s\S]*?)(?=\nRELEASED|$)/);
-          const removedMatch = content.match(/RELEASED \((\d+)\):\n([\s\S]*?)$/);
-          
-          const added = addedMatch ? addedMatch[2].split('\n').filter(l => l.trim().startsWith('+')).map(l => l.replace(/^\s*\+\s*/, '')) : [];
-          const removed = removedMatch ? removedMatch[2].split('\n').filter(l => l.trim().startsWith('-')).map(l => l.replace(/^\s*-\s*/, '')) : [];
-          
+          const addedMatch = content.match(/(?:BOOKED|New Bookings|Added lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:RELEASED|Releases|Removed lines)|$)/);
+          const removedMatch = content.match(/(?:RELEASED|Releases|Removed lines) \((\d+)\):\n([\s\S]*?)$/);
+
+          const added = addedMatch ? addedMatch[2].split("\n").filter(l => l.trim().startsWith("+")).map(l => l.replace(/^\s*\+\s*/, "")) : [];
+          const removed = removedMatch ? removedMatch[2].split("\n").filter(l => l.trim().startsWith("-")).map(l => l.replace(/^\s*-\s*/, "")) : [];
+
           entries.push({
             timestamp: timestampMatch[1].trim(),
             added,
@@ -277,49 +341,100 @@ app.get('/api/history', (req, res) => {
         }
       }
     }
-  } catch (e) {
-    console.error('History error:', e);
-  }
-  
+  } catch (e) {}
+
   entries.reverse();
-  
-  const entriesHtml = entries.length > 0 ?
-    entries.map(entry => {
-      const date = new Date(entry.timestamp);
-      const pstDate = date.toLocaleString('en-US', {
-        timeZone: 'America/Los_Angeles',
-        year: 'numeric',
-        month: 'numeric',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
-      }) + ' PST';
-      
-      const addedHtml = entry.added.length > 0 ?
-        '<div class="changes booked"><h4>BOOKED (' + entry.added.length + ')</h4><ul>' +
-        entry.added.slice(0, 50).map(a => '<li>' + a + '</li>').join('') +
-        (entry.added.length > 50 ? '<li>...and ' + (entry.added.length - 50) + ' more</li>' : '') +
-        '</ul></div>' : '';
-      
-      const removedHtml = entry.removed.length > 0 ?
-        '<div class="changes released"><h4>RELEASED (' + entry.removed.length + ')</h4><ul>' +
-        entry.removed.slice(0, 50).map(r => '<li>' + r + '</li>').join('') +
-        (entry.removed.length > 50 ? '<li>...and ' + (entry.removed.length - 50) + ' more</li>' : '') +
-        '</ul></div>' : '';
-      
-      const noChanges = !addedHtml && !removedHtml ? '<p class="no-changes">Initial roster capture</p>' : '';
-      
-      return '<div class="entry"><div class="entry-header">' + pstDate + '</div>' + addedHtml + removedHtml + noChanges + '</div>';
-    }).join('') :
-    '<p class="no-data">No changes recorded yet. Run the workflow to start monitoring.</p>';
-  
-  const html = `<!DOCTYPE html><html><head><title>Change History</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; font-size: 8pt; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 900px; margin: 0 auto; } h1 { font-size: 14pt; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .entry { background: #1e293b; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; } .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; } .changes { margin-top: 0.75rem; } .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; } .changes.booked h4 { color: #ef4444; } .changes.released h4 { color: #22c55e; } .changes ul { list-style: none; font-size: 8pt; color: #94a3b8; } .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; } .changes ul li:last-child { border-bottom: none; } .no-changes { color: #64748b; font-style: italic; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/" class="back-link">← Back to Status</a><h1>Change History</h1><p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>${entriesHtml}</div></body></html>`;
-  
+
+  const entriesHtml = entries.length > 0 ? entries.map(entry => {
+    const date = new Date(entry.timestamp);
+    const pstDate = date.toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    }) + " PST";
+    
+    const addedItems = entry.added.slice(0, 50).map(a => "<li>" + a + "</li>").join("");
+    const addedMore = entry.added.length > 50 ? "<li>...and " + (entry.added.length - 50) + " more</li>" : "";
+    const addedHtml = entry.added.length > 0 ? '<div class="changes booked"><h4>BOOKED (' + entry.added.length + ")</h4><ul>" + addedItems + addedMore + "</ul></div>" : "";
+
+    const removedItems = entry.removed.slice(0, 50).map(r => "<li>" + r + "</li>").join("");
+    const removedMore = entry.removed.length > 50 ? "<li>...and " + (entry.removed.length - 50) + " more</li>" : "";
+    const removedHtml = entry.removed.length > 0 ? '<div class="changes released"><h4>RELEASED (' + entry.removed.length + ")</h4><ul>" + removedItems + removedMore + "</ul></div>" : "";
+
+    const noChanges = !addedHtml && !removedHtml ? "<p class='no-changes'>Initial roster capture</p>" : "";
+
+    return '<div class="entry"><div class="entry-header">' + pstDate + "</div>" + addedHtml + removedHtml + noChanges + "</div>";
+  }).join("") : "<p class='no-data'>No changes recorded yet. Run the workflow to start monitoring.</p>";
+
+  const html = '<!DOCTYPE html><html><head><title>Change History - Mason County Jail Roster Monitor</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; font-size: 8pt; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 900px; margin: 0 auto; } h1 { font-size: 14pt; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .entry { background: #1e293b; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; } .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; } .changes { margin-top: 0.75rem; } .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; } .changes.booked h4 { color: #ef4444; } .changes.released h4 { color: #22c55e; } .changes ul { list-style: none; font-size: 8pt; color: #94a3b8; } .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; } .changes ul li:last-child { border-bottom: none; } .no-changes { color: #64748b; font-style: italic; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/api/status" class="back-link">← Back to Status</a><h1>Change History</h1><p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>' + entriesHtml + "</div></body></html>";
+
+  res.send(html);
+});
+
+// Email history page
+app.get('/api/emails', (req, res) => {
+  const dataDir = STORAGE_DIR;
+  let emailLog = "";
+  let emails = [];
+
+  try {
+    const logFile = path.join(dataDir, "email_log.txt");
+    if (fs.existsSync(logFile)) {
+      emailLog = fs.readFileSync(logFile, "utf-8");
+
+      const sections = emailLog.split("================================================================================").filter(s => s.trim());
+      for (let i = 0; i < sections.length; i += 2) {
+        const header = sections[i] || "";
+        const content = sections[i + 1] || "";
+
+        const timestampMatch = header.match(/Email sent at: (.+)/);
+        const toMatch = content.match(/To: (.+)/);
+        const subjectMatch = content.match(/Subject: (.+)/);
+        const messageIdMatch = content.match(/Message ID: (.+)/);
+        const summaryMatch = content.match(/Summary: (.+)/);
+
+        if (timestampMatch) {
+          emails.push({
+            timestamp: timestampMatch[1].trim(),
+            to: toMatch ? toMatch[1].trim() : "",
+            subject: subjectMatch ? subjectMatch[1].trim() : "",
+            messageId: messageIdMatch ? messageIdMatch[1].trim() : "",
+            summary: summaryMatch ? summaryMatch[1].trim() : ""
+          });
+        }
+      }
+    }
+  } catch (e) {
+    emailLog = "Error reading email log: " + String(e);
+  }
+
+  const emailsHtml = emails.length > 0 ? emails.reverse().map(email => {
+    const date = new Date(email.timestamp);
+    const pstEmailDate = date.toLocaleString("en-US", {
+      timeZone: "America/Los_Angeles",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true
+    }) + " PST";
+    
+    return '<div class="email"><div class="email-header">' + pstEmailDate + '</div><div class="email-details"><p><strong>To:</strong> ' + email.to + "</p><p><strong>Subject:</strong> " + email.subject + "</p><p><strong>Summary:</strong> " + email.summary + '</p><p class="message-id">Message ID: ' + email.messageId + "</p></div></div>";
+  }).join("") : "<p class='no-data'>No emails sent yet. Emails are sent when roster changes are detected.</p>";
+
+  const html = '<!DOCTYPE html><html><head><title>Email History - Mason County Jail Roster Monitor</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 800px; margin: 0 auto; } h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .email { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; } .email-header { font-weight: 600; margin-bottom: 1rem; color: #22c55e; border-bottom: 1px solid #334155; padding-bottom: 0.75rem; } .email-details p { margin: 0.5rem 0; color: #94a3b8; } .email-details strong { color: #e2e8f0; } .message-id { font-size: 0.75rem; color: #64748b; margin-top: 1rem !important; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/api/status" class="back-link">← Back to Status</a><h1>Email History</h1><p class="subtitle">Record of all notification emails sent</p>' + emailsHtml + "</div></body></html>";
+
   res.send(html);
 });
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  console.log(`Visit: http://localhost:${PORT}`);
 });
