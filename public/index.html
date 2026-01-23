@@ -157,12 +157,16 @@
           <span class="value" id="lastCheck">-</span>
         </div>
         <div class="stat">
-          <span class="label">Next Check</span>
-          <span class="value" id="nextCheck">-</span>
+          <span class="label">Current Inmates</span>
+          <span class="value" id="inmateCount">-</span>
         </div>
         <div class="stat">
-          <span class="label">Auto Monitoring</span>
-          <span class="value">Every 6 hours</span>
+          <span class="label">Changes Detected</span>
+          <span class="value" id="changeCount">-</span>
+        </div>
+        <div class="stat">
+          <span class="label">Page Views</span>
+          <span class="value" id="viewCount">-</span>
         </div>
       </div>
       
@@ -172,10 +176,8 @@
     </div>
     
     <div class="footer">
-      Monitoring 
-      <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">
-        Mason County Jail Roster
-      </a>
+      <p><a href="/api/history">View Change History</a></p>
+      <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
     </div>
   </div>
 
@@ -201,7 +203,9 @@
           document.getElementById('lastCheck').textContent = 'Never';
         }
         
-        document.getElementById('nextCheck').textContent = data.nextCheck;
+        document.getElementById('inmateCount').textContent = data.inmateCount || 0;
+        document.getElementById('changeCount').textContent = data.changeCount || 0;
+        document.getElementById('viewCount').textContent = (data.viewCount || 0).toLocaleString();
         
       } catch (e) {
         console.error('Error loading status:', e);
