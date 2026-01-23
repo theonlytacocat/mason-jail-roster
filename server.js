@@ -1,3 +1,4 @@
+import pdf from 'pdf-parse';
 import express from 'express';
 import crypto from 'crypto';
 import fs from 'fs';
@@ -153,9 +154,12 @@ app.get('/api/check-roster', async (req, res) => {
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    // For now, use buffer as text representation
-    // In production, you'd use a proper PDF parser
-    const text = buffer.toString('binary');
+    // Parse PDF properly
+    console.log('Parsing PDF...');
+    const pdfData = await pdf(buffer);
+    const text = pdfData.text;
+    
+    console.log(`Extracted ${text.length} characters from PDF`);
     
     const currentHash = crypto.createHash('md5').update(text).digest('hex');
     const timestamp = new Date().toISOString();
@@ -177,6 +181,7 @@ app.get('/api/check-roster', async (req, res) => {
       hasChanged = currentHash !== previousHash;
       
       if (hasChanged) {
+        console.log('Change detected! Extracting bookings...');
         const currentBookings = extractBookings(text);
         const previousBookings = extractBookings(previousText);
         
@@ -192,9 +197,12 @@ app.get('/api/check-roster', async (req, res) => {
         }
         addedLines = addedLines.slice(0, 30);
         removedLines = removedLines.slice(0, 30);
+        
+        console.log(`Found ${addedLines.length} bookings, ${removedLines.length} releases`);
       }
     } else {
       isFirstRun = true;
+      console.log('First run - capturing initial state');
     }
     
     fs.writeFileSync(hashFile, currentHash);
@@ -216,6 +224,8 @@ app.get('/api/check-roster', async (req, res) => {
     const message = isFirstRun ? 'Initial roster captured successfully!' :
       hasChanged ? 'Changes detected! ' + addedLines.length + ' new bookings, ' + removedLines.length + ' releases.' :
       'No changes detected.';
+    
+    console.log('Check complete:', message);
     
     res.json({
       success: true,
