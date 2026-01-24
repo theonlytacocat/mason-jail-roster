@@ -294,8 +294,48 @@ app.get('/api/run', async (req, res) => {
         ? "Changes detected! " + addedLines.length + " new bookings, " + removedLines.length + " releases."
         : "No changes detected.";
 
-    const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/status"><style>body{font-family:sans-serif;background:#0f172a;color:#e2e8f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#22c55e;font-size:3rem;margin-bottom:1rem;}h1{color:#38bdf8;margin-bottom:1rem;}p{color:#94a3b8;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Change History - Mason County Jail Roster Monitor</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #93bd8b; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    .subtitle { color: #4c6e60; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #93bd8b; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .changes { margin-top: 0.75rem; }
+    .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
+    .changes.booked h4 { color: #701e77; }
+    .changes.released h4 { color: #3e7400; }
+    .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
+    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
+    .changes ul li:last-child { border-bottom: none; }
+    .no-changes { color: #4c6e60; font-style: italic; }
+    .no-data { color: #4c6e60; text-align: center; padding: 3rem; }
+    a { color: #589270; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/api/status" class="back-link">← Back to Status</a>
+    <h1>Change History</h1>
+    <p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>
+    ${entriesHtml}
+  </div>
+</body>
+</html>`;
+
+<body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to status page...</p></div></body></html>";
 
