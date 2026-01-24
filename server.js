@@ -80,8 +80,8 @@ app.get('/api/status', (req, res) => {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #93bd8b; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
@@ -134,7 +134,7 @@ app.get('/api/status', (req, res) => {
         </div>
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
-<a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
+      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
@@ -294,48 +294,8 @@ app.get('/api/run', async (req, res) => {
         ? "Changes detected! " + addedLines.length + " new bookings, " + removedLines.length + " releases."
         : "No changes detected.";
 
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-  <title>Change History - Mason County Jail Roster Monitor</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #93bd8b; min-height: 100vh; padding: 2rem; }
-    .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
-    .subtitle { color: #4c6e60; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
-    .back-link:hover { text-decoration: underline; }
-    .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #93bd8b; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
-    .changes { margin-top: 0.75rem; }
-    .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
-    .changes.booked h4 { color: #701e77; }
-    .changes.released h4 { color: #3e7400; }
-    .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
-    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
-    .changes ul li:last-child { border-bottom: none; }
-    .no-changes { color: #4c6e60; font-style: italic; }
-    .no-data { color: #4c6e60; text-align: center; padding: 3rem; }
-    a { color: #589270; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <a href="/api/status" class="back-link">← Back to Status</a>
-    <h1>Change History</h1>
-    <p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>
-    ${entriesHtml}
-  </div>
-</body>
-</html>`;
-
-<body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+    const html =
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/status"><style>body{font-family:sans-serif;background:#181818;color:#93bd8b;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#5f8a2f;font-size:3rem;margin-bottom:1rem;}h1{color:#b8b8b8;margin-bottom:1rem;}p{color:#94b8b5;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to status page...</p></div></body></html>";
 
@@ -412,7 +372,46 @@ app.get('/api/history', (req, res) => {
     return '<div class="entry"><div class="entry-header">' + pstDate + "</div>" + addedHtml + removedHtml + noChanges + "</div>";
   }).join("") : "<p class='no-data'>No changes recorded yet. Run the workflow to start monitoring.</p>";
 
-  const html = '<!DOCTYPE html><html><head><title>Change History - Mason County Jail Roster Monitor</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; font-size: 8pt; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 900px; margin: 0 auto; } h1 { font-size: 14pt; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .entry { background: #1e293b; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; } .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; } .changes { margin-top: 0.75rem; } .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; } .changes.booked h4 { color: #ef4444; } .changes.released h4 { color: #22c55e; } .changes ul { list-style: none; font-size: 8pt; color: #94a3b8; } .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; } .changes ul li:last-child { border-bottom: none; } .no-changes { color: #64748b; font-style: italic; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/api/status" class="back-link">← Back to Status</a><h1>Change History</h1><p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>' + entriesHtml + "</div></body></html>";
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Change History - Mason County Jail Roster Monitor</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #93bd8b; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    .subtitle { color: #4c6e60; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #93bd8b; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
+    .changes { margin-top: 0.75rem; }
+    .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
+    .changes.booked h4 { color: #701e77; }
+    .changes.released h4 { color: #3e7400; }
+    .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
+    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
+    .changes ul li:last-child { border-bottom: none; }
+    .no-changes { color: #4c6e60; font-style: italic; }
+    .no-data { color: #4c6e60; text-align: center; padding: 3rem; }
+    a { color: #589270; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/api/status" class="back-link">← Back to Status</a>
+    <h1>Change History</h1>
+    <p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>
+    ${entriesHtml}
+  </div>
+</body>
+</html>`;
 
   res.send(html);
 });
