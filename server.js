@@ -89,7 +89,7 @@ app.get('/api/status', (req, res) => {
     h1 { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #38bdf8; letter-spacing: 1px; }
     .status { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #127992; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
@@ -97,8 +97,8 @@ app.get('/api/status', (req, res) => {
     .stat:last-child { border-bottom: none; }
     .stat-label { color: #94a3b8; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #22c55e; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #16a34a; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #127992; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn:hover { background: #127992; }
     .footer { text-align: center; color: #64748b; font-size: 0.875rem; margin-top: 1.5rem; }
     a { color: #38bdf8; text-decoration: none; }
   </style>
