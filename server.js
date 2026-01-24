@@ -134,6 +134,7 @@ app.get('/api/status', (req, res) => {
         </div>
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
+<a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
