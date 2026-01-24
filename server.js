@@ -95,12 +95,12 @@ app.get('/api/status', (req, res) => {
     .stats { display: grid; gap: 1rem; }
     .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #334155; }
     .stat:last-child { border-bottom: none; }
-    .stat-label { color: #94a3b8; }
+    .stat-label { color: #94b8b5; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #127992; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #127992; }
-    .footer { text-align: center; color: #64748b; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #38bdf8; text-decoration: none; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #385517; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn:hover { background: #129252; }
+    .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
+    a { color: #38f8bf; text-decoration: none; }
   </style>
 </head>
 <body>
