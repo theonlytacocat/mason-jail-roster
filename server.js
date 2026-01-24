@@ -136,7 +136,7 @@ app.get('/api/status', (req, res) => {
       <a href="/api/run" class="run-btn">Run Check Now</a>
     </div>
     <div class="footer">
-      <p><a href="/api/history">View Change History</a> | <a href="/api/emails">View Email History</a></p>
+      <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
     </div>
   </div>
@@ -372,64 +372,6 @@ app.get('/api/history', (req, res) => {
   }).join("") : "<p class='no-data'>No changes recorded yet. Run the workflow to start monitoring.</p>";
 
   const html = '<!DOCTYPE html><html><head><title>Change History - Mason County Jail Roster Monitor</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Arial, sans-serif; font-size: 8pt; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 900px; margin: 0 auto; } h1 { font-size: 14pt; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .entry { background: #1e293b; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; } .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f8fafc; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; } .changes { margin-top: 0.75rem; } .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; } .changes.booked h4 { color: #ef4444; } .changes.released h4 { color: #22c55e; } .changes ul { list-style: none; font-size: 8pt; color: #94a3b8; } .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; } .changes ul li:last-child { border-bottom: none; } .no-changes { color: #64748b; font-style: italic; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/api/status" class="back-link">← Back to Status</a><h1>Change History</h1><p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>' + entriesHtml + "</div></body></html>";
-
-  res.send(html);
-});
-
-// Email history page
-app.get('/api/emails', (req, res) => {
-  const dataDir = STORAGE_DIR;
-  let emailLog = "";
-  let emails = [];
-
-  try {
-    const logFile = path.join(dataDir, "email_log.txt");
-    if (fs.existsSync(logFile)) {
-      emailLog = fs.readFileSync(logFile, "utf-8");
-
-      const sections = emailLog.split("================================================================================").filter(s => s.trim());
-      for (let i = 0; i < sections.length; i += 2) {
-        const header = sections[i] || "";
-        const content = sections[i + 1] || "";
-
-        const timestampMatch = header.match(/Email sent at: (.+)/);
-        const toMatch = content.match(/To: (.+)/);
-        const subjectMatch = content.match(/Subject: (.+)/);
-        const messageIdMatch = content.match(/Message ID: (.+)/);
-        const summaryMatch = content.match(/Summary: (.+)/);
-
-        if (timestampMatch) {
-          emails.push({
-            timestamp: timestampMatch[1].trim(),
-            to: toMatch ? toMatch[1].trim() : "",
-            subject: subjectMatch ? subjectMatch[1].trim() : "",
-            messageId: messageIdMatch ? messageIdMatch[1].trim() : "",
-            summary: summaryMatch ? summaryMatch[1].trim() : ""
-          });
-        }
-      }
-    }
-  } catch (e) {
-    emailLog = "Error reading email log: " + String(e);
-  }
-
-  const emailsHtml = emails.length > 0 ? emails.reverse().map(email => {
-    const date = new Date(email.timestamp);
-    const pstEmailDate = date.toLocaleString("en-US", {
-      timeZone: "America/Los_Angeles",
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    }) + " PST";
-    
-    return '<div class="email"><div class="email-header">' + pstEmailDate + '</div><div class="email-details"><p><strong>To:</strong> ' + email.to + "</p><p><strong>Subject:</strong> " + email.subject + "</p><p><strong>Summary:</strong> " + email.summary + '</p><p class="message-id">Message ID: ' + email.messageId + "</p></div></div>";
-  }).join("") : "<p class='no-data'>No emails sent yet. Emails are sent when roster changes are detected.</p>";
-
-  const html = '<!DOCTYPE html><html><head><title>Email History - Mason County Jail Roster Monitor</title><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>* { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 2rem; } .container { max-width: 800px; margin: 0 auto; } h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: #38bdf8; } .subtitle { color: #64748b; margin-bottom: 2rem; } .back-link { display: inline-block; margin-bottom: 1.5rem; color: #38bdf8; text-decoration: none; } .back-link:hover { text-decoration: underline; } .email { background: #1e293b; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; } .email-header { font-weight: 600; margin-bottom: 1rem; color: #22c55e; border-bottom: 1px solid #334155; padding-bottom: 0.75rem; } .email-details p { margin: 0.5rem 0; color: #94a3b8; } .email-details strong { color: #e2e8f0; } .message-id { font-size: 0.75rem; color: #64748b; margin-top: 1rem !important; } .no-data { color: #64748b; text-align: center; padding: 3rem; } a { color: #38bdf8; }</style></head><body><div class="container"><a href="/api/status" class="back-link">← Back to Status</a><h1>Email History</h1><p class="subtitle">Record of all notification emails sent</p>' + emailsHtml + "</div></body></html>";
 
   res.send(html);
 });
