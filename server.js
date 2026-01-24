@@ -86,7 +86,7 @@ app.get('/api/status', (req, res) => {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #93bd8b; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     .container { max-width: 500px; padding: 2rem; }
-    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -3px; }
+    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
     .status-dot { width: 12px; height: 12px; background: #5f8a2f; border-radius: 50%; animation: pulse 2s infinite; }
@@ -98,9 +98,9 @@ app.get('/api/status', (req, res) => {
     .stat-label { color: #94b8b5; }
     .stat-value { font-weight: 500; }
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #385517; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #129252; }
+    .run-btn:hover { background: #93bd8b; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #38f8bf; text-decoration: none; }
+    a { color: #589270; text-decoration: none; }
   </style>
 </head>
 <body>
