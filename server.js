@@ -293,16 +293,19 @@ app.get('/api/run', async (req, res) => {
     }
 
     function formatBooked(b) {
-      return b.name + " | Booking Time: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
+      return b.name + " | Booked: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
     }
 
     function formatReleased(b, stats, isPending = false) {
       const releaseInfo = stats.get(b.name);
       if (releaseInfo) {
+        const bailAmount = parseFloat(releaseInfo.bail.replace(/[$,]/g, ''));
+        const bailText = bailAmount > 0 ? " | Bail Posted: " + releaseInfo.bail : "";
+        
         return {
           text: b.name + " | Released: " + releaseInfo.releaseDateTime + 
                 " | Time served: " + releaseInfo.timeServed + 
-                " | Bail: " + releaseInfo.bail + 
+                bailText +
                 " (" + releaseInfo.releaseType + ")" +
                 " | Charges: " + (b.charges.join(", ") || "None listed"),
           hasPendingDetails: false
@@ -416,13 +419,16 @@ app.get('/api/run', async (req, res) => {
         "Release details update at: " + timestamp +
         "\n================================================================================\n" +
         "UPDATED RELEASE INFORMATION (" + updatedReleases.length + "):\n" +
-        updatedReleases.map(r => 
-          "  ✓ " + r.name + " | Released: " + r.details.releaseDateTime + 
-          " | Time served: " + r.details.timeServed + 
-          " | Bail: " + r.details.bail + 
-          " (" + r.details.releaseType + ")" +
-          " | Charges: " + (r.charges.join(", ") || "None listed")
-        ).join("\n") + "\n";
+        updatedReleases.map(r => {
+          const bailAmount = parseFloat(r.details.bail.replace(/[$,]/g, ''));
+          const bailText = bailAmount > 0 ? " | Bail Posted: " + r.details.bail : "";
+          
+          return "  ✓ " + r.name + " | Released: " + r.details.releaseDateTime + 
+            " | Time served: " + r.details.timeServed + 
+            bailText +
+            " (" + r.details.releaseType + ")" +
+            " | Charges: " + (r.charges.join(", ") || "None listed");
+        }).join("\n") + "\n";
       
       fs.appendFileSync(logFile, updateEntry);
     }
