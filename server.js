@@ -12,6 +12,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
+const RELEASE_STATS_URL = 'https://hub.masoncountywa.gov/sheriff/reports/release_stats48hrs.pdf';
 const STORAGE_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
 
 // Ensure storage directory exists
@@ -21,6 +22,44 @@ function ensureStorageDir() {
   }
 }
 ensureStorageDir();
+
+// Parse release stats PDF
+async function fetchReleaseStats() {
+  try {
+    const response = await fetch(RELEASE_STATS_URL);
+    if (!response.ok) return new Map();
+    
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    const text = result.text;
+    
+    const releaseMap = new Map();
+    const lines = text.split('\n');
+    
+    for (const line of lines) {
+      // Match: Date/Time | Name | Release Type | Credit Served | Bail
+      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,'-]+?)\s+\.\s+(R[A-Z]{2})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
+      
+      if (match) {
+        const [, date, time, name, releaseType, timeServed, bail] = match;
+        const cleanName = name.trim().replace(/\s+/g, ' ');
+        
+        releaseMap.set(cleanName, {
+          releaseDateTime: `${date} ${time}`,
+          releaseType,
+          timeServed: timeServed.replace(/\s+/g, ''),
+          bail: `$${bail}`
+        });
+      }
+    }
+    
+    return releaseMap;
+  } catch (error) {
+    console.error('Error fetching release stats:', error);
+    return new Map();
+  }
+}
 
 // Redirect root to status
 app.get('/', (req, res) => {
@@ -152,6 +191,7 @@ app.get('/api/run', async (req, res) => {
   try {
     ensureStorageDir();
 
+    // Fetch main roster
     const response = await fetch(PDF_URL);
     if (!response.ok) {
       throw new Error("Failed to download PDF: " + response.status);
@@ -169,12 +209,16 @@ app.get('/api/run', async (req, res) => {
     const textPath = path.join(STORAGE_DIR, "current_text.txt");
     fs.writeFileSync(textPath, text);
 
+    // Fetch release stats
+    const releaseStats = await fetchReleaseStats();
+
     const currentHash = crypto.createHash("md5").update(text).digest("hex");
     const timestamp = new Date().toISOString();
 
     const hashFile = path.join(STORAGE_DIR, "prev_hash.txt");
     const rosterFile = path.join(STORAGE_DIR, "prev_roster.txt");
     const logFile = path.join(STORAGE_DIR, "change_log.txt");
+    const pendingReleasesFile = path.join(STORAGE_DIR, "pending_releases.json");
 
     let previousHash;
     let previousText;
@@ -182,6 +226,16 @@ app.get('/api/run', async (req, res) => {
     let isFirstRun = false;
     let addedLines = [];
     let removedLines = [];
+    
+    // Load pending releases
+    let pendingReleases = [];
+    if (fs.existsSync(pendingReleasesFile)) {
+      try {
+        pendingReleases = JSON.parse(fs.readFileSync(pendingReleasesFile, "utf-8"));
+      } catch (e) {
+        pendingReleases = [];
+      }
+    }
 
     function extractBookings(rosterText) {
       const bookings = new Map();
@@ -219,9 +273,11 @@ app.get('/api/run', async (req, res) => {
             inCharges = true;
             continue;
           }
-          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol/)) {
+          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:/)) {
             const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+/);
-            if (m) charges.push(m[1].trim());
+            if (m) {
+              charges.push(m[1].trim());
+            }
           }
         }
 
@@ -237,11 +293,36 @@ app.get('/api/run', async (req, res) => {
     }
 
     function formatBooked(b) {
-      return b.name + " | Booked: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
+      return b.name + " | Booking Time: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
     }
 
-    function formatReleased(b) {
-      return b.name + " | Released: " + b.releaseDate + " | Charges: " + (b.charges.join(", ") || "None listed");
+    function formatReleased(b, stats, isPending = false) {
+      const releaseInfo = stats.get(b.name);
+      if (releaseInfo) {
+        return {
+          text: b.name + " | Released: " + releaseInfo.releaseDateTime + 
+                " | Time served: " + releaseInfo.timeServed + 
+                " | Bail: " + releaseInfo.bail + 
+                " (" + releaseInfo.releaseType + ")" +
+                " | Charges: " + (b.charges.join(", ") || "None listed"),
+          hasPendingDetails: false
+        };
+      }
+      
+      // No release stats available yet
+      if (isPending) {
+        return {
+          text: b.name + " | Released: " + b.releaseDate + " (exact time pending)" + 
+                " | Charges: " + (b.charges.join(", ") || "None listed"),
+          hasPendingDetails: true,
+          bookingData: b
+        };
+      }
+      
+      return {
+        text: b.name + " | Released: " + b.releaseDate + " | Charges: " + (b.charges.join(", ") || "None listed"),
+        hasPendingDetails: false
+      };
     }
 
     if (fs.existsSync(hashFile) && fs.existsSync(rosterFile)) {
@@ -258,21 +339,61 @@ app.get('/api/run', async (req, res) => {
             addedLines.push(formatBooked(booking));
           }
         }
+        
+        // Track releases
+        const newPendingReleases = [];
         for (const [id, booking] of previousBookings) {
           if (!currentBookings.has(id)) {
-            removedLines.push(formatReleased(booking));
+            const releaseResult = formatReleased(booking, releaseStats, true);
+            removedLines.push(releaseResult.text);
+            
+            // If release details are pending, track it
+            if (releaseResult.hasPendingDetails) {
+              newPendingReleases.push({
+                name: booking.name,
+                bookingData: booking,
+                detectedAt: timestamp
+              });
+            }
           }
         }
+        
+        // Update pending releases list
+        pendingReleases = [...pendingReleases, ...newPendingReleases];
+        
         addedLines = addedLines.slice(0, 30);
         removedLines = removedLines.slice(0, 30);
       }
     } else {
       isFirstRun = true;
     }
+    
+    // Check for updates to pending releases
+    let updatedReleases = [];
+    let stillPending = [];
+    
+    for (const pending of pendingReleases) {
+      const releaseInfo = releaseStats.get(pending.name);
+      if (releaseInfo) {
+        // Found updated info!
+        updatedReleases.push({
+          name: pending.name,
+          details: releaseInfo,
+          charges: pending.bookingData.charges
+        });
+      } else {
+        // Still waiting for details
+        stillPending.push(pending);
+      }
+    }
+    
+    // Save updated pending list
+    fs.writeFileSync(pendingReleasesFile, JSON.stringify(stillPending, null, 2));
 
     fs.writeFileSync(hashFile, currentHash);
     fs.writeFileSync(rosterFile, text);
 
+    // Build log entry for roster changes
     const logEntry =
       "\n================================================================================\n" +
       (isFirstRun ? "Initial capture" : hasChanged ? "Change detected" : "No change") +
@@ -287,12 +408,33 @@ app.get('/api/run', async (req, res) => {
          : "No changes detected.\n");
 
     fs.appendFileSync(logFile, logEntry);
+    
+    // Add separate entry for updated release details if any
+    if (updatedReleases.length > 0) {
+      const updateEntry =
+        "\n================================================================================\n" +
+        "Release details update at: " + timestamp +
+        "\n================================================================================\n" +
+        "UPDATED RELEASE INFORMATION (" + updatedReleases.length + "):\n" +
+        updatedReleases.map(r => 
+          "  ✓ " + r.name + " | Released: " + r.details.releaseDateTime + 
+          " | Time served: " + r.details.timeServed + 
+          " | Bail: " + r.details.bail + 
+          " (" + r.details.releaseType + ")" +
+          " | Charges: " + (r.charges.join(", ") || "None listed")
+        ).join("\n") + "\n";
+      
+      fs.appendFileSync(logFile, updateEntry);
+    }
 
     const message = isFirstRun
       ? "Initial roster captured successfully!"
       : hasChanged
-        ? "Changes detected! " + addedLines.length + " new bookings, " + removedLines.length + " releases."
-        : "No changes detected.";
+        ? "Changes detected! " + addedLines.length + " new bookings, " + removedLines.length + " releases." +
+          (updatedReleases.length > 0 ? " Also updated " + updatedReleases.length + " release details." : "")
+        : updatedReleases.length > 0
+          ? "Updated release details for " + updatedReleases.length + " inmates."
+          : "No changes detected.";
 
     const html =
       '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/status"><style>body{font-family:sans-serif;background:#181818;color:#93bd8b;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#5f8a2f;font-size:3rem;margin-bottom:1rem;}h1{color:#b8b8b8;margin-bottom:1rem;}p{color:#94b8b5;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
@@ -326,18 +468,21 @@ app.get('/api/history', (req, res) => {
         const header = sections[i] || "";
         const content = sections[i + 1] || "";
 
-        const timestampMatch = header.match(/(?:Change detected at|Initial capture at|No change at): (.+)/);
+        const timestampMatch = header.match(/(?:Change detected at|Initial capture at|No change at|Release details update at): (.+)/);
         if (timestampMatch) {
-          const addedMatch = content.match(/(?:BOOKED|New Bookings|Added lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:RELEASED|Releases|Removed lines)|$)/);
-          const removedMatch = content.match(/(?:RELEASED|Releases|Removed lines) \((\d+)\):\n([\s\S]*?)$/);
+          const addedMatch = content.match(/(?:BOOKED|New Bookings|Added lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:RELEASED|Releases|Removed lines|UPDATED)|$)/);
+          const removedMatch = content.match(/(?:RELEASED|Releases|Removed lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:UPDATED)|$)/);
+          const updatedMatch = content.match(/(?:UPDATED RELEASE INFORMATION) \((\d+)\):\n([\s\S]*?)$/);
 
           const added = addedMatch ? addedMatch[2].split("\n").filter(l => l.trim().startsWith("+")).map(l => l.replace(/^\s*\+\s*/, "")) : [];
           const removed = removedMatch ? removedMatch[2].split("\n").filter(l => l.trim().startsWith("-")).map(l => l.replace(/^\s*-\s*/, "")) : [];
+          const updated = updatedMatch ? updatedMatch[2].split("\n").filter(l => l.trim().startsWith("✓")).map(l => l.replace(/^\s*✓\s*/, "")) : [];
 
           entries.push({
             timestamp: timestampMatch[1].trim(),
             added,
-            removed
+            removed,
+            updated
           });
         }
       }
@@ -367,9 +512,13 @@ app.get('/api/history', (req, res) => {
     const removedMore = entry.removed.length > 50 ? "<li>...and " + (entry.removed.length - 50) + " more</li>" : "";
     const removedHtml = entry.removed.length > 0 ? '<div class="changes released"><h4>RELEASED (' + entry.removed.length + ")</h4><ul>" + removedItems + removedMore + "</ul></div>" : "";
 
-    const noChanges = !addedHtml && !removedHtml ? "<p class='no-changes'>Initial roster capture</p>" : "";
+    const updatedItems = entry.updated ? entry.updated.slice(0, 50).map(u => "<li>" + u + "</li>").join("") : "";
+    const updatedMore = entry.updated && entry.updated.length > 50 ? "<li>...and " + (entry.updated.length - 50) + " more</li>" : "";
+    const updatedHtml = entry.updated && entry.updated.length > 0 ? '<div class="changes updated"><h4>UPDATED RELEASE INFO (' + entry.updated.length + ")</h4><ul>" + updatedItems + updatedMore + "</ul></div>" : "";
 
-    return '<div class="entry"><div class="entry-header">' + pstDate + "</div>" + addedHtml + removedHtml + noChanges + "</div>";
+    const noChanges = !addedHtml && !removedHtml && !updatedHtml ? "<p class='no-changes'>Initial roster capture</p>" : "";
+
+    return '<div class="entry"><div class="entry-header">' + pstDate + "</div>" + addedHtml + removedHtml + updatedHtml + noChanges + "</div>";
   }).join("") : "<p class='no-data'>No changes recorded yet. Run the workflow to start monitoring.</p>";
 
   const html = `<!DOCTYPE html>
@@ -395,6 +544,7 @@ app.get('/api/history', (req, res) => {
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
     .changes.booked h4 { color: #701e77; }
     .changes.released h4 { color: #3e7400; }
+    .changes.updated h4 { color: #589270; }
     .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
     .changes ul li:last-child { border-bottom: none; }
