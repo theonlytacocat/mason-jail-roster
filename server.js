@@ -220,7 +220,7 @@ app.get('/api/run', async (req, res) => {
             continue;
           }
           if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol/)) {
-            const m = t.match(/^\S+\s+(.+?)\s+(DIST|SUPR|MUNI)/);
+            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+/);
             if (m) charges.push(m[1].trim());
           }
         }
