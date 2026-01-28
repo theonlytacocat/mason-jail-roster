@@ -12,7 +12,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
-const STORAGE_DIR = path.join(__dirname, '.mastra', 'output', '.data');
+const STORAGE_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
 
 // Ensure storage directory exists
 function ensureStorageDir() {
