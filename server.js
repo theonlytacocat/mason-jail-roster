@@ -210,6 +210,11 @@ app.get('/api/run', async (req, res) => {
 
     const textPath = path.join(STORAGE_DIR, "current_text.txt");
     fs.writeFileSync(textPath, text);
+    
+    // Also save a sample block for debugging
+    const sampleBlock = text.substring(0, 2000);
+    const debugPath = path.join(STORAGE_DIR, "debug_sample.txt");
+    fs.writeFileSync(debugPath, sampleBlock);
 
     // Fetch release stats
     const releaseStats = await fetchReleaseStats();
@@ -269,20 +274,47 @@ app.get('/api/run', async (req, res) => {
         const charges = [];
         const lines = block.split("\n");
         let inCharges = false;
+        
         for (const line of lines) {
           const t = line.trim();
-          if (t.includes("Statute") && t.includes("Offense")) {
+          
+          // Start capturing after we see the header
+          if (t.startsWith("Statute") && t.includes("Offense")) {
             inCharges = true;
             continue;
           }
-          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:|^Report Includes:/)) {
-            // Simple approach: split by multiple spaces, offense description is between statute and court
-            const parts = t.split(/\s{2,}/); // Split by 2+ spaces
-            if (parts.length >= 3) {
-              // parts[0] = statute, parts[1] = offense, parts[2] = court + offense code + class
-              const offense = parts[1].trim();
-              if (offense && offense.length > 2) {
-                charges.push(offense);
+          
+          // Stop if we hit another booking or page marker
+          if (t.startsWith("Booking #:") || t.startsWith("Page ") || t.startsWith("Current Inmate")) {
+            break;
+          }
+          
+          // If we're in the charges section and line isn't empty or a header
+          if (inCharges && t.length > 0) {
+            // Skip various non-charge lines
+            if (t.includes("Name Number:") || t.includes("Book Date:") || t.includes("Rel Date:") || 
+                t.includes("rpjlciol") || t.includes("Report Includes") || t.startsWith("--")) {
+              continue;
+            }
+            
+            // Try to extract offense - format is typically:
+            // "STATUTE_CODE OFFENSE_DESCRIPTION COURT_TYPE OFFENSE_CODE CLASS"
+            // Example: "72.09.310 Failure to Appear SUPR FTA FC"
+            
+            // Match lines that start with statute code pattern
+            if (/^[\d\w.()]+\s/.test(t)) {
+              // Remove the statute code at start
+              const withoutStatute = t.replace(/^[\d\w.()]+\s+/, '');
+              
+              // Find where court type starts (DIST, SUPR, MUNI, DOC)
+              const courtMatch = withoutStatute.match(/\s+(DIST|SUPR|MUNI|DOC)\s+/);
+              
+              if (courtMatch) {
+                // Extract everything before the court type
+                const offense = withoutStatute.substring(0, courtMatch.index).trim();
+                if (offense && offense.length > 1) {
+                  charges.push(offense);
+                }
               }
             }
           }
