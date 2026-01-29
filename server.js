@@ -276,9 +276,9 @@ app.get('/api/run', async (req, res) => {
             continue;
           }
           if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:/)) {
-            // Match pattern: statute code, then offense description, then court type, then offense class
-            // Example: "9A.36.041 Assault, Simple SUPR ASSI GM"
-            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+\w+\s+\w+/);
+            // Match: statute code, then offense description (can have commas), then court type, then offense code, then class
+            // Handle multiple spaces between fields
+            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+\w+\s+\w+$/);
             if (m) {
               charges.push(m[1].trim());
             }
