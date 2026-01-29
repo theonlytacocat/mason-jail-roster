@@ -39,11 +39,13 @@ async function fetchReleaseStats() {
     
     for (const line of lines) {
       // Match: Date/Time | Name | Release Type | Credit Served | Bail
-      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,'-]+?)\s+\.\s+(R[A-Z]{2})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
+      // Handle names with periods like "ALLEN, HAROLD F. III"
+      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+\.\s*(R[A-Z]{2,3})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
       
       if (match) {
         const [, date, time, name, releaseType, timeServed, bail] = match;
-        const cleanName = name.trim().replace(/\s+/g, ' ');
+        // Clean up name - remove trailing periods and extra spaces
+        const cleanName = name.trim().replace(/\.\s*$/, '').replace(/\s+/g, ' ');
         
         releaseMap.set(cleanName, {
           releaseDateTime: `${date} ${time}`,
@@ -274,7 +276,9 @@ app.get('/api/run', async (req, res) => {
             continue;
           }
           if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:/)) {
-            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+/);
+            // Match pattern: statute code, then offense description, then court type, then offense class
+            // Example: "9A.36.041 Assault, Simple SUPR ASSI GM"
+            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+\w+\s+\w+/);
             if (m) {
               charges.push(m[1].trim());
             }
