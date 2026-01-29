@@ -199,6 +199,7 @@ app.get('/api/status', (req, res) => {
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #334155; color: #93bd8b; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -507,6 +508,62 @@ app.get('/api/run', async (req, res) => {
       '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
     res.send(html);
   }
+});
+
+// Legislative session page
+app.get('/legislative', (req, res) => {
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <title>Washington State Legislative Session News</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #181818; color: #93bd8b; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    .subtitle { color: #4c6e60; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .content { background: #000; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #93bd8b; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content p { margin-bottom: 1rem; color: #94b8b5; }
+    .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .content li { margin-bottom: 0.5rem; color: #94b8b5; }
+    a { color: #589270; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/api/status" class="back-link">← Back to Jail Roster Monitor</a>
+    <h1>Washington State Legislative Session News</h1>
+    <p class="subtitle">Updates and information about current legislative activity</p>
+    
+    <div class="content">
+      <h2>About This Page</h2>
+      <p>This page is dedicated to tracking and reporting on the Washington State Legislative Session.</p>
+      
+      <h2>How to Add Content</h2>
+      <p>Content for this page can be updated by editing the server.js file. You can add:</p>
+      <ul>
+        <li>Bill summaries and status updates</li>
+        <li>Committee hearing information</li>
+        <li>Legislative analysis and commentary</li>
+        <li>Links to relevant resources</li>
+      </ul>
+      
+      <h2>Useful Resources</h2>
+      <p><a href="https://leg.wa.gov" target="_blank">Washington State Legislature Website</a></p>
+      <p><a href="https://app.leg.wa.gov/billinfo/" target="_blank">Bill Information</a></p>
+    </div>
+  </div>
+</body>
+</html>`;
+  
+  res.send(html);
 });
 
 // History page
