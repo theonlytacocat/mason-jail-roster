@@ -298,42 +298,35 @@ app.get('/api/run', async (req, res) => {
           const t = line.trim();
           
           // Start capturing after we see the header
-          if (t.startsWith("Statute") && t.includes("Offense")) {
+          if (t.includes("Statute") && t.includes("Offense") && t.includes("Court")) {
             inCharges = true;
             continue;
           }
           
-          // Stop if we hit another booking or page marker
-          if (t.startsWith("Booking #:") || t.startsWith("Page ") || t.startsWith("Current Inmate")) {
+          // Stop if we hit another booking
+          if (t.startsWith("Booking #:")) {
             break;
           }
           
-          // If we're in the charges section and line isn't empty or a header
+          // If we're in the charges section
           if (inCharges && t.length > 0) {
-            // Skip various non-charge lines
+            // Skip headers and other non-charge lines
             if (t.includes("Name Number:") || t.includes("Book Date:") || t.includes("Rel Date:") || 
-                t.includes("rpjlciol") || t.includes("Report Includes") || t.startsWith("--")) {
+                t.includes("Page ") || t.includes("rpjlciol") || t.includes("Current Inmate")) {
               continue;
             }
             
-            // Try to extract offense - format is typically:
-            // "STATUTE_CODE OFFENSE_DESCRIPTION COURT_TYPE OFFENSE_CODE CLASS"
-            // Example: "72.09.310 Failure to Appear SUPR FTA FC"
+            // Format is: STATUTEOffenseDESCRIPTIONCOURT_TYPEOFFENSE_CODECLASS
+            // Example: "72.09.310Failure to AppearSUPRFTAFC"
+            // We need to extract the offense description between statute and court type
             
-            // Match lines that start with statute code pattern
-            if (/^[\d\w.()]+\s/.test(t)) {
-              // Remove the statute code at start
-              const withoutStatute = t.replace(/^[\d\w.()]+\s+/, '');
-              
-              // Find where court type starts (DIST, SUPR, MUNI, DOC)
-              const courtMatch = withoutStatute.match(/\s+(DIST|SUPR|MUNI|DOC)\s+/);
-              
-              if (courtMatch) {
-                // Extract everything before the court type
-                const offense = withoutStatute.substring(0, courtMatch.index).trim();
-                if (offense && offense.length > 1) {
-                  charges.push(offense);
-                }
+            // Match statute code at start, then capture until we hit DIST|SUPR|MUNI|DOC
+            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+?)(DIST|SUPR|MUNI|DOC)[A-Z]+[A-Z]{2}$/);
+            
+            if (match) {
+              const offense = match[1].trim();
+              if (offense && offense.length > 1) {
+                charges.push(offense);
               }
             }
           }
