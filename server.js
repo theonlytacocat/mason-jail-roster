@@ -275,22 +275,18 @@ app.get('/api/run', async (req, res) => {
             inCharges = true;
             continue;
           }
-          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:/)) {
-            // Debug: log what we're trying to match
-            console.log("Trying to match charge line:", t);
-            
-            // Match: statute code, then offense description (can have commas), then court type, then offense code, then class
-            // Handle multiple spaces between fields
-            const m = t.match(/^[\d\w.()]+\s+(.+?)\s+(DIST|SUPR|MUNI|DOC)\s+\w+\s+\w+$/);
-            if (m) {
-              console.log("MATCHED:", m[1].trim());
-              charges.push(m[1].trim());
-            } else {
-              console.log("NO MATCH");
+          if (inCharges && t && !t.match(/^Booking #:|^--|^Page|^Current|^rpjlciol|^Name Number:|^Book Date:|^Rel Date:|^Report Includes:/)) {
+            // Simple approach: split by multiple spaces, offense description is between statute and court
+            const parts = t.split(/\s{2,}/); // Split by 2+ spaces
+            if (parts.length >= 3) {
+              // parts[0] = statute, parts[1] = offense, parts[2] = court + offense code + class
+              const offense = parts[1].trim();
+              if (offense && offense.length > 2) {
+                charges.push(offense);
+              }
             }
           }
         }
-        console.log("Total charges found:", charges.length);
 
         bookings.set(id, {
           id,
