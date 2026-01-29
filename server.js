@@ -63,6 +63,25 @@ async function fetchReleaseStats() {
   }
 }
 
+// Debug endpoint to see parsed PDF text
+app.get('/api/debug', async (req, res) => {
+  try {
+    const response = await fetch(PDF_URL);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    const text = result.text;
+    
+    // Get first 3000 characters
+    const sample = text.substring(0, 3000);
+    
+    res.setHeader('Content-Type', 'text/plain');
+    res.send(sample);
+  } catch (error) {
+    res.send('Error: ' + error.message);
+  }
+});
+
 // Redirect root to status
 app.get('/', (req, res) => {
   res.redirect('/api/status');
