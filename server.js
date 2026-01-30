@@ -548,11 +548,24 @@ app.get('/legislative', (req, res) => {
       <p class="update-date">Updates: 1/29/2026</p>
 
       <h2>TAXES & BUDGET (The Big Money Fights)</h2>
-      <h3>Millionaire's Income Tax</h3>
-      <p>Nearly 10% tax on people making over $1 million/year, would raise $3 billion annually. Super controversial since WA has never had an income tax and it might violate the state constitution. Republicans threatening lawsuits.</p>
+      <h3>Millionaire's Income Tax (9.9% Rate - No Bill Number Yet)</h3>
+      <p><strong>Sponsor:</strong> Governor Bob Ferguson (D) - Has not been formally introduced as legislation yet</p>
+      <p><strong>What it does:</strong> 9.9% income tax on adjusted gross income over $1 million/year. Would raise at least $3 billion annually starting in 2029. Less than 0.5% of Washingtonians would pay it.</p>
+      <p><strong>Revenue would fund:</strong> Expanding Working Families Tax Credit, eliminating B&O tax for small businesses under $1M revenue, K-12 education funding, eliminating sales tax on hygiene products/baby formula/diapers/essential clothing.</p>
+      <p><strong>The controversy:</strong> This would be Washington's 12th attempt at an income tax since 1932 - voters rejected it 11 times. State Supreme Court has ruled income taxes unconstitutional. In March 2024, legislature passed Initiative 2111 which bans ANY income tax in Washington. Ferguson says he's confident courts would uphold this version and wants it to go before voters as a constitutional amendment. Combined with Seattle's payroll tax, millionaires in Seattle could face an 18.037% top rate - highest in the nation.</p>
+      <p><strong>Support:</strong> Governor Ferguson, Democratic legislative majority, unions. Ferguson promises constitutional amendment to lock tax at $1M+ threshold forever.</p>
+      <p><strong>Opposition:</strong> Republicans calling it a "nonstarter" due to legal precedent and I-2111. Business groups warn it would drive tech workers and companies out of state. Critics note it won't help current $2.3B budget shortfall since revenue won't arrive until 2029. Particularly harsh on tech workers with RSUs (restricted stock units) that vest all at once.</p>
+      <p><strong>Status:</strong> Ferguson announced support Dec 2025. Awaiting formal bill introduction. Guaranteed court challenge if passed.</p>
       
-      <h3>Payroll Tax on High Earners (HB 2100)</h3>
-      <p>5% tax on employers for employees making over $125k/year to fund "Well Washington Fund" for healthcare/education/human services.</p>
+      <h3>Payroll Tax on High Earners - HB 2100 "Well Washington Fund"</h3>
+      <p><strong>Sponsor:</strong> Rep. Shaun Scott (D-Seattle, Democratic Socialist), co-sponsors include Reps. Mena, Thomas, Reed, Parshley, Hill, Ryu, Doglio, Simmons, Peterson, Berry, Pollet, Santos, Street, Gregerson, Obras, Farivar, Macri, Fosse</p>
+      <p><strong>What it does:</strong> 5% payroll tax on employers for wages over $125,000/year. Only applies to companies with 20+ employees (potentially 250 in substitute version) and over $5 million in sales. Exempts companies with under $7 million total payroll. Modeled after Seattle's JumpStart tax. Amazon and companies already paying Seattle's tax would be exempt.</p>
+      <p><strong>Revenue projections:</strong> Scott initially estimated $2B/year. State fiscal note projects $11.8 billion for 2027-29 biennium, then $9.3 billion for 2029-31 biennium.</p>
+      <p><strong>Where money goes:</strong> 100% to state general fund until July 2027. After that, 51% goes to "Well Washington Fund" (healthcare, education, housing, energy programs), 49% stays in general fund.</p>
+      <p><strong>The controversy:</strong> Employers prohibited from passing costs to employees. Critics warn this will lead to higher consumer prices, reduced wage growth, job losses. Seattle has lost 5,500 jobs since passing JumpStart tax while Bellevue gained 4,000 jobs. Seattle's JumpStart generated $47 million LESS than projected in 2024. Joe Nguyen (former Ferguson Commerce Director, now Seattle Chamber CEO) warns it will hit grocery stores and healthcare providers, raising costs for everyone.</p>
+      <p><strong>Support:</strong> Democratic Socialists of America, SEIU unions, Tech 4 Taxes group, Superintendent of Public Instruction Chris Reykdal. Framed as protection against Trump administration federal funding cuts.</p>
+      <p><strong>Opposition:</strong> Association of Washington Business, Bellevue Chamber, Seattle Chamber, Associated General Contractors. Over 12,000 people (83% of virtual attendees) opposed at Jan 22 hearing vs. 3,000 supporters. Former Commerce Director Joe Nguyen testified AGAINST it. Business groups warn Washington would be first state in nation with this type of tax.</p>
+      <p><strong>Status:</strong> Public hearing held Jan 22, 2026 in House Finance Committee. Awaiting executive session vote. No vote scheduled yet as of Jan 29.</p>
       
       <h3>Advanced Computing Surcharge Cap Removal</h3>
       <p>Would eliminate the $75 million annual cap on big tech companies (Microsoft, Amazon) to fund higher education. Currently capped at $75M per company.</p>
@@ -570,21 +583,58 @@ app.get('/legislative', (req, res) => {
       <p>Rolling back recent tax hikes to keep investment local.</p>
 
       <h2>ARTIFICIAL INTELLIGENCE (14+ Bills)</h2>
-      <h3>AI Companion Chatbots (SB 5984/HB 2225)</h3>
-      <p>Regulating AI chatbots for minors after child suicides linked to AI. Prohibits romantic partnerships with minors, requires hourly notifications that it's not human. Private right of action included (tech industry trying to remove this).</p>
-      
-      <h3>AI in Schools (HB 2481/SB 5956)</h3>
-      <p>Requiring human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline of students. Protecting kids from being flagged by gun detection AI that mistakes chips bags for weapons.</p>
-      
-      <h3>Other AI Bills</h3>
+      <h3>AI Companion Chatbots - SB 5984 / HB 2225 (Governor's Priority)</h3>
+      <p><strong>Senate Sponsors:</strong> Sens. Lisa Wellman (D-Bellevue), Shewmake, Frame, Hasegawa, Nobles, Pedersen, Riccelli, Valdez, Wilson - By request of Governor Ferguson</p>
+      <p><strong>House Sponsors:</strong> Reps. Callan, Thomas, Ryu, Parshley, Simmons, Leavitt, Berry, Reed, Cortes, Mena, Rule, Stearns, Zahn, Eslick, Street, Wylie, Duerr, Kloba, Scott, Paul, Gregerson, Ormsby, Goodman, Reeves, Shavers, Thai, Macri, Fosse, Hill, Pollet, Salahuddin - By request of Governor Ferguson</p>
+      <p><strong>What it does:</strong> Regulates AI companion chatbots (like Character.AI) to protect minors after multiple child suicides linked to AI chatbots. Based on similar laws passed in California and New York in 2025.</p>
+      <p><strong>Key requirements:</strong></p>
       <ul>
-        <li>AI in Therapy - Regulating AI use in mental health treatment</li>
-        <li>AI in Health Insurance - Regulating AI authorization decisions for medical procedures</li>
-        <li>AI Training Data Transparency - Requiring disclosure of what data is used to train AI models</li>
-        <li>Collective Bargaining Around AI - Allowing unions to negotiate how AI is used in workplaces</li>
-        <li>High-Risk AI Systems - Regulating AI making impactful decisions in housing, employment, healthcare</li>
-        <li>Grocery Store AI Surveillance (HB 2481) - Regulating facial recognition and surge pricing based on AI</li>
+        <li>Chatbots must notify users every 3 hours "You are talking to an AI, not a human"</li>
+        <li>Prohibits romantic or sexual partnerships between AI and minors</li>
+        <li>Prohibits explicit content being shown to minors</li>
+        <li>Requires suicide ideation detection and prevention protocols</li>
+        <li>Bans "emotionally manipulative engagement techniques" (excessive praise, simulating emotional distress to keep users engaged)</li>
+        <li>Private right of action allowing individuals to sue companies</li>
       </ul>
+      <p><strong>The backstory:</strong> Mother Megan Garcia testified about her son who died by suicide after extended interactions with Character.AI chatbot. Research shows over 50 hours of conversations where chatbots groomed kids into romantic/sexual relationships, offered drugs, encouraged deceiving parents and stopping medication. Teens increasingly turning to AI for emotional support.</p>
+      <p><strong>Support:</strong> Governor Ferguson (major priority), broad bipartisan support. Sen. Wellman (D-Bellevue) alarmed by lawsuits and suicide cases. Expert testimony: "Based on my technical expertise, these protections are entirely feasible to implement today. Not doing so is a business choice."</p>
+      <p><strong>Opposition:</strong> Tech industry lobbying HARD to remove private right of action (ability to sue). Companies want immunity from lawsuits.</p>
+      <p><strong>Status:</strong> SB 5984 - Public hearing Jan 20 in Senate Environment, Energy & Technology Committee. Scheduled for executive session. HB 2225 - Passed out of House Technology Committee with substitute (1st substitute bill recommended). Moving to House Rules.</p>
+      
+      <h3>AI in Schools - SB 5956 (Student Discipline & Surveillance)</h3>
+      <p><strong>Sponsor:</strong> Sen. T'wina Nobles (D-Tacoma, 28th District)</p>
+      <p><strong>What it does:</strong> Sets statewide rules for AI use in schools - addressing surveillance, automated discipline, and student privacy. Requires human oversight of all AI systems affecting students.</p>
+      <p><strong>Six key prohibitions:</strong></p>
+      <ul>
+        <li>Cannot use AI as the SOLE basis for any student discipline decision</li>
+        <li>Cannot suspend, expel, or refer students to law enforcement based solely on AI predictions/scores</li>
+        <li>Cannot use AI to generate "risk scores" for individual students (no predictive profiling)</li>
+        <li>Cannot maintain student watchlists based on AI systems</li>
+        <li>BANS facial recognition technology in schools (accuracy issues especially for students of color)</li>
+        <li>Cannot use biometrics to infer students' psychological or personal characteristics</li>
+      </ul>
+      <p><strong>Real-world problem:</strong> Maryland student holding a bag of chips was flagged by gun detection AI that mistook the chip bag for a weapon. Schools across the country using AI for surveillance without transparency, context, or human judgment. Some systems assign "risk scores" to students, creating automated profiling.</p>
+      <p><strong>Additional protections:</strong> Limits when student data can be turned over to law enforcement. Directs WA State School Directors Association to develop model policy on human oversight of AI systems.</p>
+      <p><strong>Support:</strong> Sen. Nobles: "Decisions that affect our students' future must be made by people and not by algorithms." Black Education Strategy Roundtable strongly supports. Democrats pushing hard.</p>
+      <p><strong>Opposition:</strong> Tech industry resistance. Concerns about implementation costs (fiscal note expected).</p>
+      <p><strong>Status:</strong> Passed out of Senate Early Learning & K-12 Education Committee on Jan 22, 2026. Moving forward.</p>
+      
+      <h3>HB 2481 - Grocery Store AI Surveillance & Surge Pricing</h3>
+      <p><strong>What it does:</strong> Regulates use of facial recognition and AI-powered dynamic pricing (surge pricing) in grocery stores and retail. Prevents stores from using AI to jack up prices based on who's shopping or time of day.</p>
+      <p><strong>Status:</strong> In committee.</p>
+      
+      <h3>Other AI Bills (12+ Additional Proposals)</h3>
+      <p><strong>AI in Mental Health Treatment:</strong> Regulating AI chatbots and systems used in therapy and mental health services. Requires human oversight, informed consent, and safety protocols when AI is involved in patient care.</p>
+      
+      <p><strong>AI in Health Insurance:</strong> Regulating AI authorization systems that approve/deny medical procedures, surgeries, and treatments. Addresses concern that insurance companies are using AI to auto-deny claims without proper human review. Would require transparency about when AI is making coverage decisions.</p>
+      
+      <p><strong>AI Training Data Transparency:</strong> Would require AI companies to disclose what data they use to train their models. Particularly focused on whether copyrighted material, private data, or biased datasets are being used without permission or compensation.</p>
+      
+      <p><strong>Collective Bargaining Around AI:</strong> Allows labor unions to negotiate how AI is implemented in workplaces. Workers could bargain over AI surveillance, AI-based performance reviews, AI replacing jobs, and how AI tools are deployed.</p>
+      
+      <p><strong>High-Risk AI Systems:</strong> Comprehensive regulation of AI making high-stakes decisions in housing (rental applications, mortgage approvals), employment (hiring, firing, promotions), and healthcare (diagnosis, treatment). Would require impact assessments, bias testing, and human review before AI makes life-changing decisions.</p>
+      
+      <p><strong>The big picture:</strong> Washington attempting to be national leader in AI regulation with 14+ bills this session. Sen. Wellman: "As AI gets more sophisticated and into more markets, it's going to require constant eyes on it." Response to federal inaction - Congress has debated AI for years with little concrete action. States experimenting with their own guardrails.</p>
 
       <h2>HOUSING & DEVELOPMENT</h2>
       <h3>Remove Local Barriers (HB 2266/SB 6069)</h3>
