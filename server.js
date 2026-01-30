@@ -318,13 +318,21 @@ app.get('/api/run', async (req, res) => {
               continue;
             }
             
-            // Format: STATUTEOffenseDESCRIPTIONCOURT_TYPEOFFENSE_CODECLASS
-            // Example: "72.09.310Failure to AppearSUPRFTAFC"
-            // Court types are always: DIST, SUPR, MUNI, or DOC (all caps, 4 letters)
-            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+?)(DIST|SUPR|MUNI|DOC)[A-Z]+$/);
+            // Match pattern: STATUTE + OFFENSE + COURT (4 letters) + CODE (4 letters) + CLASS (2 letters)
+            // Examples:
+            // 72.09.310Failure to AppearSUPRFTAFC
+            // 9A.52.030Failure to AppearSUPRFTABW
+            // Court is always DIST, SUPR, MUNI, or DOC
+            // After court comes 4-letter offense code (like FTAF, TOFF, etc)
+            // Then 2-letter class (FC, BW, GM, etc)
+            
+            // Capture everything between statute code and the COURT code
+            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+)(DIST|SUPR|MUNI|DOC)[A-Z]{4}[A-Z]{2}$/);
             
             if (match) {
-              const offense = match[1].trim();
+              let offense = match[1].trim();
+              // Remove any trailing commas or spaces
+              offense = offense.replace(/[,\s]+$/, '');
               if (offense && offense.length > 1) {
                 charges.push(offense);
               }
@@ -546,7 +554,7 @@ app.get('/legislative', (req, res) => {
     <div class="content">
       <p class="update-date">Updates: 1/29/2026</p>
       
-      <h2>WASHINGTON STATE LEGISLATIVE SESSION - updates 01-26-2026</h2>
+      <h2>Washington state legislature 2026 - what's actually going on</h2>
 
       <h2>POLICE & PUBLIC SAFETY:</h2>
       <p>BAN ON POLICE FACE COVERINGS - Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ice raids. Lots of momentum.</p>
@@ -624,7 +632,7 @@ app.get('/legislative', (req, res) => {
       <p>GRAY WOLF RECLASSIFICATION - Downgrading from "endangered" to "sensitive" status.</p>
       <p>DISCOVER PASS PRICE HIKE - Increasing from $30 to $45 for state parks access, would be the first increase in 14 years.</p>
 
-      <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">Source: <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
+      <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
     </div>
   </div>
 </body>
