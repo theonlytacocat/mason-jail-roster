@@ -199,7 +199,7 @@ app.get('/api/status', (req, res) => {
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #334155; color: #93bd8b; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #445645; color: #ffa0f9; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -528,36 +528,222 @@ app.get('/legislative', (req, res) => {
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .content { background: #000; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #93bd8b; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content h2 { color: #ffa0f9; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
-    .content p { margin-bottom: 1rem; color: #94b8b5; }
+    .content h3 { color: #93bd8b; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
+    .content p { margin-bottom: 0.75rem; color: #94b8b5; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
     .content li { margin-bottom: 0.5rem; color: #94b8b5; }
+    .update-date { color: #ffa0f9; font-weight: bold; margin-bottom: 1rem; }
     a { color: #589270; }
   </style>
 </head>
 <body>
   <div class="container">
     <a href="/api/status" class="back-link">← Back to Jail Roster Monitor</a>
-    <h1>Washington State Legislative Session News</h1>
-    <p class="subtitle">Updates and information about current legislative activity</p>
+    <h1>Washington State Legislative Session</h1>
+    <p class="subtitle">2026 Session Updates and Bill Tracking</p>
     
     <div class="content">
-      <h2>About This Page</h2>
-      <p>This page is dedicated to tracking and reporting on the Washington State Legislative Session.</p>
+      <p class="update-date">Updates: 1/29/2026</p>
+
+      <h2>TAXES & BUDGET (The Big Money Fights)</h2>
+      <h3>Millionaire's Income Tax</h3>
+      <p>Nearly 10% tax on people making over $1 million/year, would raise $3 billion annually. Super controversial since WA has never had an income tax and it might violate the state constitution. Republicans threatening lawsuits.</p>
       
-      <h2>How to Add Content</h2>
-      <p>Content for this page can be updated by editing the server.js file. You can add:</p>
+      <h3>Payroll Tax on High Earners (HB 2100)</h3>
+      <p>5% tax on employers for employees making over $125k/year to fund "Well Washington Fund" for healthcare/education/human services.</p>
+      
+      <h3>Advanced Computing Surcharge Cap Removal</h3>
+      <p>Would eliminate the $75 million annual cap on big tech companies (Microsoft, Amazon) to fund higher education. Currently capped at $75M per company.</p>
+      
+      <h3>Higher Education Funding Reset</h3>
+      <p>10% tuition cuts for 3 years starting fall 2027, expanding Washington College Grant eligibility.</p>
+      
+      <h3>Paid Protester Tax</h3>
+      <p>Would tax temporary staffing agencies that provide "paid protesters" at protests (yes, really).</p>
+      
+      <h3>Bullion Tax Repeal (HB 2093)</h3>
+      <p>Republicans trying to eliminate the sales tax on gold/silver, saying it's driving coin shops out of business.</p>
+      
+      <h3>Reversing 2025 Tax Increases (HB 2101)</h3>
+      <p>Rolling back recent tax hikes to keep investment local.</p>
+
+      <h2>ARTIFICIAL INTELLIGENCE (14+ Bills)</h2>
+      <h3>AI Companion Chatbots (SB 5984/HB 2225)</h3>
+      <p>Regulating AI chatbots for minors after child suicides linked to AI. Prohibits romantic partnerships with minors, requires hourly notifications that it's not human. Private right of action included (tech industry trying to remove this).</p>
+      
+      <h3>AI in Schools (HB 2481/SB 5956)</h3>
+      <p>Requiring human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline of students. Protecting kids from being flagged by gun detection AI that mistakes chips bags for weapons.</p>
+      
+      <h3>Other AI Bills</h3>
       <ul>
-        <li>Bill summaries and status updates</li>
-        <li>Committee hearing information</li>
-        <li>Legislative analysis and commentary</li>
-        <li>Links to relevant resources</li>
+        <li>AI in Therapy - Regulating AI use in mental health treatment</li>
+        <li>AI in Health Insurance - Regulating AI authorization decisions for medical procedures</li>
+        <li>AI Training Data Transparency - Requiring disclosure of what data is used to train AI models</li>
+        <li>Collective Bargaining Around AI - Allowing unions to negotiate how AI is used in workplaces</li>
+        <li>High-Risk AI Systems - Regulating AI making impactful decisions in housing, employment, healthcare</li>
+        <li>Grocery Store AI Surveillance (HB 2481) - Regulating facial recognition and surge pricing based on AI</li>
+      </ul>
+
+      <h2>HOUSING & DEVELOPMENT</h2>
+      <h3>Remove Local Barriers (HB 2266/SB 6069)</h3>
+      <p>Streamlining development of supportive/transitional/emergency housing by removing local regulatory barriers.</p>
+      
+      <h3>Scissor Stairs (HB 2228)</h3>
+      <p>Legalizing scissor stairwells in apartment buildings (common in Vancouver BC) to fit more units by wasting less space on hallways.</p>
+      
+      <h3>Elevator Reform</h3>
+      <p>Adopting smaller European elevator standards to make building cheaper and faster.</p>
+      
+      <h3>Commercial to Residential Conversion (SB 6026)</h3>
+      <p>Governor's priority - allowing mixed-use and residential in commercial zones without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
+      
+      <h3>Short-Term Rental Tax (SB 5576)</h3>
+      <p>Up to 4% excise tax on Airbnbs to fund affordable housing. Was statewide, amended to let local governments decide.</p>
+      
+      <h3>Parking Reform</h3>
+      <p>Already passed in 2025, now implementing rules reducing parking requirements that drive up housing costs.</p>
+
+      <h2>POLICE & PUBLIC SAFETY</h2>
+      <h3>Ban on Police Face Coverings</h3>
+      <p>Gaining major momentum. Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ICE raids where masked agents arrested people.</p>
+      
+      <h3>$100 Million Police Hiring Grants (SB 5060)</h3>
+      <p>Covers 75% of new officer salaries for 36 months. Ferguson's priority. Cities must implement 0.1% sales tax or already have similar tax to access funds.</p>
+      
+      <h3>Sheriff/Police Chief Requirements (HB 1399/SB 5974)</h3>
+      <p>New standards: min age 25, background checks, must maintain peace officer certification. Sheriffs PISSED, calling it unconstitutional.</p>
+      
+      <h3>Public Defense Crisis (SB 5404)</h3>
+      <p>Making state actually fund public defenders. WA is one of only 2 states that doesn't fully fund them, leading to overworked defenders and constitutional violations.</p>
+      
+      <h3>Other Safety Bills</h3>
+      <ul>
+        <li>Flock License Plate Camera Regulation - New bill would regulate automated license plate readers across the state</li>
+        <li>No Secret Police Act - Requiring law enforcement to be identifiable during arrests</li>
+      </ul>
+
+      <h2>GUN CONTROL</h2>
+      <ul>
+        <li>Permit to Purchase (HB 1163) - Requiring state permit before buying firearms, like a dozen other states have</li>
+        <li>Expanding Gun-Free Zones - Adding more locations where carrying firearms is illegal</li>
+        <li>Bulk Ammo Purchase Limits - Restricting how much ammunition can be bought at once</li>
+        <li>Mandatory Gun Storage in Cars/Homes - Requiring guns be locked up</li>
+        <li>Additional Gun Dealer Requirements - More regulations for firearm retailers</li>
+      </ul>
+
+      <h2>EDUCATION & PARENTAL RIGHTS</h2>
+      <h3>Parental Rights Initiatives</h3>
+      <p>Two super controversial initiatives coming that would:</p>
+      <ul>
+        <li>Give parents access to ALL school curriculum</li>
+        <li>Allow parents to see mental health counseling records from school counselors</li>
+        <li>One is being called a rewrite of last year's controversial HB 1296</li>
       </ul>
       
-      <h2>Useful Resources</h2>
-      <p><a href="https://leg.wa.gov" target="_blank">Washington State Legislature Website</a></p>
-      <p><a href="https://app.leg.wa.gov/billinfo/" target="_blank">Bill Information</a></p>
+      <h3>Special Education Funding Cap Removal</h3>
+      <p>Eliminating the 16% enrollment cap on special ed funding.</p>
+      
+      <h3>Eid State Holidays</h3>
+      <p>WA is first state to recognize Eid al-Fitr and Eid al-Adha as state holidays.</p>
+
+      <h2>IMMIGRATION</h2>
+      <h3>Immigrant Worker Protections (HB 2105/SB 5852)</h3>
+      <p>Requiring employers to give workers notice if ICE does an I-9 audit of legal work status.</p>
+
+      <h2>LABOR & WORKERS</h2>
+      <h3>Minimum Wage $17.13/hour</h3>
+      <p>Already in effect Jan 1, 2026. Highest in the nation. Some cities higher (Seattle $21.63, SeaTac $20.74).</p>
+      
+      <h3>Striking Workers Get Unemployment</h3>
+      <p>Already in effect. Strikers can collect up to 6 weeks of unemployment benefits after strike starts.</p>
+      
+      <h3>Paid Family Leave Expansion</h3>
+      <p>Job protection after just 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
+      
+      <h3>Other Worker Protections</h3>
+      <ul>
+        <li>Workplace Violence Prevention - Healthcare facilities must investigate violence incidents promptly and update prevention plans annually</li>
+        <li>Isolated Worker Protections - Panic buttons and safety measures for janitors, housekeepers, security guards who work alone</li>
+        <li>Hate Crime Victim Leave - Time off for victims to seek safety, medical care, counseling</li>
+      </ul>
+
+      <h2>HEALTHCARE & VACCINES</h2>
+      <h3>State Vaccine Authority (SB 5967/HB 2242)</h3>
+      <p>Governor's priority. Allowing WA Dept of Health to make vaccine recommendations independent of CDC/federal government. Response to Trump politicizing CDC. Does NOT create new mandates.</p>
+      
+      <h3>Already in Effect</h3>
+      <ul>
+        <li>Medical Debt Credit Reporting Ban - Medical debt can't be reported to credit agencies</li>
+        <li>Blood Type on Driver's License (SB 5689) - Voluntary blood type info on state IDs</li>
+      </ul>
+      
+      <h3>Other Healthcare Bills</h3>
+      <ul>
+        <li>Physician Assistant Compact - Joining interstate agreement for PA licensing</li>
+        <li>Mental Health Parity - Strengthening enforcement of mental health coverage requirements</li>
+      </ul>
+
+      <h2>ENVIRONMENT & ENERGY</h2>
+      <h3>Nuclear Power Strategic Framework</h3>
+      <p>Bipartisan push to embrace nuclear energy development. Department of Commerce to publish framework for opportunities/obstacles. No state funding - must use private money.</p>
+      
+      <h3>Wildfire Prevention Funding</h3>
+      <p>Fighting $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
+      
+      <h3>Other Environmental Initiatives</h3>
+      <ul>
+        <li>Clean Energy Grid Expansion - Accelerating transmission and renewable energy to meet climate goals while lowering bills</li>
+        <li>Big Truck Climate Push - New regulations targeting commercial vehicle emissions</li>
+      </ul>
+
+      <h2>TRANSPORTATION & ROADS</h2>
+      <h3>Reckless Driving Redefined (SB 5890)</h3>
+      <p>30+ mph over speed limit = reckless driving charge.</p>
+      
+      <h3>Reckless Interference with Emergency Operations (HB 2203)</h3>
+      <p>New driving offense for blocking emergency vehicles.</p>
+      
+      <h3>Ferry System Crisis</h3>
+      <p>7 of 21 ferries currently unable to sail due to mechanical issues and planned maintenance.</p>
+
+      <h2>CRIMINAL JUSTICE & CRIME</h2>
+      <ul>
+        <li>Political Affiliation Hate Crime (SB 5830) - Making it a Class C felony to assault someone based on their political beliefs</li>
+        <li>Juvenile Detention Overcrowding - Allowing youth transfers to state prisons and community facilities in certain cases</li>
+        <li>Early Release for Youth Offenders - Allowing people convicted before age 18 to petition for early release at age 24</li>
+        <li>DUI Lab Expansion - Allowing more labs to perform toxicology tests to speed up cases</li>
+      </ul>
+
+      <h2>CONSUMER & BUSINESS</h2>
+      <h3>Already in Effect</h3>
+      <ul>
+        <li>Nicotine/Vape Tax - 95% excise tax on ALL nicotine products including synthetic nicotine, vapes, pouches. A $7 product now costs $15.06 after taxes</li>
+        <li>Plastic Bag Fee Increase - Minimum charge raised from 8 cents to 12 cents per bag</li>
+      </ul>
+      
+      <h3>Pending Bills</h3>
+      <ul>
+        <li>Right to Repair (HB 1483) - Electronics manufacturers must provide parts and repair methods to independent shops</li>
+        <li>Luxury Vehicle Tax - New taxes on high-end cars</li>
+        <li>Permitting and Licensing Improvements - Governor's priority to streamline business permits</li>
+      </ul>
+
+      <h2>WEIRD/QUIRKY ONES</h2>
+      <ul>
+        <li>Diaper Changing Stations - Already in effect. Mandatory in all new/remodeled public buildings costing $15k+</li>
+        <li>Gray Wolf Reclassification - Downgrading from "endangered" to "sensitive" status</li>
+        <li>Discover Pass Price Hike - Increasing from $30 to $45 for state parks access. First increase in 14 years</li>
+        <li>Cannabis License Changes - Various updates to marijuana business regulations</li>
+        <li>Pesticide Committee Extension - Extending Pesticide Application Safety Committee to 2035</li>
+      </ul>
+
+      <h2>INITIATIVE PROCESS REFORM</h2>
+      <h3>Revamping Initiatives</h3>
+      <p>Democrats want to change how citizen initiatives work. Getting MASSIVE pushback from Republicans and initiative supporters who see it as Democrats trying to make it harder to challenge the legislature.</p>
+
+      <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
     </div>
   </div>
 </body>
