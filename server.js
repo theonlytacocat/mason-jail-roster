@@ -318,23 +318,27 @@ app.get('/api/run', async (req, res) => {
               continue;
             }
             
-            // Match pattern: STATUTE + OFFENSE + COURT (4 letters) + CODE (4 letters) + CLASS (2 letters)
-            // Examples:
-            // 72.09.310Failure to AppearSUPRFTAFC
-            // 9A.52.030Failure to AppearSUPRFTABW
-            // Court is always DIST, SUPR, MUNI, or DOC
-            // After court comes 4-letter offense code (like FTAF, TOFF, etc)
-            // Then 2-letter class (FC, BW, GM, etc)
+            // Find the court type in the string
+            let courtIndex = -1;
+            const courtTypes = ['DIST', 'SUPR', 'MUNI', 'DOC'];
             
-            // Capture everything between statute code and the COURT code
-            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+)(DIST|SUPR|MUNI|DOC)[A-Z]{4}[A-Z]{2}$/);
+            for (const court of courtTypes) {
+              const idx = t.indexOf(court);
+              if (idx > 0) {
+                courtIndex = idx;
+                break;
+              }
+            }
             
-            if (match) {
-              let offense = match[1].trim();
-              // Remove any trailing commas or spaces
-              offense = offense.replace(/[,\s]+$/, '');
-              if (offense && offense.length > 1) {
-                charges.push(offense);
+            if (courtIndex > 0) {
+              // Get everything before the court type
+              const beforeCourt = t.substring(0, courtIndex);
+              
+              // Remove the statute code at the start (numbers, dots, letters, parens)
+              const withoutStatute = beforeCourt.replace(/^[\d\w.()]+/, '');
+              
+              if (withoutStatute && withoutStatute.length > 1) {
+                charges.push(withoutStatute.trim());
               }
             }
           }
