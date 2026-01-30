@@ -546,7 +546,7 @@ app.get('/legislative', (req, res) => {
     <div class="content">
       <p class="update-date">Updates: 1/29/2026</p>
       
-      <h2>Washington state legislature 2026 - what's actually going on</h2>
+      <h2> WASHINGTON STATE LEGISLATIVE SESSION - updates as of 1-26-2026</h2>
 
       <h2>POLICE & PUBLIC SAFETY:</h2>
       <p>BAN ON POLICE FACE COVERINGS - Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ice raids. Lots of momentum.</p>
@@ -624,7 +624,7 @@ app.get('/legislative', (req, res) => {
       <p>GRAY WOLF RECLASSIFICATION - Downgrading from "endangered" to "sensitive" status.</p>
       <p>DISCOVER PASS PRICE HIKE - Increasing from $30 to $45 for state parks access, would be the first increase in 14 years.</p>
 
-      <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
+      <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">Source: <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
     </div>
   </div>
 </body>
@@ -672,7 +672,70 @@ app.get('/api/history', (req, res) => {
 
   entries.reverse();
 
-  const entriesHtml = entries.length > 0 ? entries.map(entry => {
+  // Group consecutive "Initial roster capture" / "No change" entries
+  const groupedEntries = [];
+  let noChangeGroup = [];
+  
+  for (const entry of entries) {
+    const hasChanges = entry.added.length > 0 || entry.removed.length > 0 || (entry.updated && entry.updated.length > 0);
+    
+    if (!hasChanges) {
+      // This is a "no change" entry - add to group
+      noChangeGroup.push(entry);
+    } else {
+      // This entry has changes - flush any pending no-change group first
+      if (noChangeGroup.length > 0) {
+        groupedEntries.push({
+          type: 'no-change-group',
+          count: noChangeGroup.length,
+          startTime: noChangeGroup[0].timestamp,
+          endTime: noChangeGroup[noChangeGroup.length - 1].timestamp
+        });
+        noChangeGroup = [];
+      }
+      // Then add the actual change entry
+      groupedEntries.push(entry);
+    }
+  }
+  
+  // Don't forget any remaining no-change group at the end
+  if (noChangeGroup.length > 0) {
+    groupedEntries.push({
+      type: 'no-change-group',
+      count: noChangeGroup.length,
+      startTime: noChangeGroup[0].timestamp,
+      endTime: noChangeGroup[noChangeGroup.length - 1].timestamp
+    });
+  }
+
+  const entriesHtml = groupedEntries.length > 0 ? groupedEntries.map(entry => {
+    // Handle grouped "no change" entries
+    if (entry.type === 'no-change-group') {
+      const startDate = new Date(entry.startTime);
+      const endDate = new Date(entry.endTime);
+      const startPst = startDate.toLocaleString("en-US", {
+        timeZone: "America/Los_Angeles",
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      });
+      const endPst = endDate.toLocaleString("en-US", {
+        timeZone: "America/Los_Angeles",
+        month: "numeric",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true
+      });
+      
+      return '<div class="entry no-change-entry"><p class="no-changes">Checked ' + entry.count + ' time' + (entry.count > 1 ? 's' : '') + ' between ' + startPst + ' - ' + endPst + ' PST (no changes detected)</p></div>';
+    }
+    
+    // Handle regular entries with changes
     const date = new Date(entry.timestamp);
     const pstDate = date.toLocaleString("en-US", {
       timeZone: "America/Los_Angeles",
@@ -720,6 +783,7 @@ app.get('/api/history', (req, res) => {
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry.no-change-entry { background: #0a0a0a; padding: 0.75rem; border-left: 3px solid #334155; }
     .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #93bd8b; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
     .changes { margin-top: 0.75rem; }
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
