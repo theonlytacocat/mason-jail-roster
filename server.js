@@ -351,12 +351,6 @@ app.get('/api/run', async (req, res) => {
           releaseDate,
           charges: [...new Set(charges)]
         });
-        
-        if (charges.length > 0) {
-          console.log(`✓ ${name}: Found ${charges.length} charges:`, charges);
-        } else {
-          console.log(`✗ ${name}: NO CHARGES FOUND`);
-        }
       }
       return bookings;
     }
