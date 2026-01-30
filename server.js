@@ -546,7 +546,7 @@ app.get('/legislative', (req, res) => {
     <div class="content">
       <p class="update-date">Updates: 1/29/2026</p>
       
-      <h2> WASHINGTON STATE LEGISLATIVE SESSION - updates as of 1-26-2026</h2>
+      <h2>WASHINGTON STATE LEGISLATIVE SESSION - updates 01-26-2026</h2>
 
       <h2>POLICE & PUBLIC SAFETY:</h2>
       <p>BAN ON POLICE FACE COVERINGS - Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ice raids. Lots of momentum.</p>
