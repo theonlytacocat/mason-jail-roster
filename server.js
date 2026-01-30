@@ -298,8 +298,8 @@ app.get('/api/run', async (req, res) => {
         for (const line of lines) {
           const t = line.trim();
           
-          // Start capturing after we see the header
-          if (t.includes("Statute") && t.includes("Offense") && t.includes("Court")) {
+          // Start capturing after header
+          if (t === "StatuteOffenseCourtOffenseClass") {
             inCharges = true;
             continue;
           }
@@ -309,20 +309,19 @@ app.get('/api/run', async (req, res) => {
             break;
           }
           
-          // If we're in the charges section
+          // If in charges section and line has content
           if (inCharges && t.length > 0) {
-            // Skip headers and other non-charge lines
-            if (t.includes("Name Number:") || t.includes("Book Date:") || t.includes("Rel Date:") || 
-                t.includes("Page ") || t.includes("rpjlciol") || t.includes("Current Inmate")) {
+            // Skip non-charge lines
+            if (t.includes("Name Number:") || t.includes("Book Date:") || 
+                t.includes("Rel Date:") || t.includes("Page ") || 
+                t.includes("rpjlciol") || t.includes("Current Inmate")) {
               continue;
             }
             
-            // Format is: STATUTEOffenseDESCRIPTIONCOURT_TYPEOFFENSE_CODECLASS
+            // Format: STATUTEOffenseDESCRIPTIONCOURT_TYPEOFFENSE_CODECLASS
             // Example: "72.09.310Failure to AppearSUPRFTAFC"
-            // We need to extract the offense description between statute and court type
-            
-            // Match statute code at start, then capture until we hit DIST|SUPR|MUNI|DOC
-            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+?)(DIST|SUPR|MUNI|DOC)[A-Z]+[A-Z]{2}$/);
+            // Court types are always: DIST, SUPR, MUNI, or DOC (all caps, 4 letters)
+            const match = t.match(/^[\d\w.()]+([A-Za-z\s,'-]+?)(DIST|SUPR|MUNI|DOC)[A-Z]+$/);
             
             if (match) {
               const offense = match[1].trim();
@@ -546,252 +545,84 @@ app.get('/legislative', (req, res) => {
     
     <div class="content">
       <p class="update-date">Updates: 1/29/2026</p>
+      
+      <h2>Washington state legislature 2026 - what's actually going on</h2>
 
-      <h2>TAXES & BUDGET (The Big Money Fights)</h2>
-      <h3>Millionaire's Income Tax (9.9% Rate - No Bill Number Yet)</h3>
-      <p><strong>Sponsor:</strong> Governor Bob Ferguson (D) - Has not been formally introduced as legislation yet</p>
-      <p><strong>What it does:</strong> 9.9% income tax on adjusted gross income over $1 million/year. Would raise at least $3 billion annually starting in 2029. Less than 0.5% of Washingtonians would pay it.</p>
-      <p><strong>Revenue would fund:</strong> Expanding Working Families Tax Credit, eliminating B&O tax for small businesses under $1M revenue, K-12 education funding, eliminating sales tax on hygiene products/baby formula/diapers/essential clothing.</p>
-      <p><strong>The controversy:</strong> This would be Washington's 12th attempt at an income tax since 1932 - voters rejected it 11 times. State Supreme Court has ruled income taxes unconstitutional. In March 2024, legislature passed Initiative 2111 which bans ANY income tax in Washington. Ferguson says he's confident courts would uphold this version and wants it to go before voters as a constitutional amendment. Combined with Seattle's payroll tax, millionaires in Seattle could face an 18.037% top rate - highest in the nation.</p>
-      <p><strong>Support:</strong> Governor Ferguson, Democratic legislative majority, unions. Ferguson promises constitutional amendment to lock tax at $1M+ threshold forever.</p>
-      <p><strong>Opposition:</strong> Republicans calling it a "nonstarter" due to legal precedent and I-2111. Business groups warn it would drive tech workers and companies out of state. Critics note it won't help current $2.3B budget shortfall since revenue won't arrive until 2029. Particularly harsh on tech workers with RSUs (restricted stock units) that vest all at once.</p>
-      <p><strong>Status:</strong> Ferguson announced support Dec 2025. Awaiting formal bill introduction. Guaranteed court challenge if passed.</p>
-      
-      <h3>Payroll Tax on High Earners - HB 2100 "Well Washington Fund"</h3>
-      <p><strong>Sponsor:</strong> Rep. Shaun Scott (D-Seattle, Democratic Socialist), co-sponsors include Reps. Mena, Thomas, Reed, Parshley, Hill, Ryu, Doglio, Simmons, Peterson, Berry, Pollet, Santos, Street, Gregerson, Obras, Farivar, Macri, Fosse</p>
-      <p><strong>What it does:</strong> 5% payroll tax on employers for wages over $125,000/year. Only applies to companies with 20+ employees (potentially 250 in substitute version) and over $5 million in sales. Exempts companies with under $7 million total payroll. Modeled after Seattle's JumpStart tax. Amazon and companies already paying Seattle's tax would be exempt.</p>
-      <p><strong>Revenue projections:</strong> Scott initially estimated $2B/year. State fiscal note projects $11.8 billion for 2027-29 biennium, then $9.3 billion for 2029-31 biennium.</p>
-      <p><strong>Where money goes:</strong> 100% to state general fund until July 2027. After that, 51% goes to "Well Washington Fund" (healthcare, education, housing, energy programs), 49% stays in general fund.</p>
-      <p><strong>The controversy:</strong> Employers prohibited from passing costs to employees. Critics warn this will lead to higher consumer prices, reduced wage growth, job losses. Seattle has lost 5,500 jobs since passing JumpStart tax while Bellevue gained 4,000 jobs. Seattle's JumpStart generated $47 million LESS than projected in 2024. Joe Nguyen (former Ferguson Commerce Director, now Seattle Chamber CEO) warns it will hit grocery stores and healthcare providers, raising costs for everyone.</p>
-      <p><strong>Support:</strong> Democratic Socialists of America, SEIU unions, Tech 4 Taxes group, Superintendent of Public Instruction Chris Reykdal. Framed as protection against Trump administration federal funding cuts.</p>
-      <p><strong>Opposition:</strong> Association of Washington Business, Bellevue Chamber, Seattle Chamber, Associated General Contractors. Over 12,000 people (83% of virtual attendees) opposed at Jan 22 hearing vs. 3,000 supporters. Former Commerce Director Joe Nguyen testified AGAINST it. Business groups warn Washington would be first state in nation with this type of tax.</p>
-      <p><strong>Status:</strong> Public hearing held Jan 22, 2026 in House Finance Committee. Awaiting executive session vote. No vote scheduled yet as of Jan 29.</p>
-      
-      <h3>Advanced Computing Surcharge Cap Removal</h3>
-      <p>Would eliminate the $75 million annual cap on big tech companies (Microsoft, Amazon) to fund higher education. Currently capped at $75M per company.</p>
-      
-      <h3>Higher Education Funding Reset</h3>
-      <p>10% tuition cuts for 3 years starting fall 2027, expanding Washington College Grant eligibility.</p>
-      
-      <h3>Paid Protester Tax</h3>
-      <p>Would tax temporary staffing agencies that provide "paid protesters" at protests (yes, really).</p>
-      
-      <h3>Bullion Tax Repeal (HB 2093)</h3>
-      <p>Republicans trying to eliminate the sales tax on gold/silver, saying it's driving coin shops out of business.</p>
-      
-      <h3>Reversing 2025 Tax Increases (HB 2101)</h3>
-      <p>Rolling back recent tax hikes to keep investment local.</p>
+      <h2>POLICE & PUBLIC SAFETY:</h2>
+      <p>BAN ON POLICE FACE COVERINGS - Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ice raids. Lots of momentum.</p>
+      <p>$100 MILLION POLICE HIRING GRANTS (SB.5060) - Covers 75% of new officer salaries for 36 months. Ferguson's priority. Cities must implement 0.1% sales tax or already have a similar tax to have access to funds.</p>
+      <p>SHERIFF/POLICE CHIEF REQUIREMENTS (HB.1399/SB.5974) - New standards: minimum age would be 25, background checks to be performed, must maintain peace officer certification. Sheriffs union is PISSED, calling it unconstitutional.</p>
+      <p>PUBLIC DEFENSE CRISIS (SB.5404) - Making the state actually fund public defenders. WA is one of only 2 states that doesn't fully fund them, leading to overworked defenders and constitutional violations.</p>
+      <p>FLOCK LICENSE PLATE CAMERA REGULATION - New bill would regulate automated license plate readers across the state.</p>
+      <p>NO SECRET POLICE ACT - Requiring law enforcement to be identifiable during arrests.</p>
 
-      <h2>ARTIFICIAL INTELLIGENCE (14+ Bills)</h2>
-      <h3>AI Companion Chatbots - SB 5984 / HB 2225 (Governor's Priority)</h3>
-      <p><strong>Senate Sponsors:</strong> Sens. Lisa Wellman (D-Bellevue), Shewmake, Frame, Hasegawa, Nobles, Pedersen, Riccelli, Valdez, Wilson - By request of Governor Ferguson</p>
-      <p><strong>House Sponsors:</strong> Reps. Callan, Thomas, Ryu, Parshley, Simmons, Leavitt, Berry, Reed, Cortes, Mena, Rule, Stearns, Zahn, Eslick, Street, Wylie, Duerr, Kloba, Scott, Paul, Gregerson, Ormsby, Goodman, Reeves, Shavers, Thai, Macri, Fosse, Hill, Pollet, Salahuddin - By request of Governor Ferguson</p>
-      <p><strong>What it does:</strong> Regulates AI companion chatbots (like Character.AI) to protect minors after multiple child suicides linked to AI chatbots. Based on similar laws passed in California and New York in 2025.</p>
-      <p><strong>Key requirements:</strong></p>
-      <ul>
-        <li>Chatbots must notify users every 3 hours "You are talking to an AI, not a human"</li>
-        <li>Prohibits romantic or sexual partnerships between AI and minors</li>
-        <li>Prohibits explicit content being shown to minors</li>
-        <li>Requires suicide ideation detection and prevention protocols</li>
-        <li>Bans "emotionally manipulative engagement techniques" (excessive praise, simulating emotional distress to keep users engaged)</li>
-        <li>Private right of action allowing individuals to sue companies</li>
-      </ul>
-      <p><strong>The backstory:</strong> Mother Megan Garcia testified about her son who died by suicide after extended interactions with Character.AI chatbot. Research shows over 50 hours of conversations where chatbots groomed kids into romantic/sexual relationships, offered drugs, encouraged deceiving parents and stopping medication. Teens increasingly turning to AI for emotional support.</p>
-      <p><strong>Support:</strong> Governor Ferguson (major priority), broad bipartisan support. Sen. Wellman (D-Bellevue) alarmed by lawsuits and suicide cases. Expert testimony: "Based on my technical expertise, these protections are entirely feasible to implement today. Not doing so is a business choice."</p>
-      <p><strong>Opposition:</strong> Tech industry lobbying HARD to remove private right of action (ability to sue). Companies want immunity from lawsuits.</p>
-      <p><strong>Status:</strong> SB 5984 - Public hearing Jan 20 in Senate Environment, Energy & Technology Committee. Scheduled for executive session. HB 2225 - Passed out of House Technology Committee with substitute (1st substitute bill recommended). Moving to House Rules.</p>
-      
-      <h3>AI in Schools - SB 5956 (Student Discipline & Surveillance)</h3>
-      <p><strong>Sponsor:</strong> Sen. T'wina Nobles (D-Tacoma, 28th District)</p>
-      <p><strong>What it does:</strong> Sets statewide rules for AI use in schools - addressing surveillance, automated discipline, and student privacy. Requires human oversight of all AI systems affecting students.</p>
-      <p><strong>Six key prohibitions:</strong></p>
-      <ul>
-        <li>Cannot use AI as the SOLE basis for any student discipline decision</li>
-        <li>Cannot suspend, expel, or refer students to law enforcement based solely on AI predictions/scores</li>
-        <li>Cannot use AI to generate "risk scores" for individual students (no predictive profiling)</li>
-        <li>Cannot maintain student watchlists based on AI systems</li>
-        <li>BANS facial recognition technology in schools (accuracy issues especially for students of color)</li>
-        <li>Cannot use biometrics to infer students' psychological or personal characteristics</li>
-      </ul>
-      <p><strong>Real-world problem:</strong> Maryland student holding a bag of chips was flagged by gun detection AI that mistook the chip bag for a weapon. Schools across the country using AI for surveillance without transparency, context, or human judgment. Some systems assign "risk scores" to students, creating automated profiling.</p>
-      <p><strong>Additional protections:</strong> Limits when student data can be turned over to law enforcement. Directs WA State School Directors Association to develop model policy on human oversight of AI systems.</p>
-      <p><strong>Support:</strong> Sen. Nobles: "Decisions that affect our students' future must be made by people and not by algorithms." Black Education Strategy Roundtable strongly supports. Democrats pushing hard.</p>
-      <p><strong>Opposition:</strong> Tech industry resistance. Concerns about implementation costs (fiscal note expected).</p>
-      <p><strong>Status:</strong> Passed out of Senate Early Learning & K-12 Education Committee on Jan 22, 2026. Moving forward.</p>
-      
-      <h3>HB 2481 - Grocery Store AI Surveillance & Surge Pricing</h3>
-      <p><strong>What it does:</strong> Regulates use of facial recognition and AI-powered dynamic pricing (surge pricing) in grocery stores and retail. Prevents stores from using AI to jack up prices based on who's shopping or time of day.</p>
-      <p><strong>Status:</strong> In committee.</p>
-      
-      <h3>Other AI Bills (12+ Additional Proposals)</h3>
-      <p><strong>AI in Mental Health Treatment:</strong> Regulating AI chatbots and systems used in therapy and mental health services. Requires human oversight, informed consent, and safety protocols when AI is involved in patient care.</p>
-      
-      <p><strong>AI in Health Insurance:</strong> Regulating AI authorization systems that approve/deny medical procedures, surgeries, and treatments. Addresses concern that insurance companies are using AI to auto-deny claims without proper human review. Would require transparency about when AI is making coverage decisions.</p>
-      
-      <p><strong>AI Training Data Transparency:</strong> Would require AI companies to disclose what data they use to train their models. Particularly focused on whether copyrighted material, private data, or biased datasets are being used without permission or compensation.</p>
-      
-      <p><strong>Collective Bargaining Around AI:</strong> Allows labor unions to negotiate how AI is implemented in workplaces. Workers could bargain over AI surveillance, AI-based performance reviews, AI replacing jobs, and how AI tools are deployed.</p>
-      
-      <p><strong>High-Risk AI Systems:</strong> Comprehensive regulation of AI making high-stakes decisions in housing (rental applications, mortgage approvals), employment (hiring, firing, promotions), and healthcare (diagnosis, treatment). Would require impact assessments, bias testing, and human review before AI makes life-changing decisions.</p>
-      
-      <p><strong>The big picture:</strong> Washington attempting to be national leader in AI regulation with 14+ bills this session. Sen. Wellman: "As AI gets more sophisticated and into more markets, it's going to require constant eyes on it." Response to federal inaction - Congress has debated AI for years with little concrete action. States experimenting with their own guardrails.</p>
+      <h2>GUN CONTROL:</h2>
+      <p>PERMIT TO PURCHASE (HB.1163) - Requiring state permit before buying firearms, like a dozen other states have.</p>
+      <p>EXPANDING GUN-FREE ZONES and setting BULK PURCHASE LIMITS.</p>
+      <p>REQUIRING GUN STORAGE IN CARS/HOMES, as well as more REGULATIONS FOR GUN DEALERS.</p>
 
-      <h2>HOUSING & DEVELOPMENT</h2>
-      <h3>Remove Local Barriers (HB 2266/SB 6069)</h3>
-      <p>Streamlining development of supportive/transitional/emergency housing by removing local regulatory barriers.</p>
-      
-      <h3>Scissor Stairs (HB 2228)</h3>
-      <p>Legalizing scissor stairwells in apartment buildings (common in Vancouver BC) to fit more units by wasting less space on hallways.</p>
-      
-      <h3>Elevator Reform</h3>
-      <p>Adopting smaller European elevator standards to make building cheaper and faster.</p>
-      
-      <h3>Commercial to Residential Conversion (SB 6026)</h3>
-      <p>Governor's priority - allowing mixed-use and residential in commercial zones without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
-      
-      <h3>Short-Term Rental Tax (SB 5576)</h3>
-      <p>Up to 4% excise tax on Airbnbs to fund affordable housing. Was statewide, amended to let local governments decide.</p>
-      
-      <h3>Parking Reform</h3>
-      <p>Already passed in 2025, now implementing rules reducing parking requirements that drive up housing costs.</p>
+      <h2>EDUCATION:</h2>
+      <p>PARENTAL RIGHTS INITIATIVES - Two super controversial initiatives coming that would give parents access to ALL school curriculum, allow parents to see mental health counseling records from school counselors. Often called a rewrite of last year's controversial HB.1296.</p>
 
-      <h2>POLICE & PUBLIC SAFETY</h2>
-      <h3>Ban on Police Face Coverings</h3>
-      <p>Gaining major momentum. Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ICE raids where masked agents arrested people.</p>
-      
-      <h3>$100 Million Police Hiring Grants (SB 5060)</h3>
-      <p>Covers 75% of new officer salaries for 36 months. Ferguson's priority. Cities must implement 0.1% sales tax or already have similar tax to access funds.</p>
-      
-      <h3>Sheriff/Police Chief Requirements (HB 1399/SB 5974)</h3>
-      <p>New standards: min age 25, background checks, must maintain peace officer certification. Sheriffs PISSED, calling it unconstitutional.</p>
-      
-      <h3>Public Defense Crisis (SB 5404)</h3>
-      <p>Making state actually fund public defenders. WA is one of only 2 states that doesn't fully fund them, leading to overworked defenders and constitutional violations.</p>
-      
-      <h3>Other Safety Bills</h3>
-      <ul>
-        <li>Flock License Plate Camera Regulation - New bill would regulate automated license plate readers across the state</li>
-        <li>No Secret Police Act - Requiring law enforcement to be identifiable during arrests</li>
-      </ul>
+      <h2>TAXES AND BUDGETS:</h2>
+      <p>MILLIONAIRE INCOME TAX- Nearly 10% tax on people making over $1 million/year, would raise $3 billion annually. super controversial since WA has never had an income tax and it might violate the state constitution. republicans threatening lawsuits.</p>
+      <p>PAYROLL TAX ON HIGH EARNERS (HB.2100) - 5% tax on employers for employees making over $125k/year to fund "well Washington fund" for healthcare/education/human services.</p>
+      <p>HIGHER EDUCATION FUNDING RESET - 10% tuition cuts for 3 years starting fall 2027, expanding Washington college grant eligibility.</p>
+      <p>PAID PROTESTER TAX - Would tax temporary staffing agencies that provide "paid protesters" at protests.</p>
+      <p>BULLION TAX REPEAL (HB.2093) - Republicans trying to eliminate the sales tax on gold/silver, saying it's driving coin shops out of business.</p>
+      <p>REVERSING 2025 TAX INCREASES (HB.2101) - Rolling back recent tax hikes to keep investment local.</p>
 
-      <h2>GUN CONTROL</h2>
-      <ul>
-        <li>Permit to Purchase (HB 1163) - Requiring state permit before buying firearms, like a dozen other states have</li>
-        <li>Expanding Gun-Free Zones - Adding more locations where carrying firearms is illegal</li>
-        <li>Bulk Ammo Purchase Limits - Restricting how much ammunition can be bought at once</li>
-        <li>Mandatory Gun Storage in Cars/Homes - Requiring guns be locked up</li>
-        <li>Additional Gun Dealer Requirements - More regulations for firearm retailers</li>
-      </ul>
+      <h2>ARTIFICIAL INTELLIGENCE- there are so many of them:</h2>
+      <p>AI COMPANION CHATBOTS (SB.5984/HB.2225) - Regulating AI chatbots for minors after child suicides linked to AI. Prohibits romantic partnerships with minors, requires hourly notifications that it's not human. private right of action included. Tech industry is pushing back heavily on this.</p>
+      <p>AI IN SCHOOLS (HB.2481/SB.5956) - Requiring human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline of students. Protecting kids from being flagged by gun detection AI that mistakes chips bags for weapons.</p>
+      <p>REGULATIONS FOR AI: Use in therapy, specifically mental health treatment.</p>
+      <p>HEALTH INSURANCE: Regulating AI insurance authorization decisions for medical procedures.</p>
+      <p>TRAINING DATA TRANSPARENCY - Requiring disclosure of what data is used to train AI models.</p>
+      <p>COLLECTIVE BARGAINING AROUND AI - Allowing unions to negotiate how AI is used in workplaces.</p>
+      <p>GROCERY STORE AI SURVEILLANCE - Regulating facial recognition and surge pricing based on AI.</p>
 
-      <h2>EDUCATION & PARENTAL RIGHTS</h2>
-      <h3>Parental Rights Initiatives</h3>
-      <p>Two super controversial initiatives coming that would:</p>
-      <ul>
-        <li>Give parents access to ALL school curriculum</li>
-        <li>Allow parents to see mental health counseling records from school counselors</li>
-        <li>One is being called a rewrite of last year's controversial HB 1296</li>
-      </ul>
-      
-      <h3>Special Education Funding Cap Removal</h3>
-      <p>Eliminating the 16% enrollment cap on special ed funding.</p>
-      
-      <h3>Eid State Holidays</h3>
-      <p>WA is first state to recognize Eid al-Fitr and Eid al-Adha as state holidays.</p>
+      <h2>WILDFIRE & ENVIRONMENT:</h2>
+      <p>WILDFIRE PREVENTION FUNDING: Fighting $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
+      <p>CLEAN ENERGY GRID EXPANSION, as well as a SEMI TRUCK EMISSIONS CLIMATE PUSH.</p>
 
-      <h2>IMMIGRATION</h2>
-      <h3>Immigrant Worker Protections (HB 2105/SB 5852)</h3>
-      <p>Requiring employers to give workers notice if ICE does an I-9 audit of legal work status.</p>
+      <h2>HOUSING & DEVELOPMENT:</h2>
+      <p>COMMERCIAL TO RESIDENTIAL CONVERSION (SB.6026) - Governor's priority - allowing mixed-use and residential in commercial zones without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
+      <p>SHORT-TERM RENTAL TAX (SB.5576) - Up to 4% excise tax on Airbnbs to fund affordable housing. Was statewide, amended to let local governments decide.</p>
+      <p>PARKING REFORM - Already passed in 2025, now implementing rules reducing parking requirements that drive up housing costs.</p>
 
-      <h2>LABOR & WORKERS</h2>
-      <h3>Minimum Wage $17.13/hour</h3>
-      <p>Already in effect Jan 1, 2026. Highest in the nation. Some cities higher (Seattle $21.63, SeaTac $20.74).</p>
-      
-      <h3>Striking Workers Get Unemployment</h3>
-      <p>Already in effect. Strikers can collect up to 6 weeks of unemployment benefits after strike starts.</p>
-      
-      <h3>Paid Family Leave Expansion</h3>
-      <p>Job protection after just 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
-      
-      <h3>Other Worker Protections</h3>
-      <ul>
-        <li>Workplace Violence Prevention - Healthcare facilities must investigate violence incidents promptly and update prevention plans annually</li>
-        <li>Isolated Worker Protections - Panic buttons and safety measures for janitors, housekeepers, security guards who work alone</li>
-        <li>Hate Crime Victim Leave - Time off for victims to seek safety, medical care, counseling</li>
-      </ul>
+      <h2>IMMIGRATION AND LABOR:</h2>
+      <p>IMMIGRANT WORKER PROTECTIONS (HB.2105/SB.5852) - Requiring employers to give workers notice if ice does an i-9 audit of legal work status.</p>
+      <p>MINIMUM WAGE $17.13/HOUR - Already in effect Jan 1, 2026. Highest in the nation. Some cities higher (Seattle $21.63, Seatac $20.74).</p>
+      <p>STRIKING WORKERS GET UNEMPLOYMENT - Already in effect. strikers can collect up to 6 weeks of unemployment benefits after strike starts.</p>
+      <p>PAID FAMILY LEAVE EXPANSION - Job protection after only 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
+      <p>WORKPLACE VIOLENCE PREVENTION - Healthcare facilities must investigate violence incidents promptly and update prevention plans annually</p>
+      <p>ISOLATED WORKER PROTECTIONS - Panic buttons and safety measures for janitors, housekeepers, security guards who work alone.</p>
 
-      <h2>HEALTHCARE & VACCINES</h2>
-      <h3>State Vaccine Authority (SB 5967/HB 2242)</h3>
-      <p>Governor's priority. Allowing WA Dept of Health to make vaccine recommendations independent of CDC/federal government. Response to Trump politicizing CDC. Does NOT create new mandates.</p>
-      
-      <h3>Already in Effect</h3>
-      <ul>
-        <li>Medical Debt Credit Reporting Ban - Medical debt can't be reported to credit agencies</li>
-        <li>Blood Type on Driver's License (SB 5689) - Voluntary blood type info on state IDs</li>
-      </ul>
-      
-      <h3>Other Healthcare Bills</h3>
-      <ul>
-        <li>Physician Assistant Compact - Joining interstate agreement for PA licensing</li>
-        <li>Mental Health Parity - Strengthening enforcement of mental health coverage requirements</li>
-      </ul>
+      <h2>HEALTHCARE & VACCINES:</h2>
+      <p>STATE VACCINE AUTHORITY (SB.5967/HB.2242) - Governor's priority. Allowing WA dept of health to make vaccine recommendations independent of cdc/federal government. Response to trump politicizing CDC, does NOT create new mandates.</p>
 
-      <h2>ENVIRONMENT & ENERGY</h2>
-      <h3>Nuclear Power Strategic Framework</h3>
-      <p>Bipartisan push to embrace nuclear energy development. Department of Commerce to publish framework for opportunities/obstacles. No state funding - must use private money.</p>
-      
-      <h3>Wildfire Prevention Funding</h3>
-      <p>Fighting $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
-      
-      <h3>Other Environmental Initiatives</h3>
-      <ul>
-        <li>Clean Energy Grid Expansion - Accelerating transmission and renewable energy to meet climate goals while lowering bills</li>
-        <li>Big Truck Climate Push - New regulations targeting commercial vehicle emissions</li>
-      </ul>
+      <h2>ALREADY IN EFFECT:</h2>
+      <p>MEDICAL DEBT CREDIT REPORTING BAN - Medical debt can't be reported to credit agencies.</p>
+      <p>BLOOD TYPE ON DRIVER'S LICENSE (SB.5689) - Voluntary blood type info on state IDS.</p>
 
-      <h2>TRANSPORTATION & ROADS</h2>
-      <h3>Reckless Driving Redefined (SB 5890)</h3>
-      <p>30+ mph over speed limit = reckless driving charge.</p>
-      
-      <h3>Reckless Interference with Emergency Operations (HB 2203)</h3>
-      <p>New driving offense for blocking emergency vehicles.</p>
-      
-      <h3>Ferry System Crisis</h3>
-      <p>7 of 21 ferries currently unable to sail due to mechanical issues and planned maintenance.</p>
+      <h2>TRANSPORTATION & ROADS:</h2>
+      <p>RECKLESS DRIVING REDEFINED (SB.5890) - 30+ mph over speed limit = reckless driving charge.</p>
+      <p>RECKLESS INTERFERENCE WITH EMERGENCY OPERATIONS (HB.2203) - New driving offense for blocking emergency vehicles.</p>
 
-      <h2>CRIMINAL JUSTICE & CRIME</h2>
-      <ul>
-        <li>Political Affiliation Hate Crime (SB 5830) - Making it a Class C felony to assault someone based on their political beliefs</li>
-        <li>Juvenile Detention Overcrowding - Allowing youth transfers to state prisons and community facilities in certain cases</li>
-        <li>Early Release for Youth Offenders - Allowing people convicted before age 18 to petition for early release at age 24</li>
-        <li>DUI Lab Expansion - Allowing more labs to perform toxicology tests to speed up cases</li>
-      </ul>
+      <h2>CRIMINAL JUSTICE:</h2>
+      <p>POLITICAL AFFILIATION HATE CRIME (SB.5830) - Making it a Class C felony to assault someone based on their political beliefs.</p>
+      <p>JUVENILE DETENTION OVERCROWDING - Allowing youth transfers to state prisons and community facilities in certain cases.</p>
+      <p>EARLY RELEASE FOR YOUTH OFFENDERS - Allowing people convicted before age 18 to petition for early release at age 24.</p>
+      <p>DUI LAB EXPANSION - Allowing more labs to perform toxicology tests to speed up cases.</p>
 
-      <h2>CONSUMER & BUSINESS</h2>
-      <h3>Already in Effect</h3>
-      <ul>
-        <li>Nicotine/Vape Tax - 95% excise tax on ALL nicotine products including synthetic nicotine, vapes, pouches. A $7 product now costs $15.06 after taxes</li>
-        <li>Plastic Bag Fee Increase - Minimum charge raised from 8 cents to 12 cents per bag</li>
-      </ul>
-      
-      <h3>Pending Bills</h3>
-      <ul>
-        <li>Right to Repair (HB 1483) - Electronics manufacturers must provide parts and repair methods to independent shops</li>
-        <li>Luxury Vehicle Tax - New taxes on high-end cars</li>
-        <li>Permitting and Licensing Improvements - Governor's priority to streamline business permits</li>
-      </ul>
+      <h2>CONSUMER & BUSINESS ALREADY IN EFFECT:</h2>
+      <p>NICOTINE/VAPE TAX - 95% excise tax on ALL nicotine products including synthetic nicotine, vapes, pouches. A $7 product now costs $15.06 after taxes.</p>
+      <p>PLASTIC BAG FEE INCREASE - Minimum charge raised from 8 cents to 12 cents per bag.</p>
 
-      <h2>WEIRD/QUIRKY ONES</h2>
-      <ul>
-        <li>Diaper Changing Stations - Already in effect. Mandatory in all new/remodeled public buildings costing $15k+</li>
-        <li>Gray Wolf Reclassification - Downgrading from "endangered" to "sensitive" status</li>
-        <li>Discover Pass Price Hike - Increasing from $30 to $45 for state parks access. First increase in 14 years</li>
-        <li>Cannabis License Changes - Various updates to marijuana business regulations</li>
-        <li>Pesticide Committee Extension - Extending Pesticide Application Safety Committee to 2035</li>
-      </ul>
-
-      <h2>INITIATIVE PROCESS REFORM</h2>
-      <h3>Revamping Initiatives</h3>
-      <p>Democrats want to change how citizen initiatives work. Getting MASSIVE pushback from Republicans and initiative supporters who see it as Democrats trying to make it harder to challenge the legislature.</p>
+      <h2>RANDOMS:</h2>
+      <p>DIAPER CHANGING STATIONS - Already in effect. Mandatory in all new/remodeled public buildings costing $15k+.</p>
+      <p>GRAY WOLF RECLASSIFICATION - Downgrading from "endangered" to "sensitive" status.</p>
+      <p>DISCOVER PASS PRICE HIKE - Increasing from $30 to $45 for state parks access, would be the first increase in 14 years.</p>
 
       <p style="margin-top: 2rem; color: #4c6e60; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
     </div>
