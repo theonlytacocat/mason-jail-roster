@@ -295,16 +295,12 @@ app.get('/api/run', async (req, res) => {
         const lines = block.split("\n");
         let inCharges = false;
         
-        console.log("=== PROCESSING BOOKING BLOCK ===");
-        console.log("Block preview:", block.substring(0, 200));
-        
         for (const line of lines) {
           const t = line.trim();
           
           // Start capturing after header
           if (t === "StatuteOffenseCourtOffenseClass") {
             inCharges = true;
-            console.log("Found charge header, starting charge extraction");
             continue;
           }
           
@@ -322,8 +318,6 @@ app.get('/api/run', async (req, res) => {
               continue;
             }
             
-            console.log("Processing charge line:", t);
-            
             // Find the court type in the string
             let courtIndex = -1;
             const courtTypes = ['DIST', 'SUPR', 'MUNI', 'DOC'];
@@ -332,7 +326,6 @@ app.get('/api/run', async (req, res) => {
               const idx = t.indexOf(court);
               if (idx > 0) {
                 courtIndex = idx;
-                console.log("Found court type", court, "at index", idx);
                 break;
               }
             }
@@ -340,22 +333,16 @@ app.get('/api/run', async (req, res) => {
             if (courtIndex > 0) {
               // Get everything before the court type
               const beforeCourt = t.substring(0, courtIndex);
-              console.log("Before court:", beforeCourt);
               
               // Remove the statute code at the start (numbers, dots, letters, parens)
               const withoutStatute = beforeCourt.replace(/^[\d\w.()]+/, '');
-              console.log("Without statute:", withoutStatute);
               
               if (withoutStatute && withoutStatute.length > 1) {
                 charges.push(withoutStatute.trim());
-                console.log("Added charge:", withoutStatute.trim());
               }
             }
           }
         }
-        
-        console.log("Total charges extracted:", charges.length);
-        console.log("Charges:", charges);
 
         bookings.set(id, {
           id,
