@@ -857,3 +857,20 @@ app.get('/api/debug/files', (req, res) => {
     res.json({ error: error.message });
   }
 });
+
+app.get('/api/debug/pending', (req, res) => {
+  try {
+    const pendingFile = path.join(STORAGE_DIR, 'pending_releases.json');
+    if (fs.existsSync(pendingFile)) {
+      const data = JSON.parse(fs.readFileSync(pendingFile, 'utf-8'));
+      res.json({ 
+        count: data.length,
+        pendingReleases: data 
+      });
+    } else {
+      res.json({ message: 'No pending releases file found' });
+    }
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
