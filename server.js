@@ -862,3 +862,28 @@ app.get('/api/debug/pending', (req, res) => {
     res.json({ error: error.message });
   }
 });
+
+app.get('/api/debug/charges', async (req, res) => {
+  try {
+    const response = await fetch(PDF_URL);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    const text = result.text;
+    
+    const bookings = extractBookings(text);
+    const sample = Array.from(bookings.values()).slice(0, 10).map(b => ({
+      name: b.name,
+      bookDate: b.bookDate,
+      releaseDate: b.releaseDate,
+      charges: b.charges
+    }));
+    
+    res.json({
+      totalInmates: bookings.size,
+      sample: sample
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
