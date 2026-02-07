@@ -837,3 +837,23 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
 });
+
+app.get('/api/debug/files', (req, res) => {
+  try {
+    const files = fs.readdirSync(STORAGE_DIR);
+    const fileDetails = files.map(f => {
+      const stats = fs.statSync(path.join(STORAGE_DIR, f));
+      return {
+        name: f,
+        size: stats.size,
+        modified: stats.mtime
+      };
+    });
+    res.json({ 
+      storageDir: STORAGE_DIR,
+      files: fileDetails 
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
