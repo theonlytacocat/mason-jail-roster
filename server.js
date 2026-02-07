@@ -275,95 +275,83 @@ app.get('/api/run', async (req, res) => {
     }
 
     function extractBookings(rosterText) {
-      const bookings = new Map();
-      const blocks = rosterText.split(/(?=Booking #:)/);
+       const bookings = new Map();
+       const blocks = rosterText.split(/(?=Booking #:)/);
 
-      for (const block of blocks) {
-        if (!block.includes("Booking #:")) continue;
+     for (const block of blocks) {
+       if (!block.includes("Booking #:")) continue;
 
-        const bookingMatch = block.match(/Booking #:\s*(\S+)/);
-        if (!bookingMatch) continue;
-        const id = bookingMatch[1];
+    const bookingMatch = block.match(/Booking #:\s*(\S+)/);
+       if (!bookingMatch) continue;
+       const id = bookingMatch[1];
 
-        const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,'-]+?)(?=\s*Name Number:|$)/i);
-        let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, " ") : "Unknown";
+    const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,.'"-]+?)(?=\s*Name Number:|$)/i);
+       let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, " ") : "Unknown";
         if (name.endsWith(",")) {
-          const nextLine = block.match(/Name:\s*[^\n]+\n([A-Z][A-Z\s'-]*)/i);
-          if (nextLine) name = name + " " + nextLine[1].trim();
-        }
-
-        const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
-        const bookDate = bookDateMatch ? bookDateMatch[2] + " " + bookDateMatch[1] : "Unknown";
-
-        const relDateMatch = block.match(/Rel Date:\s*(No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
-        let releaseDate = "Not Released";
-        if (relDateMatch && relDateMatch[1] !== "No Rel Date" && relDateMatch[2] && relDateMatch[3]) {
-          releaseDate = relDateMatch[3] + " " + relDateMatch[2];
-        }
-
-        const charges = [];
-        const lines = block.split("\n");
-        let inCharges = false;
-        
-        for (const line of lines) {
-          const t = line.trim();
-          
-          // Start capturing after header
-          if (t === "StatuteOffenseCourtOffenseClass") {
-            inCharges = true;
-            continue;
-          }
-          
-          // Stop if we hit another booking
-          if (t.startsWith("Booking #:")) {
-            break;
-          }
-          
-          // If in charges section and line has content
-          if (inCharges && t.length > 0) {
-            // Skip non-charge lines
-            if (t.includes("Name Number:") || t.includes("Book Date:") || 
-                t.includes("Rel Date:") || t.includes("Page ") || 
-                t.includes("rpjlciol") || t.includes("Current Inmate")) {
-              continue;
-            }
-            
-            // Find the court type in the string
-            let courtIndex = -1;
-            const courtTypes = ['DIST', 'SUPR', 'MUNI', 'DOC'];
-            
-            for (const court of courtTypes) {
-              const idx = t.indexOf(court);
-              if (idx > 0) {
-                courtIndex = idx;
-                break;
-              }
-            }
-            
-            if (courtIndex > 0) {
-              // Get everything before the court type
-              const beforeCourt = t.substring(0, courtIndex);
-              
-              // Remove the statute code at the start (numbers, dots, letters, parens)
-              const withoutStatute = beforeCourt.replace(/^[\d\w.()]+/, '');
-              
-              if (withoutStatute && withoutStatute.length > 1) {
-                charges.push(withoutStatute.trim());
-              }
-            }
-          }
-        }
-
-        bookings.set(id, {
-          id,
-          name,
-          bookDate,
-          releaseDate,
-          charges: [...new Set(charges)]
-        });
-      }
-      return bookings;
+         const nextLine = block.match(/Name:\s*[^\n]+\n([A-Z][A-Z\s'-]*)/i);
+        if (nextLine) name = name + " " + nextLine[1].trim();
     }
+
+    const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+    const bookDate = bookDateMatch ? bookDateMatch[2] + " " + bookDateMatch[1] : "Unknown";
+
+    const relDateMatch = block.match(/Rel Date:\s*(?:No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
+    let releaseDate = "Not Released";
+    if (relDateMatch && relDateMatch[1] && relDateMatch[2]) {
+      releaseDate = relDateMatch[2] + " " + relDateMatch[1];
+    }
+
+    const charges = [];
+    const lines = block.split("\n");
+    let inCharges = false;
+    
+    for (const line of lines) {
+      const t = line.trim();
+      
+      // Start capturing after header
+      if (t === "StatuteOffenseCourtOffenseClass") {
+        inCharges = true;
+        continue;
+      }
+      
+      // Stop if we hit another booking
+      if (t.startsWith("Booking #:")) {
+        break;
+      }
+      
+      // If in charges section and line has content
+      if (inCharges && t.length > 0) {
+        // Skip header lines and page markers
+        if (t.includes("Name Number:") || t.includes("Book Date:") || 
+            t.includes("Rel Date:") || t.includes("Page ") || 
+            t.includes("rpjlciol") || t.includes("Current Inmate") ||
+            t.includes("StatuteOffenseCourtOffenseClass")) {
+          continue;
+        }
+        
+        // Match pattern: StatuteCode + OffenseName + CourtType + OffenseType + Class
+        // Example: 9.41.040.1.AWeapons OffenseSUPRWOFFFB
+        const chargeMatch = t.match(/^[\d\w.()]+([A-Z][A-Za-z\s,.-]+?)(DIST|SUPR|MUNI|DOC)/);
+        
+        if (chargeMatch) {
+          const offense = chargeMatch[1].trim();
+          if (offense && offense.length > 1) {
+            charges.push(offense);
+          }
+        }
+      }
+    }
+
+    bookings.set(id, {
+      id,
+      name,
+      bookDate,
+      releaseDate,
+      charges: [...new Set(charges)]  // Remove duplicates
+    });
+  }
+  return bookings;
+}
 
     function formatBooked(b) {
       return b.name + " | Booked: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
