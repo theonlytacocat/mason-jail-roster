@@ -172,6 +172,34 @@ function formatReleased(b, stats, isPending = false) {
   };
 }
 
+app.get('/api/debug/reset', (req, res) => {
+  try {
+    const hashFile = path.join(STORAGE_DIR, 'prev_hash.txt');
+    const rosterFile = path.join(STORAGE_DIR, 'prev_roster.txt');
+    
+    let deleted = [];
+    
+    if (fs.existsSync(hashFile)) {
+      fs.unlinkSync(hashFile);
+      deleted.push('prev_hash.txt');
+    }
+    
+    if (fs.existsSync(rosterFile)) {
+      fs.unlinkSync(rosterFile);
+      deleted.push('prev_roster.txt');
+    }
+    
+    res.json({
+      success: true,
+      deleted: deleted,
+      message: 'Files deleted. Now visit /api/run to capture current roster with charges.'
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
 // Debug charges enpoint I think 
 app.get('/api/debug/charges', async (req, res) => {
   try {
@@ -986,29 +1014,3 @@ app.get('/api/debug/charge-lines', async (req, res) => {
   }
 });
 
-app.get('/api/debug/reset', (req, res) => {
-  try {
-    const hashFile = path.join(STORAGE_DIR, 'prev_hash.txt');
-    const rosterFile = path.join(STORAGE_DIR, 'prev_roster.txt');
-    
-    let deleted = [];
-    
-    if (fs.existsSync(hashFile)) {
-      fs.unlinkSync(hashFile);
-      deleted.push('prev_hash.txt');
-    }
-    
-    if (fs.existsSync(rosterFile)) {
-      fs.unlinkSync(rosterFile);
-      deleted.push('prev_roster.txt');
-    }
-    
-    res.json({
-      success: true,
-      deleted: deleted,
-      message: 'Files deleted. Now visit /api/run to capture current roster with charges.'
-    });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
-});
