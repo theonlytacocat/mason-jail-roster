@@ -98,8 +98,8 @@ function extractBookings(rosterText) {
     for (const line of lines) {
       const t = line.trim();
       
-      // Start capturing after header
-      if (t === "StatuteOffenseCourtOffenseClass") {
+      // Start capturing after header (flexible matching)
+      if (t.includes("StatuteOffense") || t.includes("Statute") && t.includes("Offense")) {
         inCharges = true;
         continue;
       }
