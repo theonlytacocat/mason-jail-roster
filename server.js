@@ -612,18 +612,26 @@ app.get('/api/run', async (req, res) => {
     fs.writeFileSync(rosterFile, text);
 
     // Build log entry for roster changes
-    const logEntry =
+    let logEntry =
       "\n================================================================================\n" +
       (isFirstRun ? "Initial capture" : hasChanged ? "Change detected" : "No change") +
       " at: " + timestamp +
-      "\n================================================================================\n" +
-      (isFirstRun ? "Initial roster state captured.\n" :
-       hasChanged ?
-         "BOOKED (" + addedLines.length + "):\n" +
-         addedLines.map(l => "  + " + l).join("\n") +
-         "\n\nRELEASED (" + removedLines.length + "):\n" +
-         removedLines.map(l => "  - " + l).join("\n") + "\n"
-         : "No changes detected.\n");
+      "\n================================================================================\n";
+    
+    if (isFirstRun) {
+      // On first run, log all current inmates as booked
+      const currentBookings = extractBookings(text);
+      const allInmates = Array.from(currentBookings.values()).map(b => formatBooked(b));
+      logEntry += "BOOKED (" + allInmates.length + "):\n" +
+                  allInmates.slice(0, 100).map(l => "  + " + l).join("\n") + "\n";
+    } else if (hasChanged) {
+      logEntry += "BOOKED (" + addedLines.length + "):\n" +
+                  addedLines.map(l => "  + " + l).join("\n") +
+                  "\n\nRELEASED (" + removedLines.length + "):\n" +
+                  removedLines.map(l => "  - " + l).join("\n") + "\n";
+    } else {
+      logEntry += "No changes detected.\n";
+    }
 
     fs.appendFileSync(logFile, logEntry);
     
