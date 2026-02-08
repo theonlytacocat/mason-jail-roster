@@ -258,27 +258,38 @@ app.get('/api/debug/release-stats', async (req, res) => {
   }
 });
 
-// Debug endpoint to test charge extraction
-app.get('/api/debug/charges', async (req, res) => {
-  try {
+  app.get('/api/debug/charge-lines', async (req, res) => {
+    try {
     const response = await fetch(PDF_URL);
     const arrayBuffer = await response.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const result = await PDFParser(buffer);
     const text = result.text;
     
-    const bookings = extractBookings(text);
-    const sample = Array.from(bookings.values()).slice(0, 10).map(b => ({
-      name: b.name,
-      bookDate: b.bookDate,
-      releaseDate: b.releaseDate,
-      charges: b.charges
-    }));
+    const blocks = text.split(/(?=Booking #:)/);
+    const firstBlock = blocks.find(b => b.includes("Booking #:"));
     
-    res.json({
-      totalInmates: bookings.size,
-      sample: sample
-    });
+    if (!firstBlock) {
+      return res.json({ error: 'No booking blocks found' });
+    }
+    
+    const lines = firstBlock.split("\n");
+    const relevantLines = [];
+    
+    // Get 30 lines to see what's happening
+    for (let i = 0; i < Math.min(30, lines.length); i++) {
+      const t = lines[i].trim();
+      relevantLines.push({
+        index: i,
+        text: t,
+        length: t.length,
+        includesStatute: t.includes("Statute"),
+        includesOffense: t.includes("Offense"),
+        exactMatch: t === "StatuteOffenseCourtOffenseClass"
+      });
+    }
+    
+    res.json({ relevantLines });
   } catch (error) {
     res.json({ error: error.message });
   }
