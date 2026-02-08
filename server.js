@@ -912,3 +912,54 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
 });
+
+app.get('/api/debug/charge-lines', async (req, res) => {
+  try {
+    const response = await fetch(PDF_URL);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    const text = result.text;
+    
+    const blocks = text.split(/(?=Booking #:)/);
+    const firstBlock = blocks.find(b => b.includes("Booking #:"));
+    
+    if (!firstBlock) {
+      return res.json({ error: 'No booking blocks found' });
+    }
+    
+    const lines = firstBlock.split("\n");
+    let inCharges = false;
+    const chargeLines = [];
+    const allLinesAfterHeader = [];
+    
+    for (const line of lines) {
+      const t = line.trim();
+      
+      if (t === "StatuteOffenseCourtOffenseClass") {
+        inCharges = true;
+        continue;
+      }
+      
+      if (t.startsWith("Booking #:")) {
+        break;
+      }
+      
+      if (inCharges) {
+        allLinesAfterHeader.push(t);
+        
+        if (t.includes('SUPR') || t.includes('DIST') || t.includes('MUNI') || t.includes('DOC')) {
+          chargeLines.push(t);
+        }
+      }
+    }
+    
+    res.json({
+      foundHeader: allLinesAfterHeader.length > 0,
+      allLinesAfterHeader: allLinesAfterHeader.slice(0, 20),
+      chargeLines: chargeLines
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
