@@ -117,7 +117,7 @@ function extractBookings(rosterText) {
         // Look for lines that contain court types
         if (t.includes('SUPR') || t.includes('DIST') || t.includes('MUNI') || t.includes('DOC')) {
           // Remove statute code at the beginning (numbers, dots, letters in parentheses)
-          let cleaned = t.replace(/^[\d.()]+[A-Z]/, '');
+          let cleaned = t.replace(/^[\d.()A-Z]+(?=[A-Z][a-z])/, '');
           
           // Remove everything from the court type onwards
           cleaned = cleaned.replace(/(SUPR|DIST|MUNI|DOC).*$/, '');
