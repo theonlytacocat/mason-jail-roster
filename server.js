@@ -165,18 +165,9 @@ function formatReleased(b, stats, isPending = false) {
     };
   }
   
-  // No release stats available yet
-  if (isPending) {
-    return {
-      text: b.name + " | Released: " + b.releaseDate + " (exact time pending)" + 
-            " | Charges: " + chargeText,
-      hasPendingDetails: true,
-      bookingData: b
-    };
-  }
-  
+  // No detailed release info available - just show charges
   return {
-    text: b.name + " | Released: " + b.releaseDate + " | Charges: " + chargeText,
+    text: b.name + " | Released | Charges: " + chargeText,
     hasPendingDetails: false
   };
 }
