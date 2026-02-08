@@ -199,6 +199,23 @@ app.get('/api/debug/reset', (req, res) => {
   }
 });
 
+// Debug Log Tail endpoint
+app.get('/api/debug/log-tail', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    if (fs.existsSync(logFile)) {
+      const content = fs.readFileSync(logFile, 'utf-8');
+      // Get last 5000 characters
+      const tail = content.slice(-5000);
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(tail);
+    } else {
+      res.send('No log file found');
+    }
+  } catch (error) {
+    res.send('Error: ' + error.message);
+  }
+});
 
 // Debug charges enpoint I think 
 app.get('/api/debug/charges', async (req, res) => {
