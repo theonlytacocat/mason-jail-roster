@@ -119,14 +119,19 @@ function extractBookings(rosterText) {
           continue;
         }
         
-        // Match pattern: StatuteCode + OffenseName + CourtType + OffenseType + Class
-        // Example: 9.41.040.1.AWeapons OffenseSUPRWOFFFB
-        const chargeMatch = t.match(/^[\d\w.()]+([A-Z][A-Za-z\s,.-]+?)(DIST|SUPR|MUNI|DOC)/);
-        
-        if (chargeMatch) {
-          const offense = chargeMatch[1].trim();
-          if (offense && offense.length > 1) {
-            charges.push(offense);
+        // Look for lines that contain court types
+        if (t.includes('SUPR') || t.includes('DIST') || t.includes('MUNI') || t.includes('DOC')) {
+          // Remove statute code at the beginning (numbers, dots, letters in parentheses)
+          let cleaned = t.replace(/^[\d.()A-Z]+/, '');
+          
+          // Remove everything from the court type onwards
+          cleaned = cleaned.replace(/(SUPR|DIST|MUNI|DOC).*$/, '');
+          
+          // What's left should be the offense name
+          cleaned = cleaned.trim();
+          
+          if (cleaned.length > 2) {
+            charges.push(cleaned);
           }
         }
       }
