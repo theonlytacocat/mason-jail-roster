@@ -63,6 +63,125 @@ async function fetchReleaseStats() {
   }
 }
 
+// Extract bookings from roster text
+function extractBookings(rosterText) {
+  const bookings = new Map();
+  const blocks = rosterText.split(/(?=Booking #:)/);
+
+  for (const block of blocks) {
+    if (!block.includes("Booking #:")) continue;
+
+    const bookingMatch = block.match(/Booking #:\s*(\S+)/);
+    if (!bookingMatch) continue;
+    const id = bookingMatch[1];
+
+    const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,.'"-]+?)(?=\s*Name Number:|$)/i);
+    let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, " ") : "Unknown";
+    if (name.endsWith(",")) {
+      const nextLine = block.match(/Name:\s*[^\n]+\n([A-Z][A-Z\s'-]*)/i);
+      if (nextLine) name = name + " " + nextLine[1].trim();
+    }
+
+    const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
+    const bookDate = bookDateMatch ? bookDateMatch[2] + " " + bookDateMatch[1] : "Unknown";
+
+    const relDateMatch = block.match(/Rel Date:\s*(?:No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
+    let releaseDate = "Not Released";
+    if (relDateMatch && relDateMatch[1] && relDateMatch[2]) {
+      releaseDate = relDateMatch[2] + " " + relDateMatch[1];
+    }
+
+    const charges = [];
+    const lines = block.split("\n");
+    let inCharges = false;
+    
+    for (const line of lines) {
+      const t = line.trim();
+      
+      // Start capturing after header
+      if (t === "StatuteOffenseCourtOffenseClass") {
+        inCharges = true;
+        continue;
+      }
+      
+      // Stop if we hit another booking
+      if (t.startsWith("Booking #:")) {
+        break;
+      }
+      
+      // If in charges section and line has content
+      if (inCharges && t.length > 0) {
+        // Skip header lines and page markers
+        if (t.includes("Name Number:") || t.includes("Book Date:") || 
+            t.includes("Rel Date:") || t.includes("Page ") || 
+            t.includes("rpjlciol") || t.includes("Current Inmate") ||
+            t.includes("StatuteOffenseCourtOffenseClass")) {
+          continue;
+        }
+        
+        // Match pattern: StatuteCode + OffenseName + CourtType + OffenseType + Class
+        // Example: 9.41.040.1.AWeapons OffenseSUPRWOFFFB
+        const chargeMatch = t.match(/^[\d\w.()]+([A-Z][A-Za-z\s,.-]+?)(DIST|SUPR|MUNI|DOC)/);
+        
+        if (chargeMatch) {
+          const offense = chargeMatch[1].trim();
+          if (offense && offense.length > 1) {
+            charges.push(offense);
+          }
+        }
+      }
+    }
+
+    bookings.set(id, {
+      id,
+      name,
+      bookDate,
+      releaseDate,
+      charges: [...new Set(charges)]
+    });
+  }
+  return bookings;
+}
+
+// Format functions
+function formatBooked(b) {
+  const chargeText = b.charges && b.charges.length > 0 ? b.charges.join(", ") : "None listed";
+  return b.name + " | Booked: " + b.bookDate + " | Charges: " + chargeText;
+}
+
+function formatReleased(b, stats, isPending = false) {
+  const chargeText = b.charges && b.charges.length > 0 ? b.charges.join(", ") : "None listed";
+  const releaseInfo = stats.get(b.name);
+  if (releaseInfo) {
+    const bailAmount = parseFloat(releaseInfo.bail.replace(/[$,]/g, ''));
+    const bailText = bailAmount > 0 ? " | Bail Posted: " + releaseInfo.bail : "";
+    
+    return {
+      text: b.name + " | Released: " + releaseInfo.releaseDateTime + 
+            " | Time served: " + releaseInfo.timeServed + 
+            bailText +
+            " (" + releaseInfo.releaseType + ")" +
+            " | Charges: " + chargeText,
+      hasPendingDetails: false
+    };
+  }
+  
+  // No release stats available yet
+  if (isPending) {
+    return {
+      text: b.name + " | Released: " + b.releaseDate + " (exact time pending)" + 
+            " | Charges: " + chargeText,
+      hasPendingDetails: true,
+      bookingData: b
+    };
+  }
+  
+  return {
+    text: b.name + " | Released: " + b.releaseDate + " | Charges: " + chargeText,
+    hasPendingDetails: false
+  };
+}
+
 // Debug endpoint to see parsed PDF text
 app.get('/api/debug', async (req, res) => {
   try {
@@ -79,6 +198,84 @@ app.get('/api/debug', async (req, res) => {
     res.send(sample);
   } catch (error) {
     res.send('Error: ' + error.message);
+  }
+});
+
+// Debug endpoint to see what files are in storage
+app.get('/api/debug/files', (req, res) => {
+  try {
+    const files = fs.readdirSync(STORAGE_DIR);
+    const fileDetails = files.map(f => {
+      const stats = fs.statSync(path.join(STORAGE_DIR, f));
+      return {
+        name: f,
+        size: stats.size,
+        modified: stats.mtime
+      };
+    });
+    res.json({ 
+      storageDir: STORAGE_DIR,
+      files: fileDetails 
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+// Debug endpoint to see pending releases
+app.get('/api/debug/pending', (req, res) => {
+  try {
+    const pendingFile = path.join(STORAGE_DIR, 'pending_releases.json');
+    if (fs.existsSync(pendingFile)) {
+      const data = JSON.parse(fs.readFileSync(pendingFile, 'utf-8'));
+      res.json({ 
+        count: data.length,
+        pendingReleases: data 
+      });
+    } else {
+      res.json({ message: 'No pending releases file found' });
+    }
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+// Debug endpoint to see release stats
+app.get('/api/debug/release-stats', async (req, res) => {
+  try {
+    const releaseStats = await fetchReleaseStats();
+    res.json({
+      count: releaseStats.size,
+      sample: Array.from(releaseStats.entries()).slice(0, 10)
+    });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+// Debug endpoint to test charge extraction
+app.get('/api/debug/charges', async (req, res) => {
+  try {
+    const response = await fetch(PDF_URL);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    const text = result.text;
+    
+    const bookings = extractBookings(text);
+    const sample = Array.from(bookings.values()).slice(0, 10).map(b => ({
+      name: b.name,
+      bookDate: b.bookDate,
+      releaseDate: b.releaseDate,
+      charges: b.charges
+    }));
+    
+    res.json({
+      totalInmates: bookings.size,
+      sample: sample
+    });
+  } catch (error) {
+    res.json({ error: error.message });
   }
 });
 
@@ -272,121 +469,6 @@ app.get('/api/run', async (req, res) => {
       } catch (e) {
         pendingReleases = [];
       }
-    }
-
-    function extractBookings(rosterText) {
-       const bookings = new Map();
-       const blocks = rosterText.split(/(?=Booking #:)/);
-
-     for (const block of blocks) {
-       if (!block.includes("Booking #:")) continue;
-
-    const bookingMatch = block.match(/Booking #:\s*(\S+)/);
-       if (!bookingMatch) continue;
-       const id = bookingMatch[1];
-
-    const nameMatch = block.match(/Name:\s*([A-Z][A-Z\s,.'"-]+?)(?=\s*Name Number:|$)/i);
-       let name = nameMatch ? nameMatch[1].trim().replace(/\s+/g, " ") : "Unknown";
-        if (name.endsWith(",")) {
-         const nextLine = block.match(/Name:\s*[^\n]+\n([A-Z][A-Z\s'-]*)/i);
-        if (nextLine) name = name + " " + nextLine[1].trim();
-    }
-
-    const bookDateMatch = block.match(/Book Date:\s*(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4})/);
-    const bookDate = bookDateMatch ? bookDateMatch[2] + " " + bookDateMatch[1] : "Unknown";
-
-    const relDateMatch = block.match(/Rel Date:\s*(?:No Rel Date|(\d{1,2}:\d{2}:\d{2})\s+(\d{1,2}\/\d{1,2}\/\d{2,4}))/);
-    let releaseDate = "Not Released";
-    if (relDateMatch && relDateMatch[1] && relDateMatch[2]) {
-      releaseDate = relDateMatch[2] + " " + relDateMatch[1];
-    }
-
-    const charges = [];
-    const lines = block.split("\n");
-    let inCharges = false;
-    
-    for (const line of lines) {
-      const t = line.trim();
-      
-      // Start capturing after header
-      if (t === "StatuteOffenseCourtOffenseClass") {
-        inCharges = true;
-        continue;
-      }
-      
-      // Stop if we hit another booking
-      if (t.startsWith("Booking #:")) {
-        break;
-      }
-      
-      // If in charges section and line has content
-      if (inCharges && t.length > 0) {
-        // Skip header lines and page markers
-        if (t.includes("Name Number:") || t.includes("Book Date:") || 
-            t.includes("Rel Date:") || t.includes("Page ") || 
-            t.includes("rpjlciol") || t.includes("Current Inmate") ||
-            t.includes("StatuteOffenseCourtOffenseClass")) {
-          continue;
-        }
-        
-        // Match pattern: StatuteCode + OffenseName + CourtType + OffenseType + Class
-        // Example: 9.41.040.1.AWeapons OffenseSUPRWOFFFB
-        const chargeMatch = t.match(/^[\d\w.()]+([A-Z][A-Za-z\s,.-]+?)(DIST|SUPR|MUNI|DOC)/);
-        
-        if (chargeMatch) {
-          const offense = chargeMatch[1].trim();
-          if (offense && offense.length > 1) {
-            charges.push(offense);
-          }
-        }
-      }
-    }
-
-    bookings.set(id, {
-      id,
-      name,
-      bookDate,
-      releaseDate,
-      charges: [...new Set(charges)]  // Remove duplicates
-    });
-  }
-  return bookings;
-}
-
-    function formatBooked(b) {
-      return b.name + " | Booked: " + b.bookDate + " | Charges: " + (b.charges.join(", ") || "None listed");
-    }
-
-    function formatReleased(b, stats, isPending = false) {
-      const releaseInfo = stats.get(b.name);
-      if (releaseInfo) {
-        const bailAmount = parseFloat(releaseInfo.bail.replace(/[$,]/g, ''));
-        const bailText = bailAmount > 0 ? " | Bail Posted: " + releaseInfo.bail : "";
-        
-        return {
-          text: b.name + " | Released: " + releaseInfo.releaseDateTime + 
-                " | Time served: " + releaseInfo.timeServed + 
-                bailText +
-                " (" + releaseInfo.releaseType + ")" +
-                " | Charges: " + (b.charges.join(", ") || "None listed"),
-          hasPendingDetails: false
-        };
-      }
-      
-      // No release stats available yet
-      if (isPending) {
-        return {
-          text: b.name + " | Released: " + b.releaseDate + " (exact time pending)" + 
-                " | Charges: " + (b.charges.join(", ") || "None listed"),
-          hasPendingDetails: true,
-          bookingData: b
-        };
-      }
-      
-      return {
-        text: b.name + " | Released: " + b.releaseDate + " | Charges: " + (b.charges.join(", ") || "None listed"),
-        hasPendingDetails: false
-      };
     }
 
     if (fs.existsSync(hashFile) && fs.existsSync(rosterFile)) {
@@ -824,66 +906,4 @@ app.get('/api/history', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
-});
-
-app.get('/api/debug/files', (req, res) => {
-  try {
-    const files = fs.readdirSync(STORAGE_DIR);
-    const fileDetails = files.map(f => {
-      const stats = fs.statSync(path.join(STORAGE_DIR, f));
-      return {
-        name: f,
-        size: stats.size,
-        modified: stats.mtime
-      };
-    });
-    res.json({ 
-      storageDir: STORAGE_DIR,
-      files: fileDetails 
-    });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
-});
-
-app.get('/api/debug/pending', (req, res) => {
-  try {
-    const pendingFile = path.join(STORAGE_DIR, 'pending_releases.json');
-    if (fs.existsSync(pendingFile)) {
-      const data = JSON.parse(fs.readFileSync(pendingFile, 'utf-8'));
-      res.json({ 
-        count: data.length,
-        pendingReleases: data 
-      });
-    } else {
-      res.json({ message: 'No pending releases file found' });
-    }
-  } catch (error) {
-    res.json({ error: error.message });
-  }
-});
-
-app.get('/api/debug/charges', async (req, res) => {
-  try {
-    const response = await fetch(PDF_URL);
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const result = await PDFParser(buffer);
-    const text = result.text;
-    
-    const bookings = extractBookings(text);
-    const sample = Array.from(bookings.values()).slice(0, 10).map(b => ({
-      name: b.name,
-      bookDate: b.bookDate,
-      releaseDate: b.releaseDate,
-      charges: b.charges
-    }));
-    
-    res.json({
-      totalInmates: bookings.size,
-      sample: sample
-    });
-  } catch (error) {
-    res.json({ error: error.message });
-  }
 });
