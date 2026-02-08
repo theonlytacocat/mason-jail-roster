@@ -99,23 +99,18 @@ function extractBookings(rosterText) {
       const t = line.trim();
       
       // Start capturing after header (flexible matching)
-      if (t.includes("StatuteOffense") || t.includes("Statute") && t.includes("Offense")) {
+      if (t.includes("StatuteOffense") || (t.includes("Statute") && t.includes("Offense"))) {
         inCharges = true;
         continue;
       }
       
-      // Stop if we hit another booking
-      if (t.startsWith("Booking #:")) {
-        break;
-      }
-      
-      // If in charges section and line has content
+      // If we're in charges section and line has content
       if (inCharges && t.length > 0) {
         // Skip header lines and page markers
         if (t.includes("Name Number:") || t.includes("Book Date:") || 
             t.includes("Rel Date:") || t.includes("Page ") || 
             t.includes("rpjlciol") || t.includes("Current Inmate") ||
-            t.includes("StatuteOffenseCourtOffenseClass")) {
+            t.includes("StatuteOffense")) {
           continue;
         }
         
@@ -136,7 +131,6 @@ function extractBookings(rosterText) {
         }
       }
     }
-
     bookings.set(id, {
       id,
       name,
