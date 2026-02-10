@@ -1505,6 +1505,22 @@ app.post('/api/admin/merge-logs', (req, res) => {
   }
 });
 
+// View full change log
+app.get('/api/admin/view-log', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    if (fs.existsSync(logFile)) {
+      const content = fs.readFileSync(logFile, 'utf-8');
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(content);
+    } else {
+      res.send('No log file found');
+    }
+  } catch (error) {
+    res.send('Error: ' + error.message);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
