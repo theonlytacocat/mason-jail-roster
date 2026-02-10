@@ -1483,15 +1483,23 @@ app.get('/api/admin/merge', (req, res) => {
 </html>`);
 });
 
-app.post('/api/admin/merge-logs', express.text({ limit: '50mb' }), (req, res) => {
+app.post('/api/admin/merge-logs', (req, res) => {
   try {
-    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
-    const oldContent = req.body;
+    let body = '';
     
-    // Append old content to current log
-    fs.appendFileSync(logFile, '\n' + oldContent);
+    req.on('data', chunk => {
+      body += chunk.toString();
+    });
     
-    res.json({ success: true, message: 'Old logs merged successfully!' });
+    req.on('end', () => {
+      const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+      
+      // Append old content to current log
+      fs.appendFileSync(logFile, '\n' + body);
+      
+      res.json({ success: true, message: 'Old logs merged successfully!' });
+    });
+    
   } catch (error) {
     res.json({ success: false, error: error.message });
   }
