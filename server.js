@@ -428,7 +428,7 @@ app.get('/api/status', (req, res) => {
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #5f8a2f; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #00ff6a; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
@@ -436,7 +436,7 @@ app.get('/api/status', (req, res) => {
     .stat:last-child { border-bottom: none; }
     .stat-label { color: #94b8b5; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #162900; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #333a2c; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #93bd8b; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
     a { color: #589270; text-decoration: none; }
@@ -473,8 +473,8 @@ app.get('/api/status', (req, res) => {
         </div>
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
-      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #162900;">View Change History</a>
-      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #411844;">View Statistics Dashboard</a>
+      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #333a2c;">View Change History</a>
+      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #411844;">*NEW* Statistics Dashboard</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
