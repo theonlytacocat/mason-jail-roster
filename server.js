@@ -474,6 +474,7 @@ app.get('/api/status', (req, res) => {
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
       <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
+      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #701e77;">View Statistics Dashboard</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
@@ -1008,6 +1009,423 @@ app.get('/api/history', (req, res) => {
 
   res.send(html);
 });
+
+// Add this new route before your app.listen() at the bottom
+
+// Stats Dashboard
+app.get('/api/stats', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    
+    if (!fs.existsSync(logFile)) {
+      return res.send(getStatsHTML({
+        totalBookings: 0,
+        totalReleases: 0,
+        currentPopulation: 0,
+        commonCharges: [],
+        bookingsByDay: {},
+        avgStayDays: 0,
+        releaseTypes: {},
+        timeSeriesData: []
+      }));
+    }
+
+    const logContent = fs.readFileSync(logFile, 'utf-8');
+    
+    // Parse the log file
+    let totalBookings = 0;
+    let totalReleases = 0;
+    let allCharges = [];
+    let releaseTypes = {};
+    let bookingDates = [];
+    let stayDurations = [];
+    
+    const sections = logContent.split('================================================================================');
+    
+    for (let i = 0; i < sections.length; i++) {
+      const section = sections[i];
+      
+      // Count bookings
+      const bookedMatch = section.match(/BOOKED \((\d+)\)/);
+      if (bookedMatch) {
+        totalBookings += parseInt(bookedMatch[1]);
+      }
+      
+      // Count releases
+      const releasedMatch = section.match(/RELEASED \((\d+)\)/);
+      if (releasedMatch) {
+        totalReleases += parseInt(releasedMatch[1]);
+      }
+      
+      // Extract charges from booked entries
+      const bookedLines = section.match(/\+ (.+?) \| Booked:/g);
+      if (bookedLines) {
+        bookedLines.forEach(line => {
+          const chargeMatch = line.match(/Charges: (.+)$/);
+          if (chargeMatch && chargeMatch[1] !== 'None listed') {
+            const charges = chargeMatch[1].split(', ');
+            allCharges.push(...charges);
+          }
+        });
+      }
+      
+      // Extract release types and time served
+      const releasedLines = section.match(/- (.+?) \| Released:/g);
+      if (releasedLines) {
+        releasedLines.forEach(line => {
+          const typeMatch = line.match(/\(([A-Z]+)\)/);
+          if (typeMatch) {
+            const type = typeMatch[1];
+            releaseTypes[type] = (releaseTypes[type] || 0) + 1;
+          }
+          
+          const timeMatch = line.match(/Time served: (\d+)d/);
+          if (timeMatch) {
+            stayDurations.push(parseInt(timeMatch[1]));
+          }
+        });
+      }
+      
+      // Extract booking dates for time series
+      const dateMatch = section.match(/at: (.+)/);
+      if (dateMatch && bookedMatch) {
+        bookingDates.push({
+          date: new Date(dateMatch[1]),
+          count: parseInt(bookedMatch[1])
+        });
+      }
+    }
+    
+    // Calculate charge frequencies
+    const chargeCounts = {};
+    allCharges.forEach(charge => {
+      chargeCounts[charge] = (chargeCounts[charge] || 0) + 1;
+    });
+    
+    const commonCharges = Object.entries(chargeCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([charge, count]) => ({ charge, count }));
+    
+    // Calculate bookings by day of week
+    const bookingsByDay = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
+    bookingDates.forEach(({ date }) => {
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const day = dayNames[date.getDay()];
+      bookingsByDay[day]++;
+    });
+    
+    // Calculate average stay
+    const avgStayDays = stayDurations.length > 0 
+      ? Math.round(stayDurations.reduce((a, b) => a + b, 0) / stayDurations.length)
+      : 0;
+    
+    // Get current population from roster file
+    let currentPopulation = 0;
+    const rosterFile = path.join(STORAGE_DIR, 'prev_roster.txt');
+    if (fs.existsSync(rosterFile)) {
+      const content = fs.readFileSync(rosterFile, 'utf-8');
+      const bookingMatches = content.match(/Booking #:/g);
+      currentPopulation = bookingMatches ? bookingMatches.length : 0;
+    }
+    
+    // Prepare time series data (last 30 days)
+    const last30Days = [];
+    for (let i = 29; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      
+      const dayBookings = bookingDates.filter(b => {
+        const bDate = new Date(b.date);
+        return bDate.toDateString() === date.toDateString();
+      }).reduce((sum, b) => sum + b.count, 0);
+      
+      last30Days.push({ date: dateStr, count: dayBookings });
+    }
+    
+    const stats = {
+      totalBookings,
+      totalReleases,
+      currentPopulation,
+      commonCharges,
+      bookingsByDay,
+      avgStayDays,
+      releaseTypes,
+      timeSeriesData: last30Days
+    };
+    
+    res.send(getStatsHTML(stats));
+    
+  } catch (error) {
+    console.error('Stats error:', error);
+    res.send('Error generating stats: ' + error.message);
+  }
+});
+
+function getStatsHTML(stats) {
+  const maxCharge = Math.max(...stats.commonCharges.map(c => c.count), 1);
+  const maxDay = Math.max(...Object.values(stats.bookingsByDay), 1);
+  
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <title>Statistics Dashboard - Mason County Jail</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: Arial, sans-serif; 
+      font-size: 9pt; 
+      background: #181818; 
+      color: #93bd8b; 
+      min-height: 100vh; 
+      padding: 2rem; 
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    h1 { 
+      font-family: 'Noto Serif', sans-serif; 
+      font-size: 2rem; 
+      margin-bottom: 0.5rem; 
+      color: #b8b8b8; 
+      letter-spacing: -4px; 
+    }
+    .subtitle { color: #4c6e60; margin-bottom: 2rem; }
+    .back-link { 
+      display: inline-block; 
+      margin-bottom: 1.5rem; 
+      color: #589270; 
+      text-decoration: none; 
+    }
+    .back-link:hover { text-decoration: underline; }
+    
+    .stats-grid { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+      gap: 1rem; 
+      margin-bottom: 2rem; 
+    }
+    .stat-card { 
+      background: #000; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      border-left: 4px solid #5f8a2f;
+    }
+    .stat-card.purple { border-left-color: #701e77; }
+    .stat-card.blue { border-left-color: #589270; }
+    .stat-card.orange { border-left-color: #d97706; }
+    
+    .stat-value { 
+      font-size: 2.5rem; 
+      font-weight: bold; 
+      color: #93bd8b; 
+      margin-bottom: 0.25rem;
+    }
+    .stat-label { 
+      color: #4c6e60; 
+      font-size: 0.875rem; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .chart-container { 
+      background: #000; 
+      border-radius: 12px; 
+      padding: 1.5rem; 
+      margin-bottom: 1rem; 
+    }
+    .chart-title { 
+      color: #ffa0f9; 
+      font-size: 1.1rem; 
+      font-weight: bold; 
+      margin-bottom: 1rem; 
+    }
+    
+    .bar-chart { margin-top: 1rem; }
+    .bar-item { 
+      display: flex; 
+      align-items: center; 
+      margin-bottom: 0.75rem; 
+    }
+    .bar-label { 
+      min-width: 200px; 
+      color: #94b8b5; 
+      font-size: 0.8rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .bar-fill { 
+      background: linear-gradient(90deg, #5f8a2f, #93bd8b); 
+      height: 24px; 
+      border-radius: 4px; 
+      display: flex; 
+      align-items: center; 
+      padding: 0 0.5rem; 
+      color: #fff; 
+      font-weight: bold; 
+      font-size: 0.75rem;
+      min-width: 30px;
+    }
+    
+    .day-chart { 
+      display: flex; 
+      gap: 0.5rem; 
+      align-items: flex-end; 
+      height: 200px; 
+      margin-top: 1rem;
+    }
+    .day-bar { 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-end;
+    }
+    .day-bar-fill { 
+      width: 100%; 
+      background: linear-gradient(180deg, #701e77, #ffa0f9); 
+      border-radius: 4px 4px 0 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: bold;
+      padding-bottom: 0.25rem;
+    }
+    .day-label { 
+      color: #4c6e60; 
+      font-size: 0.75rem; 
+      margin-top: 0.5rem; 
+    }
+    
+    .release-types { 
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+      gap: 1rem; 
+      margin-top: 1rem;
+    }
+    .release-type { 
+      background: #1a1a1a; 
+      padding: 1rem; 
+      border-radius: 8px; 
+      text-align: center;
+    }
+    .release-type-count { 
+      font-size: 1.5rem; 
+      font-weight: bold; 
+      color: #93bd8b; 
+    }
+    .release-type-label { 
+      color: #4c6e60; 
+      font-size: 0.75rem; 
+      margin-top: 0.25rem;
+    }
+
+    .time-series {
+      display: flex;
+      gap: 2px;
+      align-items: flex-end;
+      height: 150px;
+      margin-top: 1rem;
+    }
+    .time-bar {
+      flex: 1;
+      background: linear-gradient(180deg, #589270, #93bd8b);
+      border-radius: 2px 2px 0 0;
+      position: relative;
+      min-width: 8px;
+    }
+    .time-bar:hover {
+      background: linear-gradient(180deg, #ffa0f9, #701e77);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/api/status" class="back-link">← Back to Status</a>
+    <h1>Statistics Dashboard</h1>
+    <p class="subtitle">Mason County Jail Roster Analytics</p>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">${stats.totalBookings.toLocaleString()}</div>
+        <div class="stat-label">Total Bookings Tracked</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-value">${stats.totalReleases.toLocaleString()}</div>
+        <div class="stat-label">Total Releases Tracked</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-value">${stats.currentPopulation}</div>
+        <div class="stat-label">Current Population</div>
+      </div>
+      <div class="stat-card orange">
+        <div class="stat-value">${stats.avgStayDays} days</div>
+        <div class="stat-label">Average Length of Stay</div>
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Bookings Over Last 30 Days</div>
+      <div class="time-series">
+        ${stats.timeSeriesData.map(d => {
+          const maxCount = Math.max(...stats.timeSeriesData.map(x => x.count), 1);
+          const height = (d.count / maxCount) * 100;
+          return `<div class="time-bar" style="height: ${height}%" title="${d.date}: ${d.count} booking${d.count !== 1 ? 's' : ''}"></div>`;
+        }).join('')}
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-title">Most Common Charges</div>
+      <div class="bar-chart">
+        ${stats.commonCharges.map(item => `
+          <div class="bar-item">
+            <div class="bar-label">${item.charge}</div>
+            <div class="bar-fill" style="width: ${(item.count / maxCharge) * 300}px;">
+              ${item.count}
+            </div>
+          </div>
+        `).join('')}
+        ${stats.commonCharges.length === 0 ? '<p style="color: #4c6e60;">No charge data available yet</p>' : ''}
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-title">Bookings by Day of Week</div>
+      <div class="day-chart">
+        ${Object.entries(stats.bookingsByDay).map(([day, count]) => `
+          <div class="day-bar">
+            <div class="day-bar-fill" style="height: ${(count / maxDay) * 100}%;">
+              ${count > 0 ? count : ''}
+            </div>
+            <div class="day-label">${day}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+    
+    <div class="chart-container">
+      <div class="chart-title">Release Types</div>
+      <div class="release-types">
+        ${Object.entries(stats.releaseTypes).map(([type, count]) => `
+          <div class="release-type">
+            <div class="release-type-count">${count}</div>
+            <div class="release-type-label">${type}</div>
+          </div>
+        `).join('')}
+        ${Object.keys(stats.releaseTypes).length === 0 ? '<p style="color: #4c6e60;">No release data available yet</p>' : ''}
+      </div>
+    </div>
+    
+  </div>
+</body>
+</html>`;
+}
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
