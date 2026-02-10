@@ -428,7 +428,7 @@ app.get('/api/status', (req, res) => {
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #00ff6a; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #33ff00; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
@@ -1010,7 +1010,24 @@ app.get('/api/history', (req, res) => {
   res.send(html);
 });
 
-// Add this new route before your app.listen() at the bottom
+// Temp endpoint to delete the logs and keep the volume 
+app.get('/api/delete-logs', async (req, res) => {
+  const fs = require('fs').promises;
+  const path = require('path');
+  
+  try {
+    const dataDir = path.join(__dirname, 'data');
+    const files = await fs.readdir(dataDir);
+    
+    for (const file of files) {
+      await fs.unlink(path.join(dataDir, file));
+    }
+    
+    res.send('All files in /data deleted successfully');
+  } catch (err) {
+    res.status(500).send('Error: ' + err.message);
+  }
+});
 
 // Stats Dashboard
 // Replace the entire app.get('/api/stats', ...) route with this improved version:
