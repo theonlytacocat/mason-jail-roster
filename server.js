@@ -1072,8 +1072,7 @@ app.get('/api/history', (req, res) => {
   res.send(html);
 });
 
-// Stats Dashboard
-// Replace the entire app.get('/api/stats', ...) route with this improved version:
+// Stats Dashboard - UPDATED for new format
 app.get('/api/stats', (req, res) => {
   try {
     const logFile = path.join(STORAGE_DIR, 'change_log.txt');
@@ -1093,77 +1092,85 @@ app.get('/api/stats', (req, res) => {
 
     const logContent = fs.readFileSync(logFile, 'utf-8');
     
-    // Parse the log file
+    // Parse the log file for NEW format
     let totalBookings = 0;
     let totalReleases = 0;
     let allCharges = [];
     let releaseTypes = {};
     let bookingDates = [];
+    let releaseDates = [];
     let stayDurations = [];
     
-    const sections = logContent.split(/={50,}/);  // Split on any line with 50+ equals signs
+    const lines = logContent.split('\n');
     
-    for (let i = 0; i < sections.length; i++) {
-      const section = sections[i];
+    for (const line of lines) {
+      const trimmedLine = line.trim();
       
-      // Count bookings
-      const bookedMatch = section.match(/BOOKED \((\d+)\)/);
-      if (bookedMatch) {
-        totalBookings += parseInt(bookedMatch[1]);
-      }
-      
-      // Count releases
-      const releasedMatch = section.match(/RELEASED \((\d+)\)/);
-      if (releasedMatch) {
-        totalReleases += parseInt(releasedMatch[1]);
-      }
-      
-      // Extract charges from booked entries - improved regex
-      const bookedRegex = /\+\s+([^|]+)\s+\|\s+Booked:[^|]+\|\s+Charges:\s+(.+)/g;
-      let bookedMatch2;
-      while ((bookedMatch2 = bookedRegex.exec(section)) !== null) {
-        const charges = bookedMatch2[2].trim();
-        if (charges && charges !== 'None listed') {
-          const chargeList = charges.split(',').map(c => c.trim());
-          allCharges.push(...chargeList);
+      // Check for BOOKED entries in NEW format: "BOOKED | NAME | Booked: DATE | Charges: ..."
+      if (trimmedLine.startsWith('BOOKED |')) {
+        totalBookings++;
+        
+        // Extract date
+        const dateMatch = trimmedLine.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+        if (dateMatch) {
+          const dateStr = dateMatch[1]; // "01/18/26"
+          const [month, day, year] = dateStr.split('/');
+          const fullYear = 2000 + parseInt(year);
+          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+          bookingDates.push(date);
         }
-      }
-      
-      // Extract charges from released entries - improved regex
-      const releasedRegex = /-\s+([^|]+)\s+\|\s+Released:[^|]+\|\s+Charges:\s+(.+)/g;
-      let releasedMatch2;
-      while ((releasedMatch2 = releasedRegex.exec(section)) !== null) {
-        const charges = releasedMatch2[2].trim();
-        if (charges && charges !== 'None listed' && charges !== 'Not Released') {
-          const chargeList = charges.split(',').map(c => c.trim());
-          allCharges.push(...chargeList);
-        }
-      }
-      
-      // Extract release types and time served
-      const relTypeMatch = section.match(/\(([A-Z]{2,4})\)/g);
-      if (relTypeMatch) {
-        relTypeMatch.forEach(match => {
-          const type = match.replace(/[()]/g, '');
-          if (type.length >= 2 && type.length <= 4) {
-            releaseTypes[type] = (releaseTypes[type] || 0) + 1;
+        
+        // Extract charges
+        const chargesMatch = trimmedLine.match(/Charges:\s+(.+)/);
+        if (chargesMatch) {
+          const charges = chargesMatch[1].trim();
+          if (charges && charges !== 'None listed') {
+            const chargeList = charges.split(',').map(c => c.trim());
+            allCharges.push(...chargeList);
           }
-        });
+        }
       }
       
-      const timeMatch = section.match(/Time served: (\d+)\s*d/);
-      if (timeMatch) {
-        stayDurations.push(parseInt(timeMatch[1]));
+      // Check for RELEASED entries in NEW format: "RELEASED | NAME | Released: DATE | Charges: ..."
+      else if (trimmedLine.startsWith('RELEASED |')) {
+        totalReleases++;
+        
+        // Extract release type
+        if (trimmedLine.includes('Not Released')) {
+          releaseTypes['Not Released'] = (releaseTypes['Not Released'] || 0) + 1;
+        } else if (trimmedLine.includes('Released:')) {
+          releaseTypes['Released'] = (releaseTypes['Released'] || 0) + 1;
+        }
+        
+        // Extract release date
+        const dateMatch = trimmedLine.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+        if (dateMatch) {
+          const dateStr = dateMatch[1]; // "01/18/26"
+          const [month, day, year] = dateStr.split('/');
+          const fullYear = 2000 + parseInt(year);
+          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+          releaseDates.push(date);
+        }
+        
+        // Extract charges from releases too
+        const chargesMatch = trimmedLine.match(/Charges:\s+(.+)/);
+        if (chargesMatch) {
+          const charges = chargesMatch[1].trim();
+          if (charges && charges !== 'None listed' && charges !== 'Not Released') {
+            const chargeList = charges.split(',').map(c => c.trim());
+            allCharges.push(...chargeList);
+          }
+        }
       }
       
-      // Extract booking dates for time series - improved parsing
-      const dateMatch = section.match(/(?:Change detected at|Initial capture at):\s+(.+)/);
-      if (dateMatch && bookedMatch) {
-        const dateStr = dateMatch[1].replace('Z', '').trim();
-        bookingDates.push({
-          date: new Date(dateStr),
-          count: parseInt(bookedMatch[1])
-        });
+      // OLD format fallback (if you still have some old entries)
+      else if (trimmedLine.startsWith('+ ')) {
+        totalBookings++;
+        // Handle old "+ NAME | Booked: ..." format if needed
+      }
+      else if (trimmedLine.startsWith('- ')) {
+        totalReleases++;
+        // Handle old "- NAME | Released: ..." format if needed
       }
     }
     
@@ -1183,18 +1190,16 @@ app.get('/api/stats', (req, res) => {
     
     // Calculate bookings by day of week
     const bookingsByDay = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
-    bookingDates.forEach(({ date, count }) => {
+    bookingDates.forEach(date => {
       if (date && !isNaN(date.getTime())) {
         const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
         const day = dayNames[date.getDay()];
-        bookingsByDay[day] += count;
+        bookingsByDay[day] = (bookingsByDay[day] || 0) + 1;
       }
     });
     
-    // Calculate average stay
-    const avgStayDays = stayDurations.length > 0 
-      ? Math.round(stayDurations.reduce((a, b) => a + b, 0) / stayDurations.length)
-      : 0;
+    // Calculate average stay (simple approximation)
+    const avgStayDays = 0; // You'll need more data for this
     
     // Get current population from roster file
     let currentPopulation = 0;
@@ -1207,16 +1212,18 @@ app.get('/api/stats', (req, res) => {
     
     // Prepare time series data (last 30 days)
     const last30Days = [];
+    const today = new Date();
+    
     for (let i = 29; i >= 0; i--) {
-      const date = new Date();
+      const date = new Date(today);
       date.setDate(date.getDate() - i);
       const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       
-      const dayBookings = bookingDates.filter(b => {
-        if (!b.date || isNaN(b.date.getTime())) return false;
-        const bDate = new Date(b.date);
-        return bDate.toDateString() === date.toDateString();
-      }).reduce((sum, b) => sum + b.count, 0);
+      // Count bookings for this day
+      const dayBookings = bookingDates.filter(bookingDate => {
+        if (!bookingDate || isNaN(bookingDate.getTime())) return false;
+        return bookingDate.toDateString() === date.toDateString();
+      }).length;
       
       last30Days.push({ date: dateStr, count: dayBookings });
     }
