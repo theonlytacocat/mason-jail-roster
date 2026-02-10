@@ -436,7 +436,7 @@ app.get('/api/status', (req, res) => {
     .stat:last-child { border-bottom: none; }
     .stat-label { color: #94b8b5; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #385517; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #162900; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #93bd8b; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
     a { color: #589270; text-decoration: none; }
@@ -473,13 +473,13 @@ app.get('/api/status', (req, res) => {
         </div>
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
-      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
+      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #162900;">View Change History</a>
       <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #411844;">View Statistics Dashboard</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #445645; color: #333a2c; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #ec00ff; color: #000000; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
