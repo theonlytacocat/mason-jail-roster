@@ -1013,6 +1013,7 @@ app.get('/api/history', (req, res) => {
 // Add this new route before your app.listen() at the bottom
 
 // Stats Dashboard
+// Replace the entire app.get('/api/stats', ...) route with this improved version:
 app.get('/api/stats', (req, res) => {
   try {
     const logFile = path.join(STORAGE_DIR, 'change_log.txt');
@@ -1040,7 +1041,7 @@ app.get('/api/stats', (req, res) => {
     let bookingDates = [];
     let stayDurations = [];
     
-    const sections = logContent.split('================================================================================');
+    const sections = logContent.split(/={50,}/);  // Split on any line with 50+ equals signs
     
     for (let i = 0; i < sections.length; i++) {
       const section = sections[i];
@@ -1057,40 +1058,50 @@ app.get('/api/stats', (req, res) => {
         totalReleases += parseInt(releasedMatch[1]);
       }
       
-      // Extract charges from booked entries
-      const bookedLines = section.match(/\+ (.+?) \| Booked:/g);
-      if (bookedLines) {
-        bookedLines.forEach(line => {
-          const chargeMatch = line.match(/Charges: (.+)$/);
-          if (chargeMatch && chargeMatch[1] !== 'None listed') {
-            const charges = chargeMatch[1].split(', ');
-            allCharges.push(...charges);
-          }
-        });
+      // Extract charges from booked entries - improved regex
+      const bookedRegex = /\+\s+([^|]+)\s+\|\s+Booked:[^|]+\|\s+Charges:\s+(.+)/g;
+      let bookedMatch2;
+      while ((bookedMatch2 = bookedRegex.exec(section)) !== null) {
+        const charges = bookedMatch2[2].trim();
+        if (charges && charges !== 'None listed') {
+          const chargeList = charges.split(',').map(c => c.trim());
+          allCharges.push(...chargeList);
+        }
+      }
+      
+      // Extract charges from released entries - improved regex
+      const releasedRegex = /-\s+([^|]+)\s+\|\s+Released:[^|]+\|\s+Charges:\s+(.+)/g;
+      let releasedMatch2;
+      while ((releasedMatch2 = releasedRegex.exec(section)) !== null) {
+        const charges = releasedMatch2[2].trim();
+        if (charges && charges !== 'None listed' && charges !== 'Not Released') {
+          const chargeList = charges.split(',').map(c => c.trim());
+          allCharges.push(...chargeList);
+        }
       }
       
       // Extract release types and time served
-      const releasedLines = section.match(/- (.+?) \| Released:/g);
-      if (releasedLines) {
-        releasedLines.forEach(line => {
-          const typeMatch = line.match(/\(([A-Z]+)\)/);
-          if (typeMatch) {
-            const type = typeMatch[1];
+      const relTypeMatch = section.match(/\(([A-Z]{2,4})\)/g);
+      if (relTypeMatch) {
+        relTypeMatch.forEach(match => {
+          const type = match.replace(/[()]/g, '');
+          if (type.length >= 2 && type.length <= 4) {
             releaseTypes[type] = (releaseTypes[type] || 0) + 1;
-          }
-          
-          const timeMatch = line.match(/Time served: (\d+)d/);
-          if (timeMatch) {
-            stayDurations.push(parseInt(timeMatch[1]));
           }
         });
       }
       
-      // Extract booking dates for time series
-      const dateMatch = section.match(/at: (.+)/);
+      const timeMatch = section.match(/Time served: (\d+)\s*d/);
+      if (timeMatch) {
+        stayDurations.push(parseInt(timeMatch[1]));
+      }
+      
+      // Extract booking dates for time series - improved parsing
+      const dateMatch = section.match(/(?:Change detected at|Initial capture at):\s+(.+)/);
       if (dateMatch && bookedMatch) {
+        const dateStr = dateMatch[1].replace('Z', '').trim();
         bookingDates.push({
-          date: new Date(dateMatch[1]),
+          date: new Date(dateStr),
           count: parseInt(bookedMatch[1])
         });
       }
@@ -1099,7 +1110,10 @@ app.get('/api/stats', (req, res) => {
     // Calculate charge frequencies
     const chargeCounts = {};
     allCharges.forEach(charge => {
-      chargeCounts[charge] = (chargeCounts[charge] || 0) + 1;
+      const cleanCharge = charge.trim();
+      if (cleanCharge) {
+        chargeCounts[cleanCharge] = (chargeCounts[cleanCharge] || 0) + 1;
+      }
     });
     
     const commonCharges = Object.entries(chargeCounts)
@@ -1109,10 +1123,12 @@ app.get('/api/stats', (req, res) => {
     
     // Calculate bookings by day of week
     const bookingsByDay = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
-    bookingDates.forEach(({ date }) => {
-      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-      const day = dayNames[date.getDay()];
-      bookingsByDay[day]++;
+    bookingDates.forEach(({ date, count }) => {
+      if (date && !isNaN(date.getTime())) {
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        const day = dayNames[date.getDay()];
+        bookingsByDay[day] += count;
+      }
     });
     
     // Calculate average stay
@@ -1137,6 +1153,7 @@ app.get('/api/stats', (req, res) => {
       const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       
       const dayBookings = bookingDates.filter(b => {
+        if (!b.date || isNaN(b.date.getTime())) return false;
         const bDate = new Date(b.date);
         return bDate.toDateString() === date.toDateString();
       }).reduce((sum, b) => sum + b.count, 0);
