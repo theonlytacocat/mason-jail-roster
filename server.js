@@ -439,7 +439,7 @@ app.get('/api/status', (req, res) => {
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #333a2c; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #93bd8b; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #589270; text-decoration: none; }
+    a { color: #353726; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -758,7 +758,7 @@ app.get('/legislative', (req, res) => {
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .content { background: #f9c6fd; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
     .content h2 { color: #000000; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
@@ -769,7 +769,7 @@ app.get('/legislative', (req, res) => {
     .content li { margin-bottom: 0.5rem; color: #94b8b5; }
     .update-date { color: #333a2c; font-weight: bold; margin-bottom: 1rem; }
     .content strong { color: #93bd8b; }
-    a { color: #589270; }
+    a { color: #353726; }
   </style>
 </head>
 <body>
@@ -1041,7 +1041,7 @@ app.get('/api/history', (req, res) => {
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
     .entry.no-change-entry { background: #0a0a0a; padding: 0.75rem; border-left: 3px solid #334155; }
@@ -1050,13 +1050,13 @@ app.get('/api/history', (req, res) => {
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
     .changes.booked h4 { color: #411844 }
     .changes.released h4 { color: #3e7400; }
-    .changes.updated h4 { color: #589270; }
+    .changes.updated h4 { color: #353726; }
     .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #4c6e60; font-style: italic; }
     .no-data { color: #4c6e60; text-align: center; padding: 3rem; }
-    a { color: #589270; }
+    a { color: #353726; }
   </style>
 </head>
 <body>
@@ -1280,7 +1280,7 @@ function getStatsHTML(stats) {
     .back-link { 
       display: inline-block; 
       margin-bottom: 1.5rem; 
-      color: #589270; 
+      color: #353726; 
       text-decoration: none; 
     }
     .back-link:hover { text-decoration: underline; }
@@ -1298,8 +1298,8 @@ function getStatsHTML(stats) {
       border-left: 4px solid #5f8a2f;
     }
     .stat-card.purple { border-left-color: #411844; }
-    .stat-card.blue { border-left-color: #589270; }
-    .stat-card.orange { border-left-color: #d97706; }
+    .stat-card.blue { border-left-color: #353726; }
+    .stat-card.orange { border-left-color: #00b9c2; }
     
     .stat-value { 
       font-size: 2.5rem; 
@@ -1418,7 +1418,7 @@ function getStatsHTML(stats) {
     }
     .time-bar {
       flex: 1;
-      background: linear-gradient(180deg, #589270, #93bd8b);
+      background: linear-gradient(180deg, #353726, #93bd8b);
       border-radius: 2px 2px 0 0;
       position: relative;
       min-width: 8px;
@@ -1492,20 +1492,7 @@ function getStatsHTML(stats) {
         `).join('')}
       </div>
     </div>
-    
-    <div class="chart-container">
-      <div class="chart-title">Release Types</div>
-      <div class="release-types">
-        ${Object.entries(stats.releaseTypes).map(([type, count]) => `
-          <div class="release-type">
-            <div class="release-type-count">${count}</div>
-            <div class="release-type-label">${type}</div>
-          </div>
-        `).join('')}
-        ${Object.keys(stats.releaseTypes).length === 0 ? '<p style="color: #4c6e60;">No release data available yet</p>' : ''}
-      </div>
-    </div>
-    
+        
   </div>
 </body>
 </html>`;
@@ -1593,7 +1580,7 @@ app.get('/api/admin/merge', (req, res) => {
       resultDiv.style.display = 'block';
       
       if (result.success) {
-        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #589270;">View Stats Dashboard</a>';
+        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #353726;">View Stats Dashboard</a>';
         document.getElementById('logText').value = '';
       } else {
         resultDiv.innerHTML = '✗ Error: ' + result.error;
