@@ -474,12 +474,12 @@ app.get('/api/status', (req, res) => {
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
       <a href="/api/history" class="run-btn" style="margin-top: 0.75rem; background: #385517;">View Change History</a>
-      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #701e77;">View Statistics Dashboard</a>
+      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #411844;">View Statistics Dashboard</a>
     </div>
     <div class="footer">
       <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #445645; color: #ffa0f9; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #445645; color: #333a2c; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -698,14 +698,14 @@ app.get('/legislative', (req, res) => {
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #589270; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #000; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #ffa0f9; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content { background: #f9c6fd; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #000000; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
     .content h3 { color: #93bd8b; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
     .content p { margin-bottom: 0.75rem; color: #94b8b5; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
     .content li { margin-bottom: 0.5rem; color: #94b8b5; }
-    .update-date { color: #ffa0f9; font-weight: bold; margin-bottom: 1rem; }
+    .update-date { color: #333a2c; font-weight: bold; margin-bottom: 1rem; }
     .content strong { color: #93bd8b; }
     a { color: #589270; }
   </style>
@@ -986,7 +986,7 @@ app.get('/api/history', (req, res) => {
     .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #93bd8b; border-bottom: 1px solid #334155; padding-bottom: 0.5rem; }
     .changes { margin-top: 0.75rem; }
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
-    .changes.booked h4 { color: #701e77; }
+    .changes.booked h4 { color: #411844 }
     .changes.released h4 { color: #3e7400; }
     .changes.updated h4 { color: #589270; }
     .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
@@ -1230,7 +1230,7 @@ function getStatsHTML(stats) {
       padding: 1.5rem; 
       border-left: 4px solid #5f8a2f;
     }
-    .stat-card.purple { border-left-color: #701e77; }
+    .stat-card.purple { border-left-color: #411844; }
     .stat-card.blue { border-left-color: #589270; }
     .stat-card.orange { border-left-color: #d97706; }
     
@@ -1254,7 +1254,7 @@ function getStatsHTML(stats) {
       margin-bottom: 1rem; 
     }
     .chart-title { 
-      color: #ffa0f9; 
+      color: #333a2c; 
       font-size: 1.1rem; 
       font-weight: bold; 
       margin-bottom: 1rem; 
@@ -1303,7 +1303,7 @@ function getStatsHTML(stats) {
     }
     .day-bar-fill { 
       width: 100%; 
-      background: linear-gradient(180deg, #701e77, #ffa0f9); 
+      background: linear-gradient(180deg, #411844, #333a2c); 
       border-radius: 4px 4px 0 0;
       display: flex;
       align-items: flex-end;
@@ -1357,7 +1357,7 @@ function getStatsHTML(stats) {
       min-width: 8px;
     }
     .time-bar:hover {
-      background: linear-gradient(180deg, #ffa0f9, #701e77);
+      background: linear-gradient(180deg, #333a2c, #411844);
     }
   </style>
 </head>
