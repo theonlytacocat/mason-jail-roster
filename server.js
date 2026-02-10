@@ -488,6 +488,39 @@ app.get('/api/status', (req, res) => {
   res.send(html);
 });
 
+// Helper function to extract date from log line
+function extractDateFromLine(line) {
+  // Extract date from line like "Name | Booked: 01/18/26 01:45:00 | Charges: ..."
+  const match = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+  if (match) {
+    // Convert "01/18/26 01:45:00" to Date object
+    const [dateStr, timeStr] = match[1].split(' ');
+    const [month, day, year] = dateStr.split('/');
+    const [hours, minutes, seconds] = timeStr.split(':');
+    
+    // Add 2000 to 2-digit year
+    const fullYear = 2000 + parseInt(year);
+    
+    return new Date(fullYear, parseInt(month) - 1, parseInt(day), 
+                   parseInt(hours), parseInt(minutes), parseInt(seconds));
+  }
+  
+  // Also check for "Released:" format
+  const releaseMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+  if (releaseMatch) {
+    const [dateStr, timeStr] = releaseMatch[1].split(' ');
+    const [month, day, year] = dateStr.split('/');
+    const [hours, minutes, seconds] = timeStr.split(':');
+    
+    const fullYear = 2000 + parseInt(year);
+    
+    return new Date(fullYear, parseInt(month) - 1, parseInt(day), 
+                   parseInt(hours), parseInt(minutes), parseInt(seconds));
+  }
+  
+  return new Date(); // Default to current date if parsing fails
+}
+
 // Run check
 app.get('/api/run', async (req, res) => {
   try {
@@ -612,26 +645,55 @@ app.get('/api/run', async (req, res) => {
     fs.writeFileSync(hashFile, currentHash);
     fs.writeFileSync(rosterFile, text);
 
-    // Build log entry for roster changes
-    let logEntry =
-      "\n================================================================================\n" +
-      (isFirstRun ? "Initial capture" : hasChanged ? "Change detected" : "No change") +
-      " at: " + timestamp +
-      "\n================================================================================\n";
+      // Build log entry for roster changes
+    let logEntry = "";
     
     if (isFirstRun) {
       // On first run, log all current inmates as booked
       const currentBookings = extractBookings(text);
       const allInmates = Array.from(currentBookings.values()).map(b => formatBooked(b));
-      logEntry += "BOOKED (" + allInmates.length + "):\n" +
-                  allInmates.slice(0, 100).map(l => "  + " + l).join("\n") + "\n";
+      
+      // Sort by booking date (newest first)
+      allInmates.sort((a, b) => {
+        const dateA = extractDateFromLine(a);
+        const dateB = extractDateFromLine(b);
+        return dateB - dateA; // Newest first
+      });
+      
+      logEntry = allInmates.map(l => "BOOKED | " + l).join("\n") + "\n\n";
+      
     } else if (hasChanged) {
-      logEntry += "BOOKED (" + addedLines.length + "):\n" +
-                  addedLines.map(l => "  + " + l).join("\n") +
-                  "\n\nRELEASED (" + removedLines.length + "):\n" +
-                  removedLines.map(l => "  - " + l).join("\n") + "\n";
+      // For changes, add new bookings and releases in chronological order
+      const changes = [];
+      
+      // Add new bookings
+      addedLines.forEach(line => {
+        changes.push({
+          type: "BOOKED",
+          line: line,
+          date: extractDateFromLine(line)
+        });
+      });
+      
+      // Add releases (convert format)
+      removedLines.forEach(line => {
+        // Convert "Name | Booked: Date | Charges" to "Name | Released: Date | Charges"
+        const releaseLine = line.replace("Booked:", "Released:");
+        changes.push({
+          type: "RELEASED",
+          line: releaseLine,
+          date: extractDateFromLine(line) || new Date() // Use booking date or current date
+        });
+      });
+      
+      // Sort changes by date (newest first)
+      changes.sort((a, b) => b.date - a.date);
+      
+      // Format changes
+      logEntry = changes.map(c => `${c.type} | ${c.line}`).join("\n") + "\n\n";
+      
     } else {
-      logEntry += "No changes detected.\n";
+      logEntry = ""; // No changes, don't add anything
     }
 
     fs.appendFileSync(logFile, logEntry);
