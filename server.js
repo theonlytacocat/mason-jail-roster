@@ -1427,6 +1427,81 @@ function getStatsHTML(stats) {
 </html>`;
 }
 
+// ... all your other routes above ...
+
+// Admin page for merging old logs
+app.get('/api/admin/merge', (req, res) => {
+  res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Merge Old Logs</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: Arial; background: #181818; color: #93bd8b; padding: 2rem; }
+    .container { max-width: 800px; margin: 0 auto; }
+    textarea { width: 100%; height: 400px; background: #000; color: #93bd8b; border: 1px solid #334155; padding: 1rem; font-family: monospace; font-size: 10pt; }
+    button { background: #5f8a2f; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
+    button:hover { background: #93bd8b; }
+    .result { margin-top: 1rem; padding: 1rem; background: #000; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Merge Old Change Logs</h1>
+    <p>Paste your old change log text below and click Merge</p>
+    <textarea id="logText" placeholder="Paste old change log entries here..."></textarea>
+    <button onclick="mergeLogs()">Merge Logs</button>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+  <script>
+    async function mergeLogs() {
+      const text = document.getElementById('logText').value;
+      if (!text.trim()) {
+        alert('Please paste some log text first');
+        return;
+      }
+      
+      const response = await fetch('/api/admin/merge-logs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: text
+      });
+      
+      const result = await response.json();
+      const resultDiv = document.getElementById('result');
+      resultDiv.style.display = 'block';
+      
+      if (result.success) {
+        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #589270;">View Stats Dashboard</a>';
+        document.getElementById('logText').value = '';
+      } else {
+        resultDiv.innerHTML = '✗ Error: ' + result.error;
+      }
+    }
+  </script>
+</body>
+</html>`);
+});
+
+app.post('/api/admin/merge-logs', express.text({ limit: '50mb' }), (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    const oldContent = req.body;
+    
+    // Append old content to current log
+    fs.appendFileSync(logFile, '\n' + oldContent);
+    
+    res.json({ success: true, message: 'Old logs merged successfully!' });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Visit: http://localhost:${PORT}`);
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
