@@ -1010,25 +1010,6 @@ app.get('/api/history', (req, res) => {
   res.send(html);
 });
 
-// Temp endpoint to delete the logs and keep the volume 
-app.get('/api/delete-logs', async (req, res) => {
-  const fs = require('fs').promises;
-  const path = require('path');
-  
-  try {
-    const dataDir = path.join(__dirname, 'data');
-    const files = await fs.readdir(dataDir);
-    
-    for (const file of files) {
-      await fs.unlink(path.join(dataDir, file));
-    }
-    
-    res.send('All files in /data deleted successfully');
-  } catch (err) {
-    res.status(500).send('Error: ' + err.message);
-  }
-});
-
 // Stats Dashboard
 // Replace the entire app.get('/api/stats', ...) route with this improved version:
 app.get('/api/stats', (req, res) => {
@@ -1462,6 +1443,43 @@ function getStatsHTML(stats) {
 }
 
 // ... all your other routes above ...
+
+app.get('/api/delete-logs', async (req, res) => {
+  const fs = require('fs').promises;
+  const path = require('path');
+  
+  try {
+    const dataDir = path.join(__dirname, 'data');
+    
+    // Check if directory exists first
+    try {
+      await fs.access(dataDir);
+    } catch {
+      return res.send('Data directory does not exist - nothing to delete');
+    }
+    
+    const files = await fs.readdir(dataDir);
+    
+    if (files.length === 0) {
+      return res.send('Data directory is already empty');
+    }
+    
+    let deleted = [];
+    for (const file of files) {
+      try {
+        await fs.unlink(path.join(dataDir, file));
+        deleted.push(file);
+      } catch (err) {
+        console.error(`Failed to delete ${file}:`, err);
+      }
+    }
+    
+    res.send(`Deleted ${deleted.length} files: ${deleted.join(', ')}`);
+  } catch (err) {
+    console.error('Delete error:', err);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
 
 // Admin page for merging old logs
 app.get('/api/admin/merge', (req, res) => {
