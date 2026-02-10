@@ -1510,11 +1510,6 @@ app.listen(PORT, () => {
   console.log(`Visit: http://localhost:${PORT}`);
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Visit: http://localhost:${PORT}`);
-});
-
 app.get('/api/debug/charge-lines', async (req, res) => {
   try {
     const response = await fetch(PDF_URL);
