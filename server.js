@@ -1178,8 +1178,77 @@ app.get('/api/stats', (req, res) => {
       }
     });
     
-    // Calculate average stay (simple approximation)
-    const avgStayDays = 0; // You'll need more data for this
+    // Calculate average stay duration by matching names
+const bookingsByName = new Map();
+const releasesByName = new Map();
+
+// Parse bookings
+for (const line of lines) {
+  if (line.startsWith('BOOKED |')) {
+    const nameMatch = line.match(/BOOKED \| ([^|]+) \|/);
+    const dateMatch = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+    
+    if (nameMatch && dateMatch) {
+      const name = nameMatch[1].trim();
+      const [dateStr, timeStr] = [dateMatch[1], dateMatch[2]];
+      const [month, day, year] = dateStr.split('/');
+      const [hours, minutes, seconds] = timeStr.split(':');
+      const fullYear = 2000 + parseInt(year);
+      const bookDate = new Date(fullYear, parseInt(month) - 1, parseInt(day), 
+                                parseInt(hours), parseInt(minutes), parseInt(seconds));
+      
+      if (!bookingsByName.has(name)) {
+        bookingsByName.set(name, []);
+      }
+      bookingsByName.get(name).push(bookDate);
+    }
+  }
+  
+  else if (line.startsWith('RELEASED |')) {
+    const nameMatch = line.match(/RELEASED \| ([^|]+) \|/);
+    const dateMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
+    
+    if (nameMatch && dateMatch) {
+      const name = nameMatch[1].trim();
+      const [dateStr, timeStr] = [dateMatch[1], dateMatch[2]];
+      const [month, day, year] = dateStr.split('/');
+      const [hours, minutes, seconds] = timeStr.split(':');
+      const fullYear = 2000 + parseInt(year);
+      const releaseDate = new Date(fullYear, parseInt(month) - 1, parseInt(day), 
+                                   parseInt(hours), parseInt(minutes), parseInt(seconds));
+      
+      if (!releasesByName.has(name)) {
+        releasesByName.set(name, []);
+      }
+      releasesByName.get(name).push(releaseDate);
+    }
+  }
+}
+
+// Calculate stays
+let totalStayHours = 0;
+let stayCount = 0;
+
+for (const [name, bookDates] of bookingsByName.entries()) {
+  const relDates = releasesByName.get(name);
+  if (relDates) {
+    // Match most recent booking to most recent release
+    const lastBook = bookDates[bookDates.length - 1];
+    const lastRelease = relDates[relDates.length - 1];
+    
+    if (lastRelease > lastBook) {
+      const stayMs = lastRelease - lastBook;
+      const stayHours = stayMs / (1000 * 60 * 60);
+      
+      if (stayHours > 0 && stayHours < 8760) { // Between 0 and 365 days
+        totalStayHours += stayHours;
+        stayCount++;
+      }
+    }
+  }
+}
+
+const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24) : 0;
     
     // Get current population from roster file
     let currentPopulation = 0;
