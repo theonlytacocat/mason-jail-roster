@@ -1025,6 +1025,33 @@ app.get('/api/history', (req, res) => {
   res.send(html);
 });
 
+app.get('/api/admin/deduplicate', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    const content = fs.readFileSync(logFile, 'utf-8');
+    
+    const lines = content.split('\n');
+    const uniqueLines = [...new Set(lines)]; // Remove duplicates
+    
+    const deduped = uniqueLines.join('\n');
+    
+    // Backup original
+    fs.writeFileSync(logFile + '.backup', content);
+    
+    // Write deduplicated version
+    fs.writeFileSync(logFile, deduped);
+    
+    res.json({
+      success: true,
+      originalLines: lines.length,
+      uniqueLines: uniqueLines.length,
+      removed: lines.length - uniqueLines.length
+    });
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
 // Stats Dashboard - UPDATED for new format
 app.get('/api/stats', (req, res) => {
   try {
