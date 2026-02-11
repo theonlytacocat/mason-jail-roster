@@ -910,7 +910,7 @@ app.get('/legislative', (req, res) => {
   res.send(html);
 });
 
-// History page
+// History page - UPDATED for new log format
 app.get('/api/history', (req, res) => {
   const dataDir = STORAGE_DIR;
   let changeLog = "";
@@ -920,127 +920,64 @@ app.get('/api/history', (req, res) => {
     const logFile = path.join(dataDir, "change_log.txt");
     if (fs.existsSync(logFile)) {
       changeLog = fs.readFileSync(logFile, "utf-8");
-
-      const sections = changeLog.split("================================================================================").filter(s => s.trim());
-      for (let i = 0; i < sections.length; i += 2) {
-        const header = sections[i] || "";
-        const content = sections[i + 1] || "";
-
-        const timestampMatch = header.match(/(?:Change detected at|Initial capture at|No change at|Release details update at): (.+)/);
-        if (timestampMatch) {
-          const addedMatch = content.match(/(?:BOOKED|New Bookings|Added lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:RELEASED|Releases|Removed lines|UPDATED)|$)/);
-          const removedMatch = content.match(/(?:RELEASED|Releases|Removed lines) \((\d+)\):\n([\s\S]*?)(?=\n(?:UPDATED)|$)/);
-          const updatedMatch = content.match(/(?:UPDATED RELEASE INFORMATION) \((\d+)\):\n([\s\S]*?)$/);
-
-          const added = addedMatch ? addedMatch[2].split("\n").filter(l => l.trim().startsWith("+")).map(l => l.replace(/^\s*\+\s*/, "")) : [];
-          const removed = removedMatch ? removedMatch[2].split("\n").filter(l => l.trim().startsWith("-")).map(l => l.replace(/^\s*-\s*/, "")) : [];
-          const updated = updatedMatch ? updatedMatch[2].split("\n").filter(l => l.trim().startsWith("✓")).map(l => l.replace(/^\s*✓\s*/, "")) : [];
-
-          entries.push({
-            timestamp: timestampMatch[1].trim(),
-            added,
-            removed,
-            updated
-          });
+      
+      // Parse new format: just lines with BOOKED | or RELEASED |
+      const lines = changeLog.split('\n').filter(l => l.trim());
+      
+      // Group by date
+      const entriesByDate = {};
+      
+      for (const line of lines) {
+        if (line.startsWith('BOOKED |') || line.startsWith('RELEASED |')) {
+          // Extract date from line
+          const dateMatch = line.match(/(?:Booked|Released):\s+(\d{2}\/\d{2}\/\d{2})/);
+          if (dateMatch) {
+            const dateKey = dateMatch[1]; // Use date as key
+            
+            if (!entriesByDate[dateKey]) {
+              entriesByDate[dateKey] = { date: dateKey, booked: [], released: [] };
+            }
+            
+            if (line.startsWith('BOOKED |')) {
+              entriesByDate[dateKey].booked.push(line.replace('BOOKED | ', ''));
+            } else {
+              entriesByDate[dateKey].released.push(line.replace('RELEASED | ', ''));
+            }
+          }
         }
       }
-    }
-  } catch (e) {}
-
-  entries.reverse();
-
-  // Group consecutive "Initial roster capture" / "No change" entries
-  const groupedEntries = [];
-  let noChangeGroup = [];
-  
-  for (const entry of entries) {
-    const hasChanges = entry.added.length > 0 || entry.removed.length > 0 || (entry.updated && entry.updated.length > 0);
-    
-    if (!hasChanges) {
-      // This is a "no change" entry - add to group
-      noChangeGroup.push(entry);
-    } else {
-      // This entry has changes - flush any pending no-change group first
-      if (noChangeGroup.length > 0) {
-        groupedEntries.push({
-          type: 'no-change-group',
-          count: noChangeGroup.length,
-          startTime: noChangeGroup[0].timestamp,
-          endTime: noChangeGroup[noChangeGroup.length - 1].timestamp
-        });
-        noChangeGroup = [];
-      }
-      // Then add the actual change entry
-      groupedEntries.push(entry);
-    }
-  }
-  
-  // Don't forget any remaining no-change group at the end
-  if (noChangeGroup.length > 0) {
-    groupedEntries.push({
-      type: 'no-change-group',
-      count: noChangeGroup.length,
-      startTime: noChangeGroup[0].timestamp,
-      endTime: noChangeGroup[noChangeGroup.length - 1].timestamp
-    });
-  }
-
-  const entriesHtml = groupedEntries.length > 0 ? groupedEntries.map(entry => {
-    // Handle grouped "no change" entries
-    if (entry.type === 'no-change-group') {
-      const startDate = new Date(entry.startTime);
-      const endDate = new Date(entry.endTime);
-      const startPst = startDate.toLocaleString("en-US", {
-        timeZone: "America/Los_Angeles",
-        month: "numeric",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true
-      });
-      const endPst = endDate.toLocaleString("en-US", {
-        timeZone: "America/Los_Angeles",
-        month: "numeric",
-        day: "numeric",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-        hour12: true
-      });
       
-      return '<div class="entry no-change-entry"><p class="no-changes">Checked ' + entry.count + ' time' + (entry.count > 1 ? 's' : '') + ' between ' + startPst + ' - ' + endPst + ' PST (no changes detected)</p></div>';
+      // Convert to array and sort by date (newest first)
+      entries = Object.values(entriesByDate).sort((a, b) => {
+        const [aMonth, aDay, aYear] = a.date.split('/').map(Number);
+        const [bMonth, bDay, bYear] = b.date.split('/').map(Number);
+        const aDate = new Date(2000 + aYear, aMonth - 1, aDay);
+        const bDate = new Date(2000 + bYear, bMonth - 1, bDay);
+        return bDate - aDate;
+      });
     }
+  } catch (e) {
+    console.error('History parse error:', e);
+  }
+
+  const entriesHtml = entries.length > 0 ? entries.map(entry => {
+    const [month, day, year] = entry.date.split('/');
+    const displayDate = `${month}/${day}/20${year}`;
     
-    // Handle regular entries with changes
-    const date = new Date(entry.timestamp);
-    const pstDate = date.toLocaleString("en-US", {
-      timeZone: "America/Los_Angeles",
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: true
-    }) + " PST";
-    
-    const addedItems = entry.added.slice(0, 50).map(a => "<li>" + a + "</li>").join("");
-    const addedMore = entry.added.length > 50 ? "<li>...and " + (entry.added.length - 50) + " more</li>" : "";
-    const addedHtml = entry.added.length > 0 ? '<div class="changes booked"><h4>BOOKED (' + entry.added.length + ")</h4><ul>" + addedItems + addedMore + "</ul></div>" : "";
+    const bookedHtml = entry.booked.length > 0 ? 
+      '<div class="changes booked"><h4>BOOKED (' + entry.booked.length + ')</h4><ul>' +
+      entry.booked.map(b => '<li>' + b + '</li>').join('') +
+      '</ul></div>' : '';
+      
+    const releasedHtml = entry.released.length > 0 ?
+      '<div class="changes released"><h4>RELEASED (' + entry.released.length + ')</h4><ul>' +
+      entry.released.map(r => '<li>' + r + '</li>').join('') +
+      '</ul></div>' : '';
 
-    const removedItems = entry.removed.slice(0, 50).map(r => "<li>" + r + "</li>").join("");
-    const removedMore = entry.removed.length > 50 ? "<li>...and " + (entry.removed.length - 50) + " more</li>" : "";
-    const removedHtml = entry.removed.length > 0 ? '<div class="changes released"><h4>RELEASED (' + entry.removed.length + ")</h4><ul>" + removedItems + removedMore + "</ul></div>" : "";
-
-    const updatedItems = entry.updated ? entry.updated.slice(0, 50).map(u => "<li>" + u + "</li>").join("") : "";
-    const updatedMore = entry.updated && entry.updated.length > 50 ? "<li>...and " + (entry.updated.length - 50) + " more</li>" : "";
-    const updatedHtml = entry.updated && entry.updated.length > 0 ? '<div class="changes updated"><h4>UPDATED RELEASE INFO (' + entry.updated.length + ")</h4><ul>" + updatedItems + updatedMore + "</ul></div>" : "";
-
-    const noChanges = !addedHtml && !removedHtml && !updatedHtml ? "<p class='no-changes'>Initial roster capture</p>" : "";
-
-    return '<div class="entry"><div class="entry-header">' + pstDate + "</div>" + addedHtml + removedHtml + updatedHtml + noChanges + "</div>";
-  }).join("") : "<p class='no-data'>No changes recorded yet. Run the workflow to start monitoring.</p>";
+    return '<div class="entry"><div class="entry-header">' + displayDate + '</div>' + 
+           bookedHtml + releasedHtml + '</div>';
+  }).join('') : 
+  '<p class="no-data">No changes recorded yet. Run the workflow to start monitoring.</p>';
 
   const html = `<!DOCTYPE html>
 <html>
