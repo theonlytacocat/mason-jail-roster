@@ -217,6 +217,22 @@ app.get('/api/debug/log-tail', (req, res) => {
   }
 });
 
+// Changelog endpoint for frontend
+app.get('/api/changelog', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    if (fs.existsSync(logFile)) {
+      const content = fs.readFileSync(logFile, 'utf-8');
+      res.json({ success: true, log: content });
+    } else {
+      res.json({ success: true, log: '' });
+    }
+  } catch (error) {
+    console.error('Changelog error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // Debug charges enpoint I think 
 app.get('/api/debug/charges', async (req, res) => {
   try {
