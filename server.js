@@ -1464,7 +1464,7 @@ function getStatsHTML(stats) {
       <div class="day-chart">
         ${Object.entries(stats.bookingsByDay).map(([day, count]) => `
           <div class="day-bar">
-            <div class="day-bar-fill" style="height: ${(count / maxDay) * 100}%;">
+            <div class="day-bar-fill" style="height: ${(count / maxDay) * 180}px;">
               ${count > 0 ? count : ''}
             </div>
             <div class="day-label">${day}</div>
