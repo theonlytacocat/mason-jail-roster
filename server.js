@@ -454,10 +454,13 @@ app.get('/api/status', (req, res) => {
     }
 
     const logFile = path.join(dataDir, "change_log.txt");
-    if (fs.existsSync(logFile)) {
-      const content = fs.readFileSync(logFile, "utf-8");
-      changeCount = (content.match(/Change detected at:/g) || []).length;
-    }
+if (fs.existsSync(logFile)) {
+  const content = fs.readFileSync(logFile, "utf-8");
+  // Count BOOKED and RELEASED entries
+  const bookedCount = (content.match(/^BOOKED \|/gm) || []).length;
+  const releasedCount = (content.match(/^RELEASED \|/gm) || []).length;
+  changeCount = bookedCount + releasedCount;
+}
 
     const metricsFile = path.join(dataDir, "metrics.json");
     let metrics = { statusViews: 0, historyViews: 0, emailViews: 0 };
