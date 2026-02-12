@@ -164,9 +164,9 @@ function formatReleased(b, stats, isPending = false) {
     };
   }
   
-  // No detailed release info available - use booking date as approximate release date
-  // Format the date properly from b.bookDate which is like "02/10/26 22:46:00"
-  const releaseDate = b.releaseDate !== "Not Released" ? b.releaseDate : b.bookDate;
+  // No detailed release info available - use current date/time as detection time
+  const now = new Date();
+  const releaseDate = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
   
   return {
     text: b.name + " | Released: " + releaseDate + " | Charges: " + chargeText,
