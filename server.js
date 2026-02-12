@@ -1648,6 +1648,62 @@ app.get('/api/delete-logs', async (req, res) => {
   }
 });
 
+app.get('/api/admin/fix-releases', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+    const content = fs.readFileSync(logFile, 'utf-8');
+    const lines = content.split('\n');
+    
+    let fixed = 0;
+    let currentDate = null;
+    const fixedLines = [];
+    
+    for (const line of lines) {
+      // Track the current date context from ANY dated entry (BOOKED or RELEASED with valid dates)
+      const dateMatch = line.match(/(?:Booked|Released):\s+(\d{2}\/\d{2}\/\d{2})\s+\d{2}:\d{2}:\d{2}/);
+      if (dateMatch) {
+        currentDate = dateMatch[1];
+      }
+      
+      // Also check for release dates without times (like "Released: 02/09/26")
+      const releaseDateOnlyMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})(?:\s|$|\|)/);
+      if (releaseDateOnlyMatch && !line.includes('00:00:00')) {
+        currentDate = releaseDateOnlyMatch[1];
+      }
+      
+      // Fix broken RELEASED entries
+      if (line.includes('RELEASED |') && line.includes('Released: Not Released')) {
+        if (currentDate) {
+          // Replace "Released: Not Released" with "Released: DATE 00:00:00"
+          const fixedLine = line.replace('Released: Not Released', `Released: ${currentDate} 00:00:00`);
+          fixedLines.push(fixedLine);
+          fixed++;
+        } else {
+          // No date context available, keep the line as-is
+          fixedLines.push(line);
+        }
+      } else {
+        fixedLines.push(line);
+      }
+    }
+    
+    // Backup original
+    fs.writeFileSync(logFile + '.backup-' + Date.now(), content);
+    
+    // Write fixed version
+    fs.writeFileSync(logFile, fixedLines.join('\n'));
+    
+    res.json({
+      success: true,
+      fixed: fixed,
+      message: `Fixed ${fixed} release entries. Original backed up.`
+    });
+    
+  } catch (error) {
+    res.json({ success: false, error: error.message });
+  }
+});
+
 // Admin page for merging old logs
 app.get('/api/admin/merge', (req, res) => {
   res.send(`<!DOCTYPE html>
