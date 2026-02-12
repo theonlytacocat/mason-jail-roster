@@ -174,6 +174,7 @@ function formatReleased(b, stats, isPending = false) {
   };
 }
 
+// Fixing the release counter for accurate contexttt
 app.get('/api/admin/fix-releases', (req, res) => {
   try {
     const logFile = path.join(STORAGE_DIR, 'change_log.txt');
@@ -185,10 +186,16 @@ app.get('/api/admin/fix-releases', (req, res) => {
     const fixedLines = [];
     
     for (const line of lines) {
-      // Track the current date context from BOOKED entries
-      const bookedDateMatch = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2})/);
-      if (bookedDateMatch) {
-        currentDate = bookedDateMatch[1];
+      // Track the current date context from ANY dated entry (BOOKED or RELEASED with valid dates)
+      const dateMatch = line.match(/(?:Booked|Released):\s+(\d{2}\/\d{2}\/\d{2})\s+\d{2}:\d{2}:\d{2}/);
+      if (dateMatch) {
+        currentDate = dateMatch[1];
+      }
+      
+      // Also check for release dates without times (like "Released: 02/09/26")
+      const releaseDateOnlyMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})(?:\s|$|\|)/);
+      if (releaseDateOnlyMatch && !line.includes('00:00:00')) {
+        currentDate = releaseDateOnlyMatch[1];
       }
       
       // Fix broken RELEASED entries
@@ -199,7 +206,7 @@ app.get('/api/admin/fix-releases', (req, res) => {
           fixedLines.push(fixedLine);
           fixed++;
         } else {
-          // No date context available, skip this line or use a default
+          // No date context available, keep the line as-is
           fixedLines.push(line);
         }
       } else {
