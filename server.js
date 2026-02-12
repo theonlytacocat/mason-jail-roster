@@ -147,7 +147,6 @@ function formatBooked(b) {
   const chargeText = b.charges && b.charges.length > 0 ? b.charges.join(", ") : "None listed";
   return b.name + " | Booked: " + b.bookDate + " | Charges: " + chargeText;
 }
-
 function formatReleased(b, stats, isPending = false) {
   const chargeText = b.charges && b.charges.length > 0 ? b.charges.join(", ") : "None listed";
   const releaseInfo = stats.get(b.name);
@@ -165,9 +164,12 @@ function formatReleased(b, stats, isPending = false) {
     };
   }
   
-  // No detailed release info available - just show charges
+  // No detailed release info available - use booking date as approximate release date
+  // Format the date properly from b.bookDate which is like "02/10/26 22:46:00"
+  const releaseDate = b.releaseDate !== "Not Released" ? b.releaseDate : b.bookDate;
+  
   return {
-    text: b.name + " | Released | Charges: " + chargeText,
+    text: b.name + " | Released: " + releaseDate + " | Charges: " + chargeText,
     hasPendingDetails: false
   };
 }
