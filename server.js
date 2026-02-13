@@ -834,7 +834,7 @@ app.get('/legislative', (req, res) => {
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #317008; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content { background: #525f4a; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
     .content h2 { color: #778b6f; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
     .content h3 { color: #00ffcf; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
