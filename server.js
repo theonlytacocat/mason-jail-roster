@@ -1370,7 +1370,7 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       bookingsByDay,
       avgStayDays,
       releaseTypes,
-      timeSeriesData: last30Days
+      timeSeriesData: last30Days,
       dataCollectionStart: dataCollectionStart ? dataCollectionStart.toLocaleDateString('en-US') : null,
       daysOfData
     };
