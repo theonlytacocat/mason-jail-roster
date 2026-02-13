@@ -1071,9 +1071,9 @@ app.get('/api/history', (req, res) => {
 </head>
 <body>
   <div class="container">
-    <a href="/api/status" class="back-link">← Back to Status</a>
+    <a href="/api/status" class="back-link">← Back to System Check</a>
     <h1>Change History</h1>
-    <p class="subtitle">Record of all detected changes in the jail roster (newest first)</p>
+    <p class="subtitle">Record of all Bookings and Releases, with newest first</p>
     ${entriesHtml}
   </div>
 </body>
