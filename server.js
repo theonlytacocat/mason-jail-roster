@@ -499,8 +499,8 @@ if (fs.existsSync(logFile)) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #716177; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .container { max-width: 500px; padding: 2rem; }1
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #614c69; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .container { max-width: 500px; padding: 2rem; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
@@ -517,7 +517,7 @@ if (fs.existsSync(logFile)) {
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #333a2c; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #8d788f; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #411844; text-decoration: none; }
+    a { color: #353726; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -804,7 +804,7 @@ app.get('/api/run', async (req, res) => {
     const html =
       '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#181818;color:#00ffcf;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#5f8a2f;font-size:3rem;margin-bottom:1rem;}h1{color:#b8b8b8;margin-bottom:1rem;}p{color:#94b8b5;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
-      "</p><p>Redirecting to status page...</p></div></body></html>";
+      "</p><p>Redirecting to Change Log...</p></div></body></html>";
 
     res.send(html);
   } catch (error) {
@@ -831,7 +831,7 @@ app.get('/legislative', (req, res) => {
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #411844; text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .content { background: #525f4a; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
     .content h2 { color: #778b6f; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
@@ -842,7 +842,7 @@ app.get('/legislative', (req, res) => {
     .content li { margin-bottom: 0.5rem; color: #94b8b5; }
     .update-date { color: #333a2c; font-weight: bold; margin-bottom: 1rem; }
     .content strong { color: #00ffcf; }
-    a { color: #411844; }
+    a { color: #353726; }
   </style>
 </head>
 <body>
@@ -1051,7 +1051,7 @@ app.get('/api/history', (req, res) => {
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #411844; text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .entry { background: #000; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
     .entry.no-change-entry { background: #0a0a0a; padding: 0.75rem; border-left: 3px solid #334155; }
@@ -1060,13 +1060,13 @@ app.get('/api/history', (req, res) => {
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
     .changes.booked h4 { color: #411844 }
     .changes.released h4 { color: #3e7400; }
-    .changes.updated h4 { color: #411844; }
+    .changes.updated h4 { color: #353726; }
     .changes ul { list-style: none; font-size: 8pt; color: #94b8b5; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #334155; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #4c6e60; font-style: italic; }
     .no-data { color: #4c6e60; text-align: center; padding: 3rem; }
-    a { color: #411844; }
+    a { color: #353726; }
   </style>
 </head>
 <body>
@@ -1429,7 +1429,7 @@ function getStatsHTML(stats) {
     .back-link { 
       display: inline-block; 
       margin-bottom: 1.5rem; 
-      color: #411844; 
+      color: #353726; 
       text-decoration: none; 
     }
     .back-link:hover { text-decoration: underline; }
@@ -1447,7 +1447,7 @@ function getStatsHTML(stats) {
       border-left: 4px solid #5f8a2f;
     }
     .stat-card.purple { border-left-color: #411844; }
-    .stat-card.blue { border-left-color: #411844; }
+    .stat-card.blue { border-left-color: #353726; }
     .stat-card.orange { border-left-color: #00b9c2; }
     
     .stat-value { 
@@ -1567,7 +1567,7 @@ function getStatsHTML(stats) {
     }
     .time-bar {
       flex: 1;
-      background: linear-gradient(180deg, #411844, #00ffcf);
+      background: linear-gradient(180deg, #353726, #00ffcf);
       border-radius: 2px 2px 0 0;
       position: relative;
       min-width: 8px;
@@ -1785,7 +1785,7 @@ app.get('/api/admin/merge', (req, res) => {
       resultDiv.style.display = 'block';
       
       if (result.success) {
-        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #411844;">View Stats Dashboard</a>';
+        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #353726;">View Stats Dashboard</a>';
         document.getElementById('logText').value = '';
       } else {
         resultDiv.innerHTML = '✗ Error: ' + result.error;
