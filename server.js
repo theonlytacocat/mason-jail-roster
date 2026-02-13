@@ -501,12 +501,12 @@ if (fs.existsSync(logFile)) {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #00ffcf; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #8d788f; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     .container { max-width: 500px; padding: 2rem; }
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #33ff00; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #8d788f; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
@@ -515,7 +515,7 @@ if (fs.existsSync(logFile)) {
     .stat-label { color: #94b8b5; }
     .stat-value { font-weight: 500; }
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #333a2c; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #00ffcf; }
+    .run-btn:hover { background: #8d788f; }
     .footer { text-align: center; color: #4c6e60; font-size: 0.875rem; margin-top: 1.5rem; }
     a { color: #353726; text-decoration: none; }
   </style>
