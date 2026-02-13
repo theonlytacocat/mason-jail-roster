@@ -542,10 +542,6 @@ if (fs.existsSync(logFile)) {
           <span class="stat-value">${changeCount}</span>
         </div>
         <div class="stat">
-          <span class="stat-label">Notifications</span>
-          <span class="stat-value">Enabled</span>
-        </div>
-        <div class="stat">
           <span class="stat-label">Page Views</span>
           <span class="stat-value">${viewCount.toLocaleString()}</span>
         </div>
@@ -1118,7 +1114,34 @@ app.get('/api/admin/deduplicate', (req, res) => {
 app.get('/api/stats', (req, res) => {
   try {
     const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+
+     // THIS SECTION is going to add info about how l ong stats have been documented,. 
+    // Get data collection start date from first entry in log
+    let dataCollectionStart = null;
+    let daysOfData = 0;
     
+    if (fs.existsSync(logFile)) {
+      const logContent = fs.readFileSync(logFile, 'utf-8');
+      const lines = logContent.split('\n');
+      
+      // Find first dated entry
+      for (const line of lines) {
+        const dateMatch = line.match(/(?:Booked|Released):\s+(\d{2}\/\d{2}\/\d{2})/);
+        if (dateMatch) {
+          const [month, day, year] = dateMatch[1].split('/');
+          const fullYear = 2000 + parseInt(year);
+          const firstDate = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+          dataCollectionStart = firstDate;
+          
+          // Calculate days since then
+          const now = new Date();
+          daysOfData = Math.floor((now - firstDate) / (1000 * 60 * 60 * 24));
+          break;
+        }
+      }
+    }
+    // ↑↑↑ END OF NEW SECTION
+
     if (!fs.existsSync(logFile)) {
       return res.send(getStatsHTML({
         totalBookings: 0,
@@ -1348,6 +1371,8 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       avgStayDays,
       releaseTypes,
       timeSeriesData: last30Days
+      dataCollectionStart: dataCollectionStart ? dataCollectionStart.toLocaleDateString('en-US') : null,
+      daysOfData
     };
     
     res.send(getStatsHTML(stats));
@@ -1361,6 +1386,20 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
 function getStatsHTML(stats) {
   const maxCharge = Math.max(...stats.commonCharges.map(c => c.count), 1);
   const maxDay = Math.max(...Object.values(stats.bookingsByDay), 1);
+  
+  // ADD THIS ↓↓↓
+  const dataBanner = stats.dataCollectionStart ? `
+    <div style="background: #f0f4f8; border-left: 4px solid #3b82f6; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+      <p style="margin: 0; color: #1e293b;">
+        📊 Data collection started: <strong>${stats.dataCollectionStart}</strong> 
+        (${stats.daysOfData} days of tracking)
+      </p>
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #64748b;">
+        Statistics become more accurate as more data is collected over time.
+      </p>
+    </div>
+  ` : '';
+  // ↑↑↑ END OF NEW SECTION
   
   return `<!DOCTYPE html>
 <html>
