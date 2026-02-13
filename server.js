@@ -501,7 +501,9 @@ if (fs.existsSync(logFile)) {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #8d788f; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     .container { max-width: 500px; padding: 2rem; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -1px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
+    h1 span { display: inline-block; animation: ticker 15s linear infinite; }
+    @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
     .status-dot { width: 12px; height: 12px; background: #8d788f; border-radius: 50%; animation: pulse 2s infinite; }
@@ -520,7 +522,7 @@ if (fs.existsSync(logFile)) {
 </head>
 <body>
   <div class="container">
-    <h1>Mason County Jail Roster Monitor</h1>
+    <h1><span>Mason County Jail Roster Monitor</span></h1>
     <div class="status">
       <div class="status-header">
         <div class="status-dot"></div>
@@ -549,7 +551,6 @@ if (fs.existsSync(logFile)) {
       <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem; background: #411844;">*NEW* Statistics Dashboard</a>
     </div>
     <div class="footer">
-      <p><a href="/api/history">View Change History</a></p>
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
       <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #8d788f; color: #000000; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
     </div>
