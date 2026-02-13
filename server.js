@@ -10,6 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+app.use('/fonts', express.static(path.join(__dirname, 'fonts')));
 const PORT = process.env.PORT || 3000;
 const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
 const RELEASE_STATS_URL = 'https://hub.masoncountywa.gov/sheriff/reports/release_stats48hrs.pdf';
