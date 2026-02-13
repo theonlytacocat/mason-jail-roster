@@ -828,14 +828,14 @@ app.get('/legislative', (req, res) => {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; background: #181818; color: #00ffcf; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #dfd; color: #00ffcf; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #f9c6fd; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #000000; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content { background: #317008; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #778b6f; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
     .content h3 { color: #00ffcf; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
     .content p { margin-bottom: 0.75rem; color: #94b8b5; }
