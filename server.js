@@ -497,14 +497,11 @@ if (fs.existsSync(logFile)) {
   <title>Mason County Jail Roster Monitor</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #8d788f; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
     .container { max-width: 500px; padding: 2rem; }
-    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .status { background: #000; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
     .status-dot { width: 12px; height: 12px; background: #8d788f; border-radius: 50%; animation: pulse 2s infinite; }
@@ -831,7 +828,7 @@ app.get('/legislative', (req, res) => {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 9pt; background: #dfd; color: #00ffcf; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
@@ -1051,7 +1048,7 @@ app.get('/api/history', (req, res) => {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #00ffcf; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Noto Serif', sans-serif; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -4px; }
     .subtitle { color: #4c6e60; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #353726; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
@@ -1421,7 +1418,7 @@ function getStatsHTML(stats) {
     }
     .container { max-width: 1200px; margin: 0 auto; }
     h1 { 
-      font-family: 'Noto Serif', sans-serif; 
+      font-family: 'Pixel Digivolve', 'Courier New', monospace; 
       font-size: 2rem; 
       margin-bottom: 0.5rem; 
       color: #b8b8b8; 
