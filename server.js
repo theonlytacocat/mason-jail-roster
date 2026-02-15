@@ -498,9 +498,10 @@ if (fs.existsSync(logFile)) {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #614c69; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .container { max-width: 500px; padding: 2rem; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; width: 100%; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #181818; color: #614c69; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
+    .container { width: 100%; max-width: 500px; padding: 1rem; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
