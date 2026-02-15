@@ -5,10 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mason County Jail Roster Monitor</title>
   <style>
-* {
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 @font-face {
@@ -204,8 +208,10 @@ button:disabled {
   .container {
     padding: 0;
     margin: 0;
+    width: 100%;
+    max-width: 100%;
   }
-}}
+}
   </style>
 </head>
 <body>
@@ -258,32 +264,26 @@ button:disabled {
           data.status === 'active' ? 'System Active' : 'Waiting for first check';
         
         if (data.lastCheck !== 'Never') {
-  const date = new Date(data.lastCheck);
-  const isMobile = window.innerWidth <= 768;
-  
-  if (isMobile) {
-    // Compact format for mobile: "2/15, 12:23 PM"
-    document.getElementById('lastCheck').textContent = 
-      date.toLocaleString('en-US', { 
-        month: 'numeric', 
-        day: 'numeric', 
-        hour: 'numeric', 
-        minute: '2-digit' 
-      });
-     } else {
-    // Full format for desktop
-         document.getElementById('lastCheck').textContent = 
-      date.toLocaleString('en-US', { 
-        month: 'short', 
-        day: 'numeric', 
-        hour: 'numeric', 
-        minute: '2-digit' 
-      });
-     }
-    } else {
-         document.getElementById('lastCheck').textContent = 'Never';
-      }
+          const date = new Date(data.lastCheck);
+          const isMobile = window.innerWidth <= 768;
 
+          if (isMobile) {
+            document.getElementById('lastCheck').textContent =
+              date.toLocaleString('en-US', {
+                month: 'numeric',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+              });
+          } else {
+            document.getElementById('lastCheck').textContent =
+              date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+              });
+          }
         } else {
           document.getElementById('lastCheck').textContent = 'Never';
         }
