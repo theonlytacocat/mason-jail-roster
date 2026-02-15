@@ -246,14 +246,32 @@ button:disabled {
           data.status === 'active' ? 'System Active' : 'Waiting for first check';
         
         if (data.lastCheck !== 'Never') {
-          const date = new Date(data.lastCheck);
-          document.getElementById('lastCheck').textContent = 
-            date.toLocaleString('en-US', { 
-              month: 'short', 
-              day: 'numeric', 
-              hour: 'numeric', 
-              minute: '2-digit' 
-            });
+  const date = new Date(data.lastCheck);
+  const isMobile = window.innerWidth <= 768;
+  
+  if (isMobile) {
+    // Compact format for mobile: "2/15, 12:23 PM"
+    document.getElementById('lastCheck').textContent = 
+      date.toLocaleString('en-US', { 
+        month: 'numeric', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit' 
+      });
+     } else {
+    // Full format for desktop
+         document.getElementById('lastCheck').textContent = 
+      date.toLocaleString('en-US', { 
+        month: 'short', 
+        day: 'numeric', 
+        hour: 'numeric', 
+        minute: '2-digit' 
+      });
+     }
+    } else {
+         document.getElementById('lastCheck').textContent = 'Never';
+      }
+      
         } else {
           document.getElementById('lastCheck').textContent = 'Never';
         }
