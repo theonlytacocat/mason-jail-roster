@@ -1151,7 +1151,9 @@ app.get('/api/stats', (req, res) => {
         bookingsByDay: {},
         avgStayDays: 0,
         releaseTypes: {},
-        timeSeriesData: []
+        timeSeriesData: [],
+        debugStays: [],
+        totalStayCount: 0
       }));
     }
 
@@ -1310,9 +1312,10 @@ for (const line of lines) {
   }
 }
 
-// Calculate stays
+// Calculate stays WITH DEBUG INFO
 let totalStayHours = 0;
 let stayCount = 0;
+const debugStays = []; // Store sample stays for debugging
 
 for (const [name, bookDates] of bookingsByName.entries()) {
   const relDates = releasesByName.get(name);
@@ -1320,14 +1323,25 @@ for (const [name, bookDates] of bookingsByName.entries()) {
     // Match most recent booking to most recent release
     const lastBook = bookDates[bookDates.length - 1];
     const lastRelease = relDates[relDates.length - 1];
-    
+
     if (lastRelease > lastBook) {
       const stayMs = lastRelease - lastBook;
       const stayHours = stayMs / (1000 * 60 * 60);
-      
+      const stayDays = stayHours / 24;
+
       if (stayHours > 0 && stayHours < 8760) { // Between 0 and 365 days
         totalStayHours += stayHours;
         stayCount++;
+
+        // Store first 20 for debugging
+        if (debugStays.length < 20) {
+          debugStays.push({
+            name: name,
+            booked: lastBook.toLocaleString(),
+            released: lastRelease.toLocaleString(),
+            stayDays: stayDays.toFixed(2)
+          });
+        }
       }
     }
   }
@@ -1372,7 +1386,9 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       releaseTypes,
       timeSeriesData: last30Days,
       dataCollectionStart: dataCollectionStart ? dataCollectionStart.toLocaleDateString('en-US') : null,
-      daysOfData
+      daysOfData,
+      debugStays,
+      totalStayCount: stayCount
     };
     
     res.send(getStatsHTML(stats));
@@ -1386,6 +1402,33 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
 function getStatsHTML(stats) {
   const maxCharge = Math.max(...stats.commonCharges.map(c => c.count), 1);
   const maxDay = Math.max(...Object.values(stats.bookingsByDay), 1);
+
+  // Debug table for verifying average stay calculation
+  const debugTable = stats.debugStays && stats.debugStays.length > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Debug: Sample Individual Stays (${stats.totalStayCount} total calculated)</div>
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.8rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid #334155;">
+            <th style="text-align: left; padding: 0.5rem; color: #94b8b5;">Name</th>
+            <th style="text-align: left; padding: 0.5rem; color: #94b8b5;">Booked</th>
+            <th style="text-align: left; padding: 0.5rem; color: #94b8b5;">Released</th>
+            <th style="text-align: right; padding: 0.5rem; color: #94b8b5;">Days</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${stats.debugStays.map(stay => `
+            <tr style="border-bottom: 1px solid #334155;">
+              <td style="padding: 0.5rem; color: #00ffcf;">${stay.name}</td>
+              <td style="padding: 0.5rem; color: #94b8b5;">${stay.booked}</td>
+              <td style="padding: 0.5rem; color: #94b8b5;">${stay.released}</td>
+              <td style="padding: 0.5rem; color: #00ffcf; text-align: right; font-weight: bold;">${stay.stayDays}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  ` : '';
   
   // ADD THIS ↓↓↓
   const dataBanner = stats.dataCollectionStart ? `
@@ -1602,6 +1645,8 @@ function getStatsHTML(stats) {
         <div class="stat-label">Average Length of Stay</div>
       </div>
     </div>
+
+    ${debugTable}
 
     <div class="chart-container">
       <div class="chart-title">Bookings Over Last 30 Days</div>
