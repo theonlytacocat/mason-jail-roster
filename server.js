@@ -1048,9 +1048,10 @@ app.get('/api/history', (req, res) => {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { overflow-x: hidden; width: 100%; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #0e1520; color: #f09030; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; word-break: break-word; }
     .subtitle { color: #2d4a6a; margin-bottom: 2rem; }
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #c45018; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
