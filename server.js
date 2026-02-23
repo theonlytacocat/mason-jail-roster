@@ -516,9 +516,9 @@ if (fs.existsSync(logFile)) {
     .stat-label { color: #7a95b0; }
     .stat-value { font-weight: 500; }
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #1a2d45; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #e8702a; }
+    .run-btn:hover { background: #1a4a6e; }
     .footer { text-align: center; color: #2d4a6a; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #c45018; text-decoration: none; }
+    a { color: #5ecfb8; text-decoration: none; }
   </style>
 </head>
 <body>
