@@ -1056,19 +1056,19 @@ app.get('/api/history', (req, res) => {
     .back-link { display: inline-block; margin-bottom: 1.5rem; color: #c45018; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
     .entry { background: #080e18; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-    .entry.no-change-entry { background: #060c14; padding: 0.75rem; border-left: 3px solid #1a3050; }
+    .entry.no-change-entry { background: #060c14; padding: 0.75rem; border-left: 3px solid #4674b9; }
     .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f09030; border-bottom: 1px solid #1a3050; padding-bottom: 0.5rem; }
     .changes { margin-top: 0.75rem; }
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
-    .changes.booked h4 { color: #e05050; }
-    .changes.released h4 { color: #40a878; }
-    .changes.updated h4 { color: #c45018; }
+    .changes.booked h4 { color: #ff3fa5; }
+    .changes.released h4 { color: #5d7eaf; }
+    .changes.updated h4 { color: #ff3fa5; }
     .changes ul { list-style: none; font-size: 8pt; color: #7a95b0; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #1a3050; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #2d4a6a; font-style: italic; }
     .no-data { color: #2d4a6a; text-align: center; padding: 3rem; }
-    a { color: #c45018; }
+    a { color: #c41877; }
   </style>
 </head>
 <body>
