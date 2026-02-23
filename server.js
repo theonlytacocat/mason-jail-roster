@@ -1059,8 +1059,8 @@ app.get('/api/history', (req, res) => {
     .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f09030; border-bottom: 1px solid #1a3050; padding-bottom: 0.5rem; }
     .changes { margin-top: 0.75rem; }
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
-    .changes.booked h4 { color: #122040 }
-    .changes.released h4 { color: #1a6080; }
+    .changes.booked h4 { color: #e05050; }
+    .changes.released h4 { color: #40a878; }
     .changes.updated h4 { color: #c45018; }
     .changes ul { list-style: none; font-size: 8pt; color: #7a95b0; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #1a3050; }
