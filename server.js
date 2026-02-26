@@ -2069,7 +2069,7 @@ app.get('/api/deepstats', async (req, res) => {
     }));
   } catch (err) {
     console.error('Deep stats error:', err);
-    res.status(200).send('Error: ' + err.message + '\n\nStack: ' + err.stack);
+    res.status(500).send('Error: ' + err.message + '\n\nStack: ' + err.stack);
   }
 });
 
@@ -2249,9 +2249,9 @@ function getDeepStatsHTML(d) {
   <h2>Time Served Statistics</h2>
   <div class="cards">
     <div class="card">
-      <div class="v">${under24 + over24 > 0 ? pct(under24, under24+over24) : '—'}</div>
+      <div class="v">${d.under24 + d.over24 > 0 ? pct(d.under24, d.under24+d.over24) : '—'}</div>
       <div class="l">Released in &lt;24 Hours</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#2d4a6a;">${under24} under / ${over24} over</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#2d4a6a;">${d.under24} under / ${d.over24} over</div>
     </div>
     ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
       <div class="v" style="font-size:1.2rem;">${fmtMins(d.histMinMins)}</div>
