@@ -1776,21 +1776,6 @@ function getStatsHTML(stats) {
         <div class="stat-value">${stats.avgStayDays} days</div>
         <div class="stat-label">Average Length of Stay</div>
       </div>
-      <div class="stat-card" style="border-left-color: #1a6e3c;">
-        <div class="stat-value" style="font-size: 1.8rem;">$${stats.totalBailThisMonth.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
-        <div class="stat-label">Bail Collected This Month</div>
-      </div>
-      <div class="stat-card" style="border-left-color: #4a1a6e;">
-        <div class="stat-value" style="font-size: 1.8rem;">${fmtMins(stats.avgTimeServedMins)}</div>
-        <div class="stat-label">Avg Time Served (PDF Data)</div>
-      </div>
-      ${stats.longestInmate ? `
-      <div class="stat-card" style="border-left-color: #6e1a1a;">
-        <div class="stat-value" style="font-size: 1.4rem;">${stats.longestInmate.days}d</div>
-        <div class="stat-label">Longest Current Stay</div>
-        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #7a95b0;">${stats.longestInmate.name}</div>
-        <div style="font-size: 0.7rem; color: #2d4a6a;">In since ${stats.longestInmate.bookDate}</div>
-      </div>` : ''}
     </div>
 
     <div class="chart-container">
