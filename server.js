@@ -2069,7 +2069,7 @@ app.get('/api/deepstats', async (req, res) => {
     }));
   } catch (err) {
     console.error('Deep stats error:', err);
-    res.status(500).send('Error: ' + err.message);
+    res.status(200).send('Error: ' + err.message + '\n\nStack: ' + err.stack);
   }
 });
 
