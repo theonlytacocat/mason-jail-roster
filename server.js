@@ -16,6 +16,9 @@ const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
 const RELEASE_STATS_URL = 'https://hub.masoncountywa.gov/sheriff/reports/release_stats48hrs.pdf';
 const STORAGE_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
 
+const RELEASE_STATS_URL = 'https://hub.masoncountywa.gov/sheriff/reports/release_stats48hrs.pdf';
+const RELEASE_STATS_FILE = path.join(STORAGE_DIR, 'release_stats.txt');
+
 // Ensure storage directory exists
 function ensureStorageDir() {
   if (!fs.existsSync(STORAGE_DIR)) {
