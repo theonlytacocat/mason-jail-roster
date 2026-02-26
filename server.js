@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 3000;
 const PDF_URL = 'https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf';
 const RELEASE_STATS_URL = 'https://hub.masoncountywa.gov/sheriff/reports/release_stats48hrs.pdf';
 const STORAGE_DIR = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/data';
+const RELEASE_STATS_HISTORY_FILE = path.join(STORAGE_DIR, 'release_stats_history.json');
 
 // Ensure storage directory exists
 function ensureStorageDir() {
@@ -57,6 +58,25 @@ async function fetchReleaseStats() {
       }
     }
     
+    // Save new entries to history file (dedup by name+releaseDateTime)
+    try {
+      let history = [];
+      if (fs.existsSync(RELEASE_STATS_HISTORY_FILE)) {
+        history = JSON.parse(fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8'));
+      }
+      const existingKeys = new Set(history.map(e => e.name + '|' + e.releaseDateTime));
+      for (const [name, info] of releaseMap.entries()) {
+        const key = name + '|' + info.releaseDateTime;
+        if (!existingKeys.has(key)) {
+          history.push({ name, ...info });
+          existingKeys.add(key);
+        }
+      }
+      fs.writeFileSync(RELEASE_STATS_HISTORY_FILE, JSON.stringify(history, null, 2));
+    } catch (e) {
+      console.error('Error saving release stats history:', e);
+    }
+
     return releaseMap;
   } catch (error) {
     console.error('Error fetching release stats:', error);
@@ -1152,7 +1172,15 @@ app.get('/api/stats', (req, res) => {
         bookingsByDay: {},
         avgStayDays: 0,
         releaseTypes: {},
-        timeSeriesData: []
+        timeSeriesData: [],
+        totalBailThisMonth: 0,
+        avgBailByCharge: [],
+        avgTimeServedMins: 0,
+        minTimeServedMins: 0,
+        maxTimeServedMins: 0,
+        longestInmate: null,
+        daysOfData: 0,
+        dataCollectionStart: null,
       }));
     }
 
@@ -1335,7 +1363,106 @@ for (const [name, bookDates] of bookingsByName.entries()) {
 }
 
 const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24) : 0;
-    
+
+    // --- NEW STATS FROM RELEASE HISTORY ---
+
+    // Build name->charges map from BOOKED lines
+    const nameToCharges = new Map();
+    for (const line of lines) {
+      if (line.startsWith('BOOKED |')) {
+        const nm = line.match(/BOOKED \| ([^|]+) \|/);
+        const ch = line.match(/Charges:\s+(.+)/);
+        if (nm && ch) {
+          const charges = ch[1].split(',').map(c => c.trim()).filter(c => c && c !== 'None listed');
+          nameToCharges.set(nm[1].trim(), charges);
+        }
+      }
+    }
+
+    // Parse RELEASED lines for release types and bail
+    const releaseTypeCounts = {};
+    const bailByCharge = {};
+    let totalBailThisMonth = 0;
+    const nowStats = new Date();
+
+    for (const line of lines) {
+      if (line.startsWith('RELEASED |')) {
+        // Extract release type code from "(RBB)" pattern
+        const typeMatch = line.match(/\(([A-Z]{2,5})\)\s*\|/);
+        if (typeMatch) {
+          const type = typeMatch[1];
+          releaseTypeCounts[type] = (releaseTypeCounts[type] || 0) + 1;
+        }
+
+        // Extract bail amount
+        const bailMatch = line.match(/Bail Posted:\s*\$([\d,]+\.\d{2})/);
+        if (bailMatch) {
+          const bail = parseFloat(bailMatch[1].replace(/,/g, ''));
+          if (bail > 0) {
+            // Check if this month
+            const dateMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})/);
+            if (dateMatch) {
+              const [rm, rd, ry] = dateMatch[1].split('/');
+              const releaseYear = 2000 + parseInt(ry);
+              const releaseMonth = parseInt(rm) - 1;
+              if (releaseYear === nowStats.getFullYear() && releaseMonth === nowStats.getMonth()) {
+                totalBailThisMonth += bail;
+              }
+            }
+            // Correlate bail with charges
+            const nm = line.match(/RELEASED \| ([^|]+) \|/);
+            if (nm) {
+              const charges = nameToCharges.get(nm[1].trim()) || [];
+              charges.forEach(charge => {
+                if (!bailByCharge[charge]) bailByCharge[charge] = { total: 0, count: 0 };
+                bailByCharge[charge].total += bail;
+                bailByCharge[charge].count++;
+              });
+            }
+          }
+        }
+      }
+    }
+
+    // Average bail by charge type (top 5)
+    const avgBailByCharge = Object.entries(bailByCharge)
+      .map(([charge, data]) => ({ charge, avgBail: Math.round(data.total / data.count), count: data.count }))
+      .sort((a, b) => b.avgBail - a.avgBail)
+      .slice(0, 5);
+
+    // Precise time served and release types from history file
+    let historyTimeMinutes = [];
+    let finalReleaseTypes = releaseTypeCounts;
+    if (fs.existsSync(RELEASE_STATS_HISTORY_FILE)) {
+      try {
+        const history = JSON.parse(fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8'));
+        const historyTypeCounts = {};
+        for (const entry of history) {
+          const tsMatch = (entry.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+          if (tsMatch) {
+            const mins = parseInt(tsMatch[1]) * 1440 + parseInt(tsMatch[2]) * 60 + parseInt(tsMatch[3]);
+            if (mins > 0 && mins < 525600) historyTimeMinutes.push(mins);
+          }
+          if (entry.releaseType) {
+            historyTypeCounts[entry.releaseType] = (historyTypeCounts[entry.releaseType] || 0) + 1;
+          }
+        }
+        if (Object.keys(historyTypeCounts).length > 0) finalReleaseTypes = historyTypeCounts;
+      } catch (e) { /* ignore */ }
+    }
+
+    // Time served stats (precise, from PDF data)
+    let avgTimeServedMins = 0, minTimeServedMins = 0, maxTimeServedMins = 0;
+    if (historyTimeMinutes.length > 0) {
+      avgTimeServedMins = Math.round(historyTimeMinutes.reduce((a, b) => a + b, 0) / historyTimeMinutes.length);
+      minTimeServedMins = Math.min(...historyTimeMinutes);
+      maxTimeServedMins = Math.max(...historyTimeMinutes);
+    }
+
+    // Longest current inmate (from roster)
+    let longestInmate = null;
+    let longestDays = 0;
+
     // Get current population from roster file
     let currentPopulation = 0;
     const rosterFile = path.join(STORAGE_DIR, 'prev_roster.txt');
@@ -1343,6 +1470,26 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       const content = fs.readFileSync(rosterFile, 'utf-8');
       const bookingMatches = content.match(/Booking #:/g);
       currentPopulation = bookingMatches ? bookingMatches.length : 0;
+
+      // Also find longest-serving current inmate
+      const currentBookings = extractBookings(content);
+      for (const [, booking] of currentBookings.entries()) {
+        if (booking.bookDate && booking.bookDate !== 'Unknown') {
+          const parts = booking.bookDate.split(' ');
+          if (parts.length === 2) {
+            const [datePart, timePart] = parts;
+            const [bm, bd, by] = datePart.split('/');
+            const [bh, bmin, bs] = timePart.split(':');
+            const byr = by.length === 2 ? 2000 + parseInt(by) : parseInt(by);
+            const bookDate = new Date(byr, parseInt(bm)-1, parseInt(bd), parseInt(bh), parseInt(bmin), parseInt(bs));
+            const daysIn = (nowStats - bookDate) / (1000 * 60 * 60 * 24);
+            if (daysIn > longestDays) {
+              longestDays = daysIn;
+              longestInmate = { name: booking.name, days: Math.floor(daysIn), bookDate: booking.bookDate };
+            }
+          }
+        }
+      }
     }
     
     // Prepare time series data (last 30 days)
@@ -1370,10 +1517,16 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       commonCharges,
       bookingsByDay,
       avgStayDays,
-      releaseTypes,
+      releaseTypes: finalReleaseTypes,
       timeSeriesData: last30Days,
       dataCollectionStart: dataCollectionStart ? dataCollectionStart.toLocaleDateString('en-US') : null,
       daysOfData,
+      totalBailThisMonth,
+      avgBailByCharge,
+      avgTimeServedMins,
+      minTimeServedMins,
+      maxTimeServedMins,
+      longestInmate,
     };
     
     res.send(getStatsHTML(stats));
@@ -1383,6 +1536,27 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
     res.send('Error generating stats: ' + error.message);
   }
 });
+
+const RELEASE_TYPE_NAMES = {
+  RBB: 'Bail Bond',
+  RPR: 'Personal Recognizance',
+  ROA: 'Own Authority',
+  RCB: 'Cash Bail',
+  RCT: 'Court Order',
+  RFTA: 'FTA / Dismissed',
+  RNCM: 'No Charges Filed',
+  RNHM: 'No Hold',
+};
+
+function fmtMins(mins) {
+  if (!mins || mins <= 0) return '—';
+  if (mins < 60) return `${mins}m`;
+  if (mins < 1440) return `${Math.floor(mins/60)}h ${mins%60}m`;
+  const d = Math.floor(mins/1440);
+  const h = Math.floor((mins%1440)/60);
+  const m = mins%60;
+  return h > 0 ? `${d}d ${h}h ${m}m` : `${d}d ${m}m`;
+}
 
 function getStatsHTML(stats) {
   const maxCharge = Math.max(...stats.commonCharges.map(c => c.count), 1);
@@ -1602,6 +1776,21 @@ function getStatsHTML(stats) {
         <div class="stat-value">${stats.avgStayDays} days</div>
         <div class="stat-label">Average Length of Stay</div>
       </div>
+      <div class="stat-card" style="border-left-color: #1a6e3c;">
+        <div class="stat-value" style="font-size: 1.8rem;">$${stats.totalBailThisMonth.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</div>
+        <div class="stat-label">Bail Collected This Month</div>
+      </div>
+      <div class="stat-card" style="border-left-color: #4a1a6e;">
+        <div class="stat-value" style="font-size: 1.8rem;">${fmtMins(stats.avgTimeServedMins)}</div>
+        <div class="stat-label">Avg Time Served (PDF Data)</div>
+      </div>
+      ${stats.longestInmate ? `
+      <div class="stat-card" style="border-left-color: #6e1a1a;">
+        <div class="stat-value" style="font-size: 1.4rem;">${stats.longestInmate.days}d</div>
+        <div class="stat-label">Longest Current Stay</div>
+        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: #7a95b0;">${stats.longestInmate.name}</div>
+        <div style="font-size: 0.7rem; color: #2d4a6a;">In since ${stats.longestInmate.bookDate}</div>
+      </div>` : ''}
     </div>
 
     <div class="chart-container">
@@ -1643,7 +1832,60 @@ function getStatsHTML(stats) {
         `).join('')}
       </div>
     </div>
-        
+
+    ${Object.keys(stats.releaseTypes).length > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Release Type Breakdown</div>
+      <div class="release-types">
+        ${Object.entries(stats.releaseTypes)
+          .sort((a, b) => b[1] - a[1])
+          .map(([code, count]) => `
+          <div class="release-type">
+            <div class="release-type-count">${count}</div>
+            <div style="font-size: 1rem; font-weight: bold; color: #f09030; margin: 0.25rem 0;">${code}</div>
+            <div class="release-type-label">${RELEASE_TYPE_NAMES[code] || code}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+
+    ${stats.avgTimeServedMins > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Time Served Statistics (from PDF Data)</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${fmtMins(stats.avgTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
+        </div>
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${fmtMins(stats.minTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
+        </div>
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${fmtMins(stats.maxTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
+        </div>
+      </div>
+    </div>` : ''}
+
+    ${stats.avgBailByCharge.length > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Average Bail by Charge Type</div>
+      <div class="bar-chart">
+        ${(() => {
+          const maxBail = Math.max(...stats.avgBailByCharge.map(x => x.avgBail), 1);
+          return stats.avgBailByCharge.map(item => `
+            <div class="bar-item">
+              <div class="bar-label">${item.charge}</div>
+              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #1a6e3c, #5ecfb8);">
+                $${item.avgBail.toLocaleString()}
+              </div>
+            </div>
+          `).join('');
+        })()}
+      </div>
+    </div>` : ''}
+
   </div>
 </body>
 </html>`;
