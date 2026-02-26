@@ -42,7 +42,7 @@ async function fetchReleaseStats() {
     for (const line of lines) {
       // Match: Date/Time | Name | Release Type | Credit Served | Bail
       // Handle names with periods like "ALLEN, HAROLD F. III"
-      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+\.\s*(R[A-Z]{2,3})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
+      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+\.\s*([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
       
       if (match) {
         const [, date, time, name, releaseType, timeServed, bail] = match;
@@ -1538,12 +1538,16 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
 });
 
 const RELEASE_TYPE_NAMES = {
-  RBB: 'Bail Bond',
-  RPR: 'Personal Recognizance',
-  ROA: 'Own Authority',
-  RCB: 'Cash Bail',
-  RCT: 'Court Order',
-  RFTA: 'FTA / Dismissed',
+  RBB:  'Released on Bail Bond',
+  RPR:  'Released Personal Recognizance',
+  ROA:  'Released Own Recognizance',
+  RCB:  'Released Cash Bail',
+  RCC:  'Released Credit for Time Served',
+  RCD:  'Released Court Disposition',
+  MIS:  'Mistaken Identity',
+  RTR:  'Released to Rehab/Treatment',
+  RCT:  'Released Court Order',
+  RFTA: 'Released FTA / Dismissed',
   RNCM: 'No Charges Filed',
   RNHM: 'No Hold',
 };
@@ -1872,6 +1876,437 @@ function getStatsHTML(stats) {
     </div>` : ''}
 
   </div>
+</body>
+</html>`;
+}
+
+// ── DEEP STATS (unlisted admin page) ─────────────────────────────────────────
+app.get('/api/deepstats', async (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+
+    // Load history
+    let history = [];
+    if (fs.existsSync(RELEASE_STATS_HISTORY_FILE)) {
+      try { history = JSON.parse(fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8')); } catch (e) {}
+    }
+
+    // Build name→charges and booked-names list from change log
+    const nameToCharges = new Map();
+    const bookedNamesList = [];
+    if (fs.existsSync(logFile)) {
+      for (const line of fs.readFileSync(logFile, 'utf-8').split('\n')) {
+        if (line.startsWith('BOOKED |')) {
+          const nm = line.match(/BOOKED \| ([^|]+) \|/);
+          const ch = line.match(/Charges:\s+(.+)/);
+          if (nm) {
+            const name = nm[1].trim();
+            bookedNamesList.push(name);
+            if (ch && !nameToCharges.has(name)) {
+              const charges = ch[1].split(',').map(c => c.trim()).filter(c => c && c !== 'None listed');
+              if (charges.length) nameToCharges.set(name, charges);
+            }
+          }
+        }
+      }
+    }
+
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const weekAgo  = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const yearStart  = new Date(now.getFullYear(), 0, 1);
+
+    // ── Release type stats ────────────────────────────────────────────────────
+    const rtStats = {}; // code → { count, totalMins, totalBail, bailCount }
+    for (const e of history) {
+      const code = e.releaseType || 'UNK';
+      if (!rtStats[code]) rtStats[code] = { count: 0, totalMins: 0, totalBail: 0, bailCount: 0 };
+      rtStats[code].count++;
+      const ts = (e.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+      if (ts) {
+        const m = parseInt(ts[1])*1440 + parseInt(ts[2])*60 + parseInt(ts[3]);
+        if (m > 0 && m < 525600) rtStats[code].totalMins += m;
+      }
+      const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
+      if (bail > 0) { rtStats[code].totalBail += bail; rtStats[code].bailCount++; }
+    }
+
+    // ── Bail stats ────────────────────────────────────────────────────────────
+    let bailToday=0, bailWeek=0, bailMonth=0, bailYTD=0, bailCount=0, noBailCount=0;
+    let maxBail=0, maxBailEntry=null;
+    const bailLeaderboardRaw = [];
+
+    for (const e of history) {
+      const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
+      let rd = null;
+      if (e.releaseDateTime) {
+        const [dp] = e.releaseDateTime.split(' ');
+        const [m, d, y] = dp.split('/');
+        rd = new Date(2000 + parseInt(y), parseInt(m)-1, parseInt(d));
+      }
+      if (bail > 0) {
+        bailCount++;
+        if (rd) {
+          if (rd.toDateString() === todayStr) bailToday += bail;
+          if (rd >= weekAgo)    bailWeek  += bail;
+          if (rd >= monthStart) bailMonth += bail;
+          if (rd >= yearStart)  bailYTD   += bail;
+        }
+        if (bail > maxBail) { maxBail = bail; maxBailEntry = e; }
+        bailLeaderboardRaw.push({ ...e, bailAmt: bail, charges: nameToCharges.get(e.name) || [] });
+      } else { noBailCount++; }
+    }
+    bailLeaderboardRaw.sort((a, b) => b.bailAmt - a.bailAmt);
+    const top10Bail = bailLeaderboardRaw.slice(0, 10);
+
+    // ── Per-charge correlations ───────────────────────────────────────────────
+    const bailByCharge = {}, timeByCharge = {}, rtByCharge = {};
+    for (const e of history) {
+      const charges = nameToCharges.get(e.name) || [];
+      const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
+      const ts = (e.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+      const mins = ts ? parseInt(ts[1])*1440 + parseInt(ts[2])*60 + parseInt(ts[3]) : 0;
+      const type = e.releaseType || 'UNK';
+      for (const charge of charges) {
+        if (!charge) continue;
+        if (bail > 0) {
+          if (!bailByCharge[charge]) bailByCharge[charge] = { total:0, count:0, max:0 };
+          bailByCharge[charge].total += bail;
+          bailByCharge[charge].count++;
+          if (bail > bailByCharge[charge].max) bailByCharge[charge].max = bail;
+        }
+        if (mins > 0 && mins < 525600) {
+          if (!timeByCharge[charge]) timeByCharge[charge] = { totalMins:0, count:0 };
+          timeByCharge[charge].totalMins += mins;
+          timeByCharge[charge].count++;
+        }
+        if (!rtByCharge[charge]) rtByCharge[charge] = {};
+        rtByCharge[charge][type] = (rtByCharge[charge][type] || 0) + 1;
+      }
+    }
+
+    // ── Time served ───────────────────────────────────────────────────────────
+    let under24=0, over24=0, histMaxMins=0, histMaxEntry=null;
+    let histMinMins=Infinity, histMinEntry=null;
+    for (const e of history) {
+      const ts = (e.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+      if (ts) {
+        const m = parseInt(ts[1])*1440 + parseInt(ts[2])*60 + parseInt(ts[3]);
+        if (m > 0 && m < 525600) {
+          if (m < 1440) under24++; else over24++;
+          if (m > histMaxMins) { histMaxMins = m; histMaxEntry = e; }
+          if (m < histMinMins) { histMinMins = m; histMinEntry = e; }
+        }
+      }
+    }
+
+    // ── Frequent flyers ───────────────────────────────────────────────────────
+    const nameCounts = {};
+    bookedNamesList.forEach(n => { nameCounts[n] = (nameCounts[n] || 0) + 1; });
+    const frequentFlyers = Object.entries(nameCounts)
+      .filter(([, c]) => c > 1)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 15)
+      .map(([name, count]) => ({ name, count, charges: nameToCharges.get(name) || [] }));
+
+    // ── Busiest release day/time (from history PDF) ───────────────────────────
+    const relDays  = { Sun:0, Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0 };
+    const relHours = Array(24).fill(0);
+    for (const e of history) {
+      const [dp, tp] = (e.releaseDateTime || '').split(' ');
+      if (dp && tp) {
+        const [m, d, y] = dp.split('/');
+        const dt = new Date(2000 + parseInt(y), parseInt(m)-1, parseInt(d));
+        relDays[['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]]++;
+        const hr = parseInt(tp.split(':')[0]);
+        if (hr >= 0 && hr < 24) relHours[hr]++;
+      }
+    }
+
+    // ── Busiest book day/time + current longest (live roster PDF) ─────────────
+    const bookDays  = { Sun:0, Mon:0, Tue:0, Wed:0, Thu:0, Fri:0, Sat:0 };
+    const bookHours = Array(24).fill(0);
+    let currentLongest = null, currentLongestDays = 0;
+    try {
+      const pdfResp = await fetch(PDF_URL);
+      if (pdfResp.ok) {
+        const buf = Buffer.from(await pdfResp.arrayBuffer());
+        const parsed = await PDFParser(buf);
+        for (const [, b] of extractBookings(parsed.text).entries()) {
+          if (b.bookDate && b.bookDate !== 'Unknown') {
+            const [dp, tp] = b.bookDate.split(' ');
+            if (dp && tp) {
+              const [bm, bd, by] = dp.split('/');
+              const [bh, bmin] = tp.split(':');
+              const byr = by.length === 2 ? 2000 + parseInt(by) : parseInt(by);
+              const dt = new Date(byr, parseInt(bm)-1, parseInt(bd), parseInt(bh), parseInt(bmin));
+              bookDays[['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()]]++;
+              const hr = parseInt(bh);
+              if (hr >= 0 && hr < 24) bookHours[hr]++;
+              const daysIn = (now - dt) / 86400000;
+              if (daysIn > currentLongestDays) {
+                currentLongestDays = daysIn;
+                currentLongest = { name: b.name, days: Math.floor(daysIn), bookDate: b.bookDate, charges: b.charges };
+              }
+            }
+          }
+        }
+      }
+    } catch (e) { console.error('deepstats PDF error:', e); }
+
+    res.send(getDeepStatsHTML({
+      history, rtStats, nameToCharges,
+      bailToday, bailWeek, bailMonth, bailYTD, bailCount, noBailCount,
+      maxBailEntry, top10Bail,
+      bailByCharge, timeByCharge, rtByCharge,
+      under24, over24,
+      histMaxMins, histMaxEntry,
+      histMinMins: histMinMins === Infinity ? 0 : histMinMins, histMinEntry,
+      frequentFlyers,
+      relDays, relHours, bookDays, bookHours,
+      currentLongest,
+    }));
+  } catch (err) {
+    console.error('Deep stats error:', err);
+    res.status(500).send('Error: ' + err.message);
+  }
+});
+
+function getDeepStatsHTML(d) {
+  const total = d.history.length;
+  const $ = n => '$' + (n||0).toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  const pct = (n, of) => of > 0 ? ((n/of)*100).toFixed(1) + '%' : '—';
+
+  // Precompute sorted arrays
+  const rtArr = Object.entries(d.rtStats)
+    .sort((a,b) => b[1].count - a[1].count)
+    .map(([code, s]) => ({
+      code,
+      name: RELEASE_TYPE_NAMES[code] || code,
+      count: s.count,
+      pct: pct(s.count, total),
+      avgTime: s.totalMins > 0 ? fmtMins(Math.round(s.totalMins / s.count)) : '—',
+      avgBail: s.bailCount > 0 ? $(Math.round(s.totalBail / s.bailCount)) : '—',
+    }));
+
+  const bailByChargeArr = Object.entries(d.bailByCharge)
+    .map(([charge, s]) => ({ charge, avg: Math.round(s.total/s.count), max: s.max, count: s.count }))
+    .sort((a,b) => b.max - a.max).slice(0, 12);
+
+  const timeByChargeArr = Object.entries(d.timeByCharge)
+    .map(([charge, s]) => ({ charge, avgMins: Math.round(s.totalMins/s.count), count: s.count }))
+    .sort((a,b) => b.avgMins - a.avgMins).slice(0, 12);
+
+  const rtByChargeArr = Object.entries(d.rtByCharge)
+    .map(([charge, types]) => {
+      const tot = Object.values(types).reduce((a,b)=>a+b,0);
+      const top = Object.entries(types).sort((a,b)=>b[1]-a[1]);
+      return { charge, total: tot, top };
+    })
+    .sort((a,b) => b.total - a.total).slice(0, 10);
+
+  const maxRelDay = Math.max(...Object.values(d.relDays), 1);
+  const maxRelHour = Math.max(...d.relHours, 1);
+  const maxBookDay = Math.max(...Object.values(d.bookDays), 1);
+  const maxBookHour = Math.max(...d.bookHours, 1);
+
+  function dayBar(days, max) {
+    return Object.entries(days).map(([day, count]) => `
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:4px;">
+        <span style="min-width:32px;color:#7a95b0;font-size:0.75rem;">${day}</span>
+        <div style="background:linear-gradient(90deg,#c45018,#f09030);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
+        <span style="color:#f09030;font-size:0.75rem;">${count}</span>
+      </div>`).join('');
+  }
+
+  function hourBar(hours, max) {
+    return hours.map((count, hr) => `
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2px;">
+        <span style="min-width:40px;color:#7a95b0;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
+        <div style="background:linear-gradient(90deg,#122040,#1a4a6e);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
+        <span style="color:#7a95b0;font-size:0.7rem;">${count}</span>
+      </div>`).join('');
+  }
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <title>Deep Stats — Mason County Jail</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#090d14;color:#7a95b0;padding:2rem;min-height:100vh}
+    .wrap{max-width:1100px;margin:0 auto}
+    h1{font-size:1.4rem;color:#b8b8b8;margin-bottom:0.25rem;letter-spacing:-0.5px}
+    h2{font-size:0.85rem;color:#c45018;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #1a2d45;padding-bottom:0.4rem}
+    a{color:#c45018;text-decoration:none}
+    .subtitle{color:#2d4a6a;font-size:0.75rem;margin-bottom:2rem}
+    table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
+    th{color:#2d4a6a;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #1a2d45;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
+    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0d1825;color:#7a95b0;vertical-align:top}
+    tr:hover td{background:#0d1825}
+    .val{color:#f09030;font-weight:bold}
+    .dim{color:#2d4a6a}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.75rem}
+    .card{background:#080e18;border-radius:8px;padding:1rem;border-left:3px solid #c45018}
+    .card .v{font-size:1.6rem;font-weight:bold;color:#f09030}
+    .card .l{color:#2d4a6a;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+    @media(max-width:700px){.two-col{grid-template-columns:1fr}}
+    .chip{display:inline-block;background:#0d1825;border:1px solid #1a3050;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#7a95b0}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <a href="/api/status" style="font-size:0.75rem;color:#2d4a6a;">← status</a>
+  <h1 style="margin-top:0.5rem;">Deep Analytics</h1>
+  <p class="subtitle">Mason County Jail · ${total} releases in history · Unlisted</p>
+
+  <h2>Release Type Breakdown</h2>
+  <table>
+    <tr><th>Code</th><th>Name</th><th>Count</th><th>%</th><th>Avg Time Served</th><th>Avg Bail (if any)</th></tr>
+    ${rtArr.map(r => `<tr>
+      <td class="val">${r.code}</td>
+      <td>${r.name}</td>
+      <td>${r.count}</td>
+      <td>${r.pct}</td>
+      <td>${r.avgTime}</td>
+      <td>${r.avgBail}</td>
+    </tr>`).join('')}
+    ${rtArr.length === 0 ? '<tr><td colspan="6" class="dim">No data yet — run /api/run first</td></tr>' : ''}
+  </table>
+
+  <h2>Bail Summary</h2>
+  <div class="cards">
+    <div class="card"><div class="v">${$( d.bailToday)}</div><div class="l">Today</div></div>
+    <div class="card"><div class="v">${$(d.bailWeek)}</div><div class="l">Last 7 Days</div></div>
+    <div class="card"><div class="v">${$(d.bailMonth)}</div><div class="l">This Month</div></div>
+    <div class="card"><div class="v">${$(d.bailYTD)}</div><div class="l">Year to Date</div></div>
+    <div class="card" style="border-left-color:#1a6e3c"><div class="v">${d.bailCount}</div><div class="l">Paid Bail</div></div>
+    <div class="card" style="border-left-color:#6e1a1a"><div class="v">${d.noBailCount}</div><div class="l">Zero-Dollar Releases</div></div>
+    <div class="card" style="border-left-color:#4a4a00">
+      <div class="v">${d.bailCount + d.noBailCount > 0 ? pct(d.bailCount, d.bailCount + d.noBailCount) : '—'}</div>
+      <div class="l">Bail vs No-Bail Ratio</div>
+    </div>
+    ${d.maxBailEntry ? `<div class="card" style="border-left-color:#6e3c1a">
+      <div class="v" style="font-size:1.2rem;">${$(d.maxBailEntry.bailAmt || parseFloat((d.maxBailEntry.bail||'$0').replace(/[$,]/g,'')))}</div>
+      <div class="l">Most Expensive Bail Ever</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.maxBailEntry.name}</div>
+    </div>` : ''}
+  </div>
+
+  <h2>Top 10 Bail Leaderboard</h2>
+  <table>
+    <tr><th>#</th><th>Name</th><th>Bail</th><th>Type</th><th>Released</th><th>Charges</th></tr>
+    ${d.top10Bail.map((e, i) => `<tr>
+      <td class="dim">${i+1}</td>
+      <td class="val">${e.name}</td>
+      <td style="color:#1cffca;font-weight:bold;">${$(e.bailAmt)}</td>
+      <td><span class="chip">${e.releaseType || '?'}</span></td>
+      <td class="dim">${e.releaseDateTime || '—'}</td>
+      <td style="font-size:0.7rem;">${e.charges.length ? e.charges.join(', ') : '<span class="dim">—</span>'}</td>
+    </tr>`).join('')}
+    ${d.top10Bail.length === 0 ? '<tr><td colspan="6" class="dim">No bail data yet</td></tr>' : ''}
+  </table>
+
+  <h2>Average &amp; Max Bail by Charge Type</h2>
+  <table>
+    <tr><th>Charge</th><th>Avg Bail</th><th>Highest Bail</th><th>Count</th></tr>
+    ${bailByChargeArr.map(r => `<tr>
+      <td>${r.charge}</td>
+      <td class="val">${$(r.avg)}</td>
+      <td style="color:#1cffca;">${$(r.max)}</td>
+      <td class="dim">${r.count}</td>
+    </tr>`).join('')}
+    ${bailByChargeArr.length === 0 ? '<tr><td colspan="4" class="dim">No data yet</td></tr>' : ''}
+  </table>
+
+  <h2>Average Time Served by Charge</h2>
+  <table>
+    <tr><th>Charge</th><th>Avg Time Served</th><th>Count</th></tr>
+    ${timeByChargeArr.map(r => `<tr>
+      <td>${r.charge}</td>
+      <td class="val">${fmtMins(r.avgMins)}</td>
+      <td class="dim">${r.count}</td>
+    </tr>`).join('')}
+    ${timeByChargeArr.length === 0 ? '<tr><td colspan="3" class="dim">No data yet</td></tr>' : ''}
+  </table>
+
+  <h2>Release Type by Charge</h2>
+  <table>
+    <tr><th>Charge</th><th>Total</th><th>Top Release Type</th><th>Full Breakdown</th></tr>
+    ${rtByChargeArr.map(r => `<tr>
+      <td>${r.charge}</td>
+      <td class="dim">${r.total}</td>
+      <td><span class="chip">${r.top[0][0]}</span> <span class="dim">${r.top[0][1]}×</span></td>
+      <td style="font-size:0.7rem;">${r.top.map(([code, cnt]) => `<span class="chip">${code} ${cnt}</span>`).join(' ')}</td>
+    </tr>`).join('')}
+    ${rtByChargeArr.length === 0 ? '<tr><td colspan="4" class="dim">No data yet</td></tr>' : ''}
+  </table>
+
+  <h2>Time Served Statistics</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="v">${under24 + over24 > 0 ? pct(under24, under24+over24) : '—'}</div>
+      <div class="l">Released in &lt;24 Hours</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#2d4a6a;">${under24} under / ${over24} over</div>
+    </div>
+    ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
+      <div class="v" style="font-size:1.2rem;">${fmtMins(d.histMinMins)}</div>
+      <div class="l">Shortest Stay Ever</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMinEntry.name}</div>
+    </div>` : ''}
+    ${d.histMaxEntry ? `<div class="card" style="border-left-color:#6e1a1a">
+      <div class="v" style="font-size:1.2rem;">${fmtMins(d.histMaxMins)}</div>
+      <div class="l">Historical Longest Stay</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMaxEntry.name}</div>
+    </div>` : ''}
+    ${d.currentLongest ? `<div class="card" style="border-left-color:#6e3c1a">
+      <div class="v" style="font-size:1.2rem;">${d.currentLongest.days}d</div>
+      <div class="l">Current Longest Stay</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.currentLongest.name}</div>
+      <div style="font-size:0.65rem;color:#2d4a6a;">In since ${d.currentLongest.bookDate}</div>
+    </div>` : ''}
+  </div>
+
+  <h2>Frequent Flyers (Booked 2+ Times)</h2>
+  <table>
+    <tr><th>Name</th><th>Bookings</th><th>Charges</th></tr>
+    ${d.frequentFlyers.map(f => `<tr>
+      <td class="val">${f.name}</td>
+      <td style="color:#f09030;text-align:center;">${f.count}</td>
+      <td style="font-size:0.7rem;">${f.charges.length ? f.charges.join(', ') : '<span class="dim">—</span>'}</td>
+    </tr>`).join('')}
+    ${d.frequentFlyers.length === 0 ? '<tr><td colspan="3" class="dim">No repeat bookings yet</td></tr>' : ''}
+  </table>
+
+  <h2>Busiest Release Times (from 48hr PDF)</h2>
+  <div class="two-col">
+    <div>
+      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
+      ${dayBar(d.relDays, maxRelDay)}
+    </div>
+    <div>
+      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
+      ${hourBar(d.relHours, maxRelHour)}
+    </div>
+  </div>
+
+  <h2>Busiest Booking Times (from live roster PDF)</h2>
+  <div class="two-col">
+    <div>
+      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
+      ${dayBar(d.bookDays, maxBookDay)}
+    </div>
+    <div>
+      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
+      ${hourBar(d.bookHours, maxBookHour)}
+    </div>
+  </div>
+
+</div>
 </body>
 </html>`;
 }
