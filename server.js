@@ -516,6 +516,7 @@ if (fs.existsSync(logFile)) {
 </script>
 
   <title>Mason County Jail Roster Monitor</title>
+  <!-- build:9b75fde -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
