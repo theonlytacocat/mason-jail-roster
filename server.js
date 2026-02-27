@@ -1170,6 +1170,7 @@ app.get('/api/stats', (req, res) => {
         totalBookings: 0,
         totalReleases: 0,
         currentPopulation: 0,
+        avgPopulation: 0,
         commonCharges: [],
         bookingsByDay: {},
         avgStayDays: 0,
@@ -1196,7 +1197,8 @@ app.get('/api/stats', (req, res) => {
     let bookingDates = [];
     let releaseDates = [];
     let stayDurations = [];
-    
+    let popEvents = []; // {ts: Date, delta: 1|-1} for avg population
+
     const lines = logContent.split('\n');
     
     for (const line of lines) {
@@ -1210,10 +1212,13 @@ app.get('/api/stats', (req, res) => {
         const dateMatch = trimmedLine.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
         if (dateMatch) {
           const dateStr = dateMatch[1]; // "01/18/26"
+          const timeStr = dateMatch[2];
           const [month, day, year] = dateStr.split('/');
+          const [hour, min, sec] = timeStr.split(':');
           const fullYear = 2000 + parseInt(year);
-          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(min), parseInt(sec));
           bookingDates.push(date);
+          popEvents.push({ ts: date, delta: 1 });
         }
         
         // Extract charges
@@ -1242,10 +1247,13 @@ app.get('/api/stats', (req, res) => {
         const dateMatch = trimmedLine.match(/Released:\s+(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})/);
         if (dateMatch) {
           const dateStr = dateMatch[1]; // "01/18/26"
+          const timeStr = dateMatch[2];
           const [month, day, year] = dateStr.split('/');
+          const [hour, min, sec] = timeStr.split(':');
           const fullYear = 2000 + parseInt(year);
-          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day));
+          const date = new Date(fullYear, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(min), parseInt(sec));
           releaseDates.push(date);
+          popEvents.push({ ts: date, delta: -1 });
         }
         
         // Extract charges from releases too
@@ -1494,6 +1502,24 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       }
     }
     
+    // Average daily population from event timeline
+    let avgPopulation = 0;
+    if (popEvents.length > 0) {
+      popEvents.sort((a, b) => a.ts - b.ts);
+      // Estimate starting population: current minus net change logged
+      const netChange = totalBookings - totalReleases;
+      let pop = Math.max(0, currentPopulation - netChange);
+      const dailyPops = {};
+      for (const ev of popEvents) {
+        pop = Math.max(0, pop + ev.delta);
+        dailyPops[ev.ts.toDateString()] = pop;
+      }
+      const pops = Object.values(dailyPops);
+      if (pops.length > 0) {
+        avgPopulation = Math.round(pops.reduce((a, b) => a + b, 0) / pops.length);
+      }
+    }
+
     // Prepare time series data (last 30 days)
     const last30Days = [];
     const today = new Date();
@@ -1516,6 +1542,7 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       totalBookings,
       totalReleases,
       currentPopulation,
+      avgPopulation,
       commonCharges,
       bookingsByDay,
       avgStayDays,
@@ -1777,6 +1804,10 @@ function getStatsHTML(stats) {
       <div class="stat-card blue">
         <div class="stat-value">${stats.currentPopulation}</div>
         <div class="stat-label">Current Population</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-value">${stats.avgPopulation}</div>
+        <div class="stat-label">Avg Daily Population</div>
       </div>
       <div class="stat-card orange">
         <div class="stat-value">${stats.avgStayDays} days</div>
