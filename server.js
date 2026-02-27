@@ -562,7 +562,7 @@ if (fs.existsSync(logFile)) {
       <div class="stats">
         <div class="stat">
           <span class="stat-label">Last Check</span>
-          <span class="stat-value">${lastCheck !== "Never" ? new Date(lastCheck).toLocaleString("en-US", { timeZone: "America/Los_Angeles", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", second: "2-digit", hour12: true }) + " PST" : "Never"}</span>
+          <span class="stat-value">${lastCheck !== "Never" ? formatDatePST(new Date(lastCheck)) : "Never"}</span>
         </div>
         <div class="stat">
           <span class="stat-label">Current Inmates</span>
