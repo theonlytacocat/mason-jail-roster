@@ -1,0 +1,309 @@
+/**
+ * STEP-BY-STEP REFACTORING CHECKLIST
+ * 
+ * Follow these steps in order. Check off each one as you complete it.
+ * Estimated time: 30-45 minutes
+ */
+
+// ============================================================================
+// PHASE 1: SETUP (5 minutes)
+// ============================================================================
+
+/*
+[ ] Step 1.1: Copy utils.js to your project directory
+    - Put it in the same folder as your main server file
+    - Make sure it's named exactly "utils.js"
+
+[ ] Step 1.2: Add the import statement
+    Location: Top of your server file (around line 7)
+    Add this after your other imports:
+    
+    import {
+      parseBookingDate,
+      formatMinutes,
+      parseTimeServed,
+      daysBetween,
+      isMidnight,
+      formatDatePST
+    } from './utils.js';
+
+[ ] Step 1.3: Test that the import works
+    - Start your server: node your-server-file.js
+    - If you see "Cannot find module './utils.js'" - fix the path
+    - If no errors, you're good!
+*/
+
+// ============================================================================
+// PHASE 2: EASY REPLACEMENTS (10 minutes)
+// ============================================================================
+
+/*
+These are simple find-and-replace operations.
+
+[ ] Step 2.1: Replace formatMinutes usage
+    - FIND the fmtMins function definition (around line 1012)
+    - DELETE the entire function
+    - Find all: fmtMins(
+    - Replace with: formatMinutes(
+    - Should find ~10 occurrences
+
+[ ] Step 2.2: Replace date formatting in /api/status
+    - FIND: new Date(lastCheck).toLocaleString("en-US", {
+    - This will be a long multi-line config object
+    - REPLACE with: formatDatePST(new Date(lastCheck))
+    - Save ~10 lines of code
+
+[ ] Step 2.3: Update time served parsing in release stats
+    - FIND: const tsMatch = (entry.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+    - REPLACE with: const mins = parseTimeServed(entry.timeServed);
+    - Then find the next 2-3 lines that do:
+      const mins = parseInt(tsMatch[1]) * 1440 + ...
+    - DELETE those lines (parseTimeServed already returns minutes)
+    - Change the if condition from:
+      if (tsMatch) {
+      to:
+      if (mins) {
+*/
+
+// ============================================================================
+// PHASE 3: MODERATE REPLACEMENTS (15 minutes)
+// ============================================================================
+
+/*
+These require a bit more care but follow the same pattern.
+
+[ ] Step 3.1: Replace extractDateFromLine function
+    - FIND the entire function (starts around line 289)
+    - REPLACE with this simpler version:
+    
+    function extractDateFromLine(line) {
+      const bookedMatch = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+      if (bookedMatch) {
+        return parseBookingDate(bookedMatch[1]);
+      }
+      
+      const releasedMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+      if (releasedMatch) {
+        return parseBookingDate(releasedMatch[1]);
+      }
+      
+      return new Date();
+    }
+
+[ ] Step 3.2: Update average stay calculation
+    - FIND the section that does manual date parsing in the booking loop
+    - It looks like:
+      const [month, day, year] = dateStr.split('/');
+      const [hours, minutes, seconds] = timeStr.split(':');
+      const fullYear = 2000 + parseInt(year);
+      const bookDate = new Date(...)
+    
+    - REPLACE with:
+      const bookDate = parseBookingDate(dateMatch[1] + ' ' + dateMatch[2]);
+      if (!bookDate) continue; // Skip invalid dates
+    
+    - Do the same for the RELEASED parsing section
+
+[ ] Step 3.3: Update stay duration calculation
+    - FIND: const stayMs = lastRelease - lastBook;
+    - FIND: const stayHours = stayMs / (1000 * 60 * 60);
+    - REPLACE both with:
+      const stayDays = daysBetween(lastBook, lastRelease);
+    
+    - Update the validation:
+      OLD: if (stayHours > 0 && stayHours < 8760)
+      NEW: if (stayDays > 0 && stayDays < 365)
+    
+    - Update accumulation:
+      OLD: totalStayHours += stayHours;
+      NEW: totalStayDays += stayDays;
+*/
+
+// ============================================================================
+// PHASE 4: DEEP STATS REFACTORING (10 minutes)
+// ============================================================================
+
+/*
+The deepstats page has many similar patterns.
+
+[ ] Step 4.1: Update time served parsing in deep stats
+    - FIND in the deepstats route (around line 1067):
+      const tsMatch = (e.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
+      if (tsMatch) {
+        const m = parseInt(tsMatch[1]) * 1440 + parseInt(tsMatch[2]) * 60 + parseInt(tsMatch[3]);
+        
+    - REPLACE with:
+      const m = parseTimeServed(e.timeServed);
+      if (m) {
+    
+    - Do this in BOTH places it appears (once for histMaxMins, once for the main loop)
+
+[ ] Step 4.2: Update longest current inmate calculation
+    - FIND (around line 1145):
+      const parts = booking.bookDate.split(' ');
+      if (parts.length === 2) {
+        const [datePart, timePart] = parts;
+        const [bm, bd, by] = datePart.split('/');
+        // ... lots of manual parsing ...
+        
+    - REPLACE with:
+      const bookDate = parseBookingDate(booking.bookDate);
+      if (bookDate) {
+        const daysIn = daysBetween(bookDate, nowStats);
+        if (daysIn > longestDays) {
+          longestDays = daysIn;
+          longestInmate = { 
+            name: booking.name, 
+            days: Math.floor(daysIn), 
+            bookDate: booking.bookDate 
+          };
+        }
+      }
+*/
+
+// ============================================================================
+// PHASE 5: TESTING (10 minutes)
+// ============================================================================
+
+/*
+CRITICAL: Test everything before deploying!
+
+[ ] Step 5.1: Start server and check for errors
+    - Run: node your-server-file.js
+    - Should see: "Server running on port 3000"
+    - No import errors or syntax errors
+
+[ ] Step 5.2: Test basic pages
+    - Visit http://localhost:3000/api/status
+    - Should load normally
+    - Date should show with PST timezone
+
+[ ] Step 5.3: Run a check
+    - Click "Run Check Now" or visit /api/run
+    - Should complete without errors
+    - Check browser console for any warnings
+
+[ ] Step 5.4: Test stats page
+    - Visit /api/stats
+    - All numbers should be identical to before refactoring
+    - If numbers changed, you have a bug - investigate
+    
+    Compare these specifically:
+    - Total Bookings Tracked
+    - Total Releases Tracked
+    - Average Length of Stay
+    - Most Common Charges
+
+[ ] Step 5.5: Test deep stats page
+    - Visit /api/deepstats
+    - Verify time served calculations look correct
+    - Check bail statistics
+    - Verify no JavaScript errors in console
+
+[ ] Step 5.6: Test edge cases
+    - Add a bad date to your change_log.txt:
+      BOOKED | TEST PERSON | Booked: 99/99/99 99:99:99 | Charges: Test
+    
+    - Visit /api/stats
+    - Should handle gracefully (skip the bad entry)
+    - Check server logs - should see: "Invalid date detected: 99/99/99..."
+
+[ ] Step 5.7: Remove test data
+    - Remove the bad date you added
+    - Run /api/run again to get clean state
+*/
+
+// ============================================================================
+// PHASE 6: DEPLOYMENT
+// ============================================================================
+
+/*
+[ ] Step 6.1: Commit to git
+    git add utils.js your-server-file.js
+    git commit -m "Refactor: centralize date parsing with utils.js
+    
+    - Extracted date parsing to utils.js
+    - Replaced manual date parsing with parseBookingDate
+    - Replaced manual time calculations with daysBetween
+    - Added validation for invalid dates
+    - Consistent timezone formatting with formatDatePST"
+
+[ ] Step 6.2: Deploy to Railway (or your hosting)
+    git push
+    
+[ ] Step 6.3: Monitor logs after deployment
+    - Check for any new errors
+    - Verify stats pages load correctly
+    - Check that date warnings appear if bad data comes through
+*/
+
+// ============================================================================
+// TROUBLESHOOTING
+// ============================================================================
+
+/*
+PROBLEM: "Cannot find module './utils.js'"
+SOLUTION: Make sure utils.js is in the same directory as your server file
+
+PROBLEM: Numbers changed after refactoring (e.g., average stay is different)
+SOLUTION: 
+  - Check if you changed totalStayHours to totalStayDays properly
+  - Verify you're dividing by stayCount, not multiplying
+  - Look for places where you might have broken the calculation logic
+
+PROBLEM: "Invalid date detected" warnings for valid dates
+SOLUTION:
+  - Check the date format in your logs
+  - Verify dates are in MM/DD/YY HH:MM:SS format
+  - Some dates might have single-digit months/days (1/5/26 instead of 01/05/26)
+  - parseBookingDate handles both, but check the regex
+
+PROBLEM: Stats page shows NaN or undefined
+SOLUTION:
+  - A function is probably returning null when you expected a number
+  - Add checks: if (!mins) continue; before using mins
+  - Check that you're not dividing by 0
+
+PROBLEM: Time zones look wrong
+SOLUTION:
+  - All dates should be in PST/PDT (America/Los_Angeles)
+  - Check that you're using formatDatePST consistently
+  - Server time might be UTC - parseBookingDate assumes PST
+*/
+
+// ============================================================================
+// SUCCESS CRITERIA
+// ============================================================================
+
+/*
+You've successfully completed the refactoring when:
+
+✅ Server starts without errors
+✅ All pages load (status, history, stats, deepstats)
+✅ Statistics match the old values (within rounding)
+✅ Dates display with PST timezone
+✅ No JavaScript errors in browser console
+✅ Invalid dates are caught and logged
+✅ Code is cleaner and easier to read
+
+BONUS POINTS:
+✅ You understand WHY each change was made
+✅ You could explain to someone else how parseBookingDate works
+✅ You feel confident making changes to date handling in the future
+*/
+
+// ============================================================================
+// NEXT STEPS (After This Refactoring)
+// ============================================================================
+
+/*
+Once you've completed this refactoring, you'll be ready for:
+
+1. Creating a data layer (functions to abstract file reading)
+2. Adding automated tests
+3. Migrating to SQLite database
+4. Improving error handling
+5. Adding rate limiting
+
+Each of these builds on having clean, maintainable utility functions!
+*/

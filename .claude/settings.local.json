@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add server.js)",
+      "Bash(git commit:*)",
+      "Bash(git push origin main)",
+      "WebFetch(domain:mason-jail-roster-production.up.railway.app)",
+      "Bash(railway status)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx @railway/cli --version)",
+      "Bash(npx @railway/cli whoami)",
+      "Bash(node --check server.js)"
+    ]
+  }
+}

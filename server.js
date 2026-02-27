@@ -595,34 +595,19 @@ if (fs.existsSync(logFile)) {
 // Helper function to extract date from log line
 function extractDateFromLine(line) {
   // Extract date from line like "Name | Booked: 01/18/26 01:45:00 | Charges: ..."
-  const match = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
-  if (match) {
-    // Convert "01/18/26 01:45:00" to Date object
-    const [dateStr, timeStr] = match[1].split(' ');
-    const [month, day, year] = dateStr.split('/');
-    const [hours, minutes, seconds] = timeStr.split(':');
-    
-    // Add 2000 to 2-digit year
-    const fullYear = 2000 + parseInt(year);
-    
-    return new Date(fullYear, parseInt(month) - 1, parseInt(day), 
-                   parseInt(hours), parseInt(minutes), parseInt(seconds));
+  const bookedMatch = line.match(/Booked:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+  if (bookedMatch) {
+    return parseBookingDate(bookedMatch[1]);
   }
   
   // Also check for "Released:" format
-  const releaseMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
-  if (releaseMatch) {
-    const [dateStr, timeStr] = releaseMatch[1].split(' ');
-    const [month, day, year] = dateStr.split('/');
-    const [hours, minutes, seconds] = timeStr.split(':');
-    
-    const fullYear = 2000 + parseInt(year);
-    
-    return new Date(fullYear, parseInt(month) - 1, parseInt(day), 
-                   parseInt(hours), parseInt(minutes), parseInt(seconds));
+  const releasedMatch = line.match(/Released:\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+  if (releasedMatch) {
+    return parseBookingDate(releasedMatch[1]);
   }
   
-  return new Date(); // Default to current date if parsing fails
+  // If no valid date found, return current date
+  return new Date();
 }
 
 // Run check
