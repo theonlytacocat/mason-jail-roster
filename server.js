@@ -6,6 +6,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import PDFParser from 'pdf-parse';
+import {
+  parseBookingDate,
+  formatMinutes,
+  parseTimeServed,
+  daysBetween,
+  isMidnight,
+  formatDatePST
+} from './utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -1581,16 +1589,6 @@ const RELEASE_TYPE_NAMES = {
   RNHM: 'No Hold',
 };
 
-function fmtMins(mins) {
-  if (!mins || mins <= 0) return '—';
-  if (mins < 60) return `${mins}m`;
-  if (mins < 1440) return `${Math.floor(mins/60)}h ${mins%60}m`;
-  const d = Math.floor(mins/1440);
-  const h = Math.floor((mins%1440)/60);
-  const m = mins%60;
-  return h > 0 ? `${d}d ${h}h ${m}m` : `${d}d ${m}m`;
-}
-
 function getStatsHTML(stats) {
   const maxCharge = Math.max(...stats.commonCharges.map(c => c.count), 1);
   const maxDay = Math.max(...Object.values(stats.bookingsByDay), 1);
@@ -1856,35 +1854,66 @@ function getStatsHTML(stats) {
     </div>
 
     ${Object.keys(stats.releaseTypes).length > 0 ? `
-    <div class="chart-container">
-      <div class="chart-title">Release Type Breakdown</div>
-      <div class="release-types">
-        ${Object.entries(stats.releaseTypes)
-          .sort((a, b) => b[1] - a[1])
-          .map(([code, count]) => `
-          <div class="release-type">
-            <div class="release-type-count">${count}</div>
-            <div style="font-size: 1rem; font-weight: bold; color: #f09030; margin: 0.25rem 0;">${code}</div>
-            <div class="release-type-label">${RELEASE_TYPE_NAMES[code] || code}</div>
-          </div>
-        `).join('')}
+<div class="chart-container">
+  <div class="chart-title">Release Type Breakdown</div>
+  <div class="release-types">
+    ${Object.entries(stats.releaseTypes)
+      .sort((a, b) => b[1] - a[1])
+      .map(([code, count]) => `
+      <div class="release-type">
+        <div class="release-type-count">${count}</div>
+        <div style="font-size: 1rem; font-weight: bold; color: #f09030; margin: 0.25rem 0;">${code}</div>
+        <div class="release-type-label">${RELEASE_TYPE_NAMES[code] || code}</div>
       </div>
-    </div>` : ''}
+    `).join('')}
+  </div>
+
+  <!-- Release Type Definitions -->
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #0a1218; border-radius: 8px; border-left: 4px solid #e8702a;">
+    <h4 style="color: #f09030; margin-bottom: 1rem; font-size: 0.95rem;">📋 What Do Release Types Mean?</h4>
+    <div style="display: grid; gap: 0.75rem; font-size: 0.85rem; color: #7a95b0;">
+      <div>
+        <strong style="color: #f09030;">RBB</strong> — Released on Bail Bond
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Posted bail through bondsman. Costs money.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RPR / ROA</strong> — Released on Personal/Own Recognizance
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released on promise to appear. $0 bail.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RCC</strong> — Released Credit for Time Served
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Already served enough time. $0 bail.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RCD</strong> — Released Court Disposition
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Case resolved by judge. Charges may be dropped/settled.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">MIS</strong> — Mistaken Identity
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Wrong person arrested. Released immediately.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RTR</strong> — Released to Rehab/Treatment
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released to enter treatment program.</span>
+      </div>
+    </div>
+  </div>
+</div>` : ''}
 
     ${stats.avgTimeServedMins > 0 ? `
     <div class="chart-container">
       <div class="chart-title">Time Served Statistics (from PDF Data)</div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
         <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${fmtMins(stats.avgTimeServedMins)}</div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${formatMinutes(stats.avgTimeServedMins)}</div>
           <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
         </div>
         <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${fmtMins(stats.minTimeServedMins)}</div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${formatMinutes(stats.minTimeServedMins)}</div>
           <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
         </div>
         <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${fmtMins(stats.maxTimeServedMins)}</div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${formatMinutes(stats.maxTimeServedMins)}</div>
           <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
         </div>
       </div>
@@ -2119,7 +2148,7 @@ function getDeepStatsHTML(d) {
       name: RELEASE_TYPE_NAMES[code] || code,
       count: s.count,
       pct: pct(s.count, total),
-      avgTime: s.totalMins > 0 ? fmtMins(Math.round(s.totalMins / s.count)) : '—',
+      avgTime: s.totalMins > 0 ? formatMinutes(Math.round(s.totalMins / s.count)) : '—',
       avgBail: s.bailCount > 0 ? $(Math.round(s.totalBail / s.bailCount)) : '—',
     }));
 
@@ -2261,7 +2290,7 @@ function getDeepStatsHTML(d) {
     <tr><th>Charge</th><th>Avg Time Served</th><th>Count</th></tr>
     ${timeByChargeArr.map(r => `<tr>
       <td>${r.charge}</td>
-      <td class="val">${fmtMins(r.avgMins)}</td>
+      <td class="val">${formatMinutes(r.avgMins)}</td>
       <td class="dim">${r.count}</td>
     </tr>`).join('')}
     ${timeByChargeArr.length === 0 ? '<tr><td colspan="3" class="dim">No data yet</td></tr>' : ''}
@@ -2287,12 +2316,12 @@ function getDeepStatsHTML(d) {
       <div style="margin-top:0.4rem;font-size:0.7rem;color:#2d4a6a;">${d.under24} under / ${d.over24} over</div>
     </div>
     ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
-      <div class="v" style="font-size:1.2rem;">${fmtMins(d.histMinMins)}</div>
+      <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMinMins)}</div>
       <div class="l">Shortest Stay Ever</div>
       <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMinEntry.name}</div>
     </div>` : ''}
     ${d.histMaxEntry ? `<div class="card" style="border-left-color:#6e1a1a">
-      <div class="v" style="font-size:1.2rem;">${fmtMins(d.histMaxMins)}</div>
+      <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMaxMins)}</div>
       <div class="l">Historical Longest Stay</div>
       <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMaxEntry.name}</div>
     </div>` : ''}
