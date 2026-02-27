@@ -1281,7 +1281,7 @@ app.get('/api/stats', (req, res) => {
     // Calculate charge frequencies
     const chargeCounts = {};
     allCharges.forEach(charge => {
-      const cleanCharge = charge.trim();
+      const cleanCharge = charge.trim().replace(/^[\d.]+/, '').trim();
       if (cleanCharge) {
         chargeCounts[cleanCharge] = (chargeCounts[cleanCharge] || 0) + 1;
       }
