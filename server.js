@@ -281,6 +281,43 @@ app.get('/api/admin/fix-releases', (req, res) => {
   }
 });
 
+// this is where im putting the release stats debug endpoint
+app.get('/api/debug/release-pdf-raw', async (req, res) => {
+  try {
+    const response = await fetch(RELEASE_STATS_URL);
+    const arrayBuffer = await response.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const result = await PDFParser(buffer);
+    
+    // Get first 3000 characters of raw text
+    const sample = result.text.substring(0, 3000);
+    
+    // Also try to parse and show what we get
+    const lines = result.text.split('\n');
+    const relevantLines = [];
+    
+    for (let i = 0; i < Math.min(50, lines.length); i++) {
+      const line = lines[i];
+      if (line.trim()) {
+        relevantLines.push({
+          index: i,
+          text: line,
+          length: line.length,
+          startsWithDate: /^\d{2}\/\d{2}\/\d{2}/.test(line)
+        });
+      }
+    }
+    
+    res.json({
+      rawSample: sample,
+      relevantLines: relevantLines
+    });
+    
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 app.get('/api/debug/reset', (req, res) => {
   try {
     const hashFile = path.join(STORAGE_DIR, 'prev_hash.txt');
