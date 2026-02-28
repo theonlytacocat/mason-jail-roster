@@ -44,87 +44,58 @@ async function fetchReleaseStats() {
     const text = result.text;
     
     const releaseMap = new Map();
-    const lines = result.text.split('\n');
+    const lines = result.text.split('\n').map(l => l.trim()).filter(l => l);
     
-    let i = 0;
-    while (i < lines.length) {
-      const line = lines[i].trim();
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
       
-      // Look for lines starting with date pattern
-      const dateMatch = line.match(/^(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})(.+)/);
+      // Look for lines starting with date/time
+      const dateMatch = line.match(/^(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})(.*)$/);
+      if (!dateMatch) continue;
       
-      if (dateMatch) {
-        const date = dateMatch[1];
-        const time = dateMatch[2];
-        let remainder = dateMatch[3]; // Everything after the timestamp
-        
-        // Check if next line might be a continuation (name on multiple lines)
-        let j = i + 1;
-        let nameAccumulator = remainder;
-        
-        // Accumulate lines until we hit a release type code or another date
-        while (j < lines.length) {
-          const nextLine = lines[j].trim();
-          
-          // Stop if we hit another date or the release type line
-          if (/^\d{2}\/\d{2}\/\d{2}/.test(nextLine)) break;
-          if (/^[A-Z]{2,5}\d+\s*d/.test(nextLine)) {
-            // This is the release type + time served line
-            const rtMatch = nextLine.match(/^([A-Z]{2,5})(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\$?([\d,]+\.\d{2})/);
-            if (rtMatch) {
-              const releaseType = rtMatch[1];
-              const timeServed = rtMatch[2];
-              const bail = rtMatch[3];
-              
-              // Clean up the accumulated name
-              const cleanName = nameAccumulator.trim()
-                .replace(/\s+/g, ' ')
-                .replace(/\.\s*$/, '')
-                .replace(/\s+\.$/, '');
-              
-              releaseMap.set(cleanName, {
-                releaseDateTime: `${date} ${time}`,
-                releaseType,
-                timeServed: timeServed.replace(/\s+/g, ''),
-                bail: `$${bail}`
-              });
-              
-              i = j; // Skip past the lines we've processed
-              break;
-            }
-            break;
-          }
-          
-          // Check if this line has everything on one line (no name continuation)
-          const oneLiner = nameAccumulator.match(/^(.+?)([A-Z]{2,5})(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\$?([\d,]+\.\d{2})/);
-          if (oneLiner) {
-            const name = oneLiner[1];
-            const releaseType = oneLiner[2];
-            const timeServed = oneLiner[3];
-            const bail = oneLiner[4];
-            
-            const cleanName = name.trim()
-              .replace(/\s+/g, ' ')
-              .replace(/\.\s*$/, '')
-              .replace(/\s+\.$/, '');
-            
-            releaseMap.set(cleanName, {
-              releaseDateTime: `${date} ${time}`,
-              releaseType,
-              timeServed: timeServed.replace(/\s+/g, ''),
-              bail: `$${bail}`
-            });
-            
-            break;
-          }
-          
-          // Otherwise accumulate this line as part of the name
-          nameAccumulator += ' ' + nextLine;
-          j++;
-        }
+      const date = dateMatch[1];
+      const time = dateMatch[2];
+      let rest = dateMatch[3].trim();
+      
+      // Accumulate subsequent lines that are part of this record
+      let fullText = rest;
+      let j = i + 1;
+      
+      // Keep adding lines until we hit another date or run out
+      while (j < lines.length && !/^\d{2}\/\d{2}\/\d{2}/.test(lines[j])) {
+        fullText += ' ' + lines[j];
+        j++;
       }
       
-      i++;
+      // Now parse the complete record
+      // Pattern: NAME RELEASE_TYPE TIME_SERVED BAIL
+      // Example: "BARNACASCEL, LEON D.RNF3 d 3 h 27 m$0.00"
+      // Example: "HILARIO GARCIA, JESSICA G. RPR 0 d 23 h 9 m $0.00"
+      
+      const recordMatch = fullText.match(/^(.+?)\s*([A-Z]{2,5})\s*(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s*\$?([\d,]+\.\d{2})/);
+      
+      if (recordMatch) {
+        const rawName = recordMatch[1];
+        const releaseType = recordMatch[2];
+        const timeServed = recordMatch[3];
+        const bail = recordMatch[4];
+        
+        // Clean up name
+        const cleanName = rawName.trim()
+          .replace(/\s+/g, ' ')
+          .replace(/\.\s*$/, '')
+          .replace(/\s*\.\s*$/, '');
+        
+        releaseMap.set(cleanName, {
+          releaseDateTime: `${date} ${time}`,
+          releaseType,
+          timeServed: timeServed.replace(/\s+/g, ''),
+          bail: `$${bail}`
+        });
+        
+        // Skip the lines we consumed
+        i = j - 1;
+      }
     }
     
     console.log(`✓ Parsed ${releaseMap.size} releases from PDF`);
