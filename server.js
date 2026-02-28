@@ -33,8 +33,6 @@ function ensureStorageDir() {
   }
 }
 ensureStorageDir();
-
-// Parse release stats PDF
 async function fetchReleaseStats() {
   try {
     const response = await fetch(RELEASE_STATS_URL);
@@ -46,38 +44,87 @@ async function fetchReleaseStats() {
     const text = result.text;
     
     const releaseMap = new Map();
-    const lines = text.split('\n');
+    const lines = result.text.split('\n');
     
-    for (const line of lines) {
-      // Skip header lines and empty lines
-      if (!line.trim() || line.includes('Date/Time Out') || line.includes('Inmate Name') || 
-          line.includes('Release Type') || line.includes('Credit Served') || 
-          line.includes('Bail Payment') || line.includes('Total Bail Payment') ||
-          line.includes('Report Includes') || line.includes('rpjlbri') ||
-          line.includes('Mason County')) {
-        continue;
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i].trim();
+      
+      // Look for lines starting with date pattern
+      const dateMatch = line.match(/^(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})(.+)/);
+      
+      if (dateMatch) {
+        const date = dateMatch[1];
+        const time = dateMatch[2];
+        let remainder = dateMatch[3]; // Everything after the timestamp
+        
+        // Check if next line might be a continuation (name on multiple lines)
+        let j = i + 1;
+        let nameAccumulator = remainder;
+        
+        // Accumulate lines until we hit a release type code or another date
+        while (j < lines.length) {
+          const nextLine = lines[j].trim();
+          
+          // Stop if we hit another date or the release type line
+          if (/^\d{2}\/\d{2}\/\d{2}/.test(nextLine)) break;
+          if (/^[A-Z]{2,5}\d+\s*d/.test(nextLine)) {
+            // This is the release type + time served line
+            const rtMatch = nextLine.match(/^([A-Z]{2,5})(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\$?([\d,]+\.\d{2})/);
+            if (rtMatch) {
+              const releaseType = rtMatch[1];
+              const timeServed = rtMatch[2];
+              const bail = rtMatch[3];
+              
+              // Clean up the accumulated name
+              const cleanName = nameAccumulator.trim()
+                .replace(/\s+/g, ' ')
+                .replace(/\.\s*$/, '')
+                .replace(/\s+\.$/, '');
+              
+              releaseMap.set(cleanName, {
+                releaseDateTime: `${date} ${time}`,
+                releaseType,
+                timeServed: timeServed.replace(/\s+/g, ''),
+                bail: `$${bail}`
+              });
+              
+              i = j; // Skip past the lines we've processed
+              break;
+            }
+            break;
+          }
+          
+          // Check if this line has everything on one line (no name continuation)
+          const oneLiner = nameAccumulator.match(/^(.+?)([A-Z]{2,5})(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\$?([\d,]+\.\d{2})/);
+          if (oneLiner) {
+            const name = oneLiner[1];
+            const releaseType = oneLiner[2];
+            const timeServed = oneLiner[3];
+            const bail = oneLiner[4];
+            
+            const cleanName = name.trim()
+              .replace(/\s+/g, ' ')
+              .replace(/\.\s*$/, '')
+              .replace(/\s+\.$/, '');
+            
+            releaseMap.set(cleanName, {
+              releaseDateTime: `${date} ${time}`,
+              releaseType,
+              timeServed: timeServed.replace(/\s+/g, ''),
+              bail: `$${bail}`
+            });
+            
+            break;
+          }
+          
+          // Otherwise accumulate this line as part of the name
+          nameAccumulator += ' ' + nextLine;
+          j++;
+        }
       }
       
-      // Match format: DATE TIME NAME RELEASETYPE TIME BAIL
-      // Example: 02/27/26 13:44:16 HILARIO GARCIA, JESSICA G. RPR 0 d 23 h 9 m $0.00
-      const match = line.match(/^(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+(.+?)\s+([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
-      
-      if (match) {
-        const [, date, time, rawName, releaseType, timeServed, bail] = match;
-        
-        // Clean up name - remove extra spaces, trailing periods
-        const cleanName = rawName.trim()
-          .replace(/\s+/g, ' ')      // Multiple spaces to single space
-          .replace(/\.\s*$/, '')      // Remove trailing period
-          .replace(/\s+\.$/, '');     // Remove space before trailing period
-        
-        releaseMap.set(cleanName, {
-          releaseDateTime: `${date} ${time}`,
-          releaseType,
-          timeServed: timeServed.replace(/\s+/g, ''),
-          bail: `$${bail}`
-        });
-      }
+      i++;
     }
     
     console.log(`✓ Parsed ${releaseMap.size} releases from PDF`);
