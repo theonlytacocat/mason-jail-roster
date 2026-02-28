@@ -49,14 +49,27 @@ async function fetchReleaseStats() {
     const lines = text.split('\n');
     
     for (const line of lines) {
-      // Match: Date/Time | Name | Release Type | Credit Served | Bail
-      // Handle names with periods like "ALLEN, HAROLD F. III"
-      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
+      // Skip header lines and empty lines
+      if (!line.trim() || line.includes('Date/Time Out') || line.includes('Inmate Name') || 
+          line.includes('Release Type') || line.includes('Credit Served') || 
+          line.includes('Bail Payment') || line.includes('Total Bail Payment') ||
+          line.includes('Report Includes') || line.includes('rpjlbri') ||
+          line.includes('Mason County')) {
+        continue;
+      }
+      
+      // Match format: DATE TIME NAME RELEASETYPE TIME BAIL
+      // Example: 02/27/26 13:44:16 HILARIO GARCIA, JESSICA G. RPR 0 d 23 h 9 m $0.00
+      const match = line.match(/^(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+(.+?)\s+([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
       
       if (match) {
-        const [, date, time, name, releaseType, timeServed, bail] = match;
-        // Clean up name - remove trailing periods and extra spaces
-        const cleanName = name.trim().replace(/\.\s*$/, '').replace(/\s+/g, ' ');
+        const [, date, time, rawName, releaseType, timeServed, bail] = match;
+        
+        // Clean up name - remove extra spaces, trailing periods
+        const cleanName = rawName.trim()
+          .replace(/\s+/g, ' ')      // Multiple spaces to single space
+          .replace(/\.\s*$/, '')      // Remove trailing period
+          .replace(/\s+\.$/, '');     // Remove space before trailing period
         
         releaseMap.set(cleanName, {
           releaseDateTime: `${date} ${time}`,
@@ -67,6 +80,8 @@ async function fetchReleaseStats() {
       }
     }
     
+    console.log(`✓ Parsed ${releaseMap.size} releases from PDF`);
+    
     // Save new entries to history file (dedup by name+releaseDateTime)
     try {
       let history = [];
@@ -74,14 +89,19 @@ async function fetchReleaseStats() {
         history = JSON.parse(fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8'));
       }
       const existingKeys = new Set(history.map(e => e.name + '|' + e.releaseDateTime));
+      let newCount = 0;
       for (const [name, info] of releaseMap.entries()) {
         const key = name + '|' + info.releaseDateTime;
         if (!existingKeys.has(key)) {
           history.push({ name, ...info });
           existingKeys.add(key);
+          newCount++;
         }
       }
-      fs.writeFileSync(RELEASE_STATS_HISTORY_FILE, JSON.stringify(history, null, 2));
+      if (newCount > 0) {
+        fs.writeFileSync(RELEASE_STATS_HISTORY_FILE, JSON.stringify(history, null, 2));
+        console.log(`✓ Saved ${newCount} new releases to history (total: ${history.length})`);
+      }
     } catch (e) {
       console.error('Error saving release stats history:', e);
     }
