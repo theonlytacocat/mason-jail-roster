@@ -2428,6 +2428,23 @@ function getDeepStatsHTML(d) {
     </div>
   </div>
 
+  <h2>Release Type Definitions</h2>
+  <table>
+    <tr><th>Code</th><th>Meaning</th></tr>
+    <tr><td class="val">RBB</td><td>Released on Bail Bond — a bail bondsman posted a surety bond on behalf of the inmate</td></tr>
+    <tr><td class="val">RPR</td><td>Released on Personal Recognizance — released on a signed promise to appear; no money required</td></tr>
+    <tr><td class="val">ROA</td><td>Released on Own Recognizance — same as RPR; released without bail on promise to appear</td></tr>
+    <tr><td class="val">RCB</td><td>Released on Cash Bail — full bail amount paid in cash directly to the jail or court</td></tr>
+    <tr><td class="val">RCC</td><td>Released — Credit for Time Served — sentence satisfied by time already spent in custody</td></tr>
+    <tr><td class="val">RCD</td><td>Released — Court Disposition — released following a court ruling or final case disposition</td></tr>
+    <tr><td class="val">RCT</td><td>Released by Court Order — judge issued a specific order to release the inmate</td></tr>
+    <tr><td class="val">RFTA</td><td>Released — FTA / Dismissed — charges dismissed or failure-to-appear warrant resolved</td></tr>
+    <tr><td class="val">RNCM</td><td>Released — No Charges Filed — prosecutor declined to file; inmate released without charges</td></tr>
+    <tr><td class="val">RNHM</td><td>Released — No Hold — no active hold or detainer; no legal basis to continue detention</td></tr>
+    <tr><td class="val">MIS</td><td>Released — Mistaken Identity — wrong person was arrested or booked</td></tr>
+    <tr><td class="val">RTR</td><td>Released to Rehab/Treatment — transferred to a treatment or rehabilitation program</td></tr>
+  </table>
+
 </div>
 </body>
 </html>`;
