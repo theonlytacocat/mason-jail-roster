@@ -51,7 +51,7 @@ async function fetchReleaseStats() {
     for (const line of lines) {
       // Match: Date/Time | Name | Release Type | Credit Served | Bail
       // Handle names with periods like "ALLEN, HAROLD F. III"
-      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+\.\s*([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
+      const match = line.match(/(\d{2}\/\d{2}\/\d{2})\s+(\d{2}:\d{2}:\d{2})\s+([A-Z][A-Z\s,.'"-]+?)\s+([A-Z]{2,5})\s+(\d+\s*d\s*\d+\s*h\s*\d+\s*m)\s+\$?([\d,]+\.\d{2})/);
       
       if (match) {
         const [, date, time, name, releaseType, timeServed, bail] = match;
