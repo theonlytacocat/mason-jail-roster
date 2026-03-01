@@ -1928,79 +1928,6 @@ function getStatsHTML(stats) {
     `).join('')}
   </div>
 
-  <!-- Release Type Definitions -->
-  <div style="margin-top: 2rem; padding: 1.5rem; background: #0a1218; border-radius: 8px; border-left: 4px solid #e8702a;">
-    <h4 style="color: #f09030; margin-bottom: 1rem; font-size: 0.95rem;">📋 What Do Release Types Mean?</h4>
-    <div style="display: grid; gap: 0.75rem; font-size: 0.85rem; color: #7a95b0;">
-      <div>
-        <strong style="color: #f09030;">RBB</strong> — Released on Bail Bond
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Posted bail through bondsman. Costs money.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RPR / ROA</strong> — Released on Personal/Own Recognizance
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released on promise to appear. $0 bail.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RCC</strong> — Released Credit for Time Served
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Already served enough time. $0 bail.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RCD</strong> — Released Court Disposition
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Case resolved by judge. Charges may be dropped/settled.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">MIS</strong> — Mistaken Identity
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Wrong person arrested. Released immediately.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RTR</strong> — Released to Rehab/Treatment
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released to enter treatment program.</span>
-      </div>
-    </div>
-  </div>
-</div>` : ''}
-
-    ${stats.avgTimeServedMins > 0 ? `
-    <div class="chart-container">
-      <div class="chart-title">Time Served Statistics (from PDF Data)</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${formatMinutes(stats.avgTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
-        </div>
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${formatMinutes(stats.minTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
-        </div>
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${formatMinutes(stats.maxTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
-        </div>
-      </div>
-    </div>` : ''}
-
-    ${stats.avgBailByCharge.length > 0 ? `
-    <div class="chart-container">
-      <div class="chart-title">Average Bail by Charge Type</div>
-      <div class="bar-chart">
-        ${(() => {
-          const maxBail = Math.max(...stats.avgBailByCharge.map(x => x.avgBail), 1);
-          return stats.avgBailByCharge.map(item => `
-            <div class="bar-item">
-              <div class="bar-label">${item.charge}</div>
-              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #1a6e3c, #5ecfb8);">
-                $${item.avgBail.toLocaleString()}
-              </div>
-            </div>
-          `).join('');
-        })()}
-      </div>
-    </div>` : ''}
-
-  </div>
-</body>
-</html>`;
-}
 
 // ── DEEP STATS (unlisted admin page) ─────────────────────────────────────────
 app.get('/api/deepstats', async (req, res) => {
@@ -2251,6 +2178,79 @@ function getDeepStatsHTML(d) {
       </div>`).join('');
   }
 
+  <!-- Release Type Definitions -->
+  <div style="margin-top: 2rem; padding: 1.5rem; background: #0a1218; border-radius: 8px; border-left: 4px solid #e8702a;">
+    <h4 style="color: #f09030; margin-bottom: 1rem; font-size: 0.95rem;">📋 What Do Release Types Mean?</h4>
+    <div style="display: grid; gap: 0.75rem; font-size: 0.85rem; color: #7a95b0;">
+      <div>
+        <strong style="color: #f09030;">RBB</strong> — Released on Bail Bond
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Posted bail through bondsman. Costs money.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RPR / ROA</strong> — Released on Personal/Own Recognizance
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released on promise to appear. $0 bail.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RCC</strong> — Released Credit for Time Served
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Already served enough time. $0 bail.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RCD</strong> — Released Court Disposition
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Case resolved by judge. Charges may be dropped/settled.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">MIS</strong> — Mistaken Identity
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Wrong person arrested. Released immediately.</span>
+      </div>
+      <div>
+        <strong style="color: #f09030;">RTR</strong> — Released to Rehab/Treatment
+        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released to enter treatment program.</span>
+      </div>
+    </div>
+  </div>
+</div>` : ''}
+
+    ${stats.avgTimeServedMins > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Time Served Statistics (from PDF Data)</div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${formatMinutes(stats.avgTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
+        </div>
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${formatMinutes(stats.minTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
+        </div>
+        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${formatMinutes(stats.maxTimeServedMins)}</div>
+          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
+        </div>
+      </div>
+    </div>` : ''}
+
+    ${stats.avgBailByCharge.length > 0 ? `
+    <div class="chart-container">
+      <div class="chart-title">Average Bail by Charge Type</div>
+      <div class="bar-chart">
+        ${(() => {
+          const maxBail = Math.max(...stats.avgBailByCharge.map(x => x.avgBail), 1);
+          return stats.avgBailByCharge.map(item => `
+            <div class="bar-item">
+              <div class="bar-label">${item.charge}</div>
+              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #1a6e3c, #5ecfb8);">
+                $${item.avgBail.toLocaleString()}
+              </div>
+            </div>
+          `).join('');
+        })()}
+      </div>
+    </div>` : ''}
+
+  </div>
+</body>
+</html>`;
+}
   return `<!DOCTYPE html>
 <html>
 <head>
