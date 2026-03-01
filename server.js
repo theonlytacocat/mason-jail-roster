@@ -2610,6 +2610,17 @@ app.get('/api/admin/view-log', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
+
+  // Auto-run roster check every 30 minutes
+  const RUN_INTERVAL_MS = 30 * 60 * 1000;
+  const autoRun = () => {
+    fetch(`http://localhost:${PORT}/api/run`)
+      .then(r => r.text())
+      .then(t => console.log(`[auto-run] ${new Date().toISOString()} — ${t.slice(0, 120)}`))
+      .catch(e => console.error(`[auto-run error] ${new Date().toISOString()} —`, e.message));
+  };
+  setInterval(autoRun, RUN_INTERVAL_MS);
+  console.log(`[auto-run] scheduled every 30 minutes`);
 });
 
 app.get('/api/debug/charge-lines', async (req, res) => {
