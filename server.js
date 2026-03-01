@@ -1130,6 +1130,17 @@ app.get('/api/history', (req, res) => {
   const html = `<!DOCTYPE html>
 <html>
 <head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-380L7KND2L"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-380L7KND2L');
+</script>
+
   <title>Change History - Mason County Jail Roster Monitor</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

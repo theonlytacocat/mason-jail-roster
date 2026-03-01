@@ -10,7 +10,8 @@
       "Bash(npx @railway/cli --version)",
       "Bash(npx @railway/cli whoami)",
       "Bash(node --check server.js)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(railway logs)"
     ]
   }
 }
