@@ -654,7 +654,7 @@ if (fs.existsSync(logFile)) {
       </div>
       <a href="/api/run" class="run-btn">Run Check Now</a>
       <a href="/api/history" class="run-btn" style="margin-top: 0.75rem;">View Change History</a>
-      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">*NEW* Statistics Dashboard</a>
+      <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">Statistics Dashboard</a>
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>

@@ -9,7 +9,8 @@
       "WebFetch(domain:github.com)",
       "Bash(npx @railway/cli --version)",
       "Bash(npx @railway/cli whoami)",
-      "Bash(node --check server.js)"
+      "Bash(node --check server.js)",
+      "Bash(git push)"
     ]
   }
 }
