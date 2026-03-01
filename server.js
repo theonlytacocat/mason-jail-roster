@@ -1928,36 +1928,6 @@ function getStatsHTML(stats) {
     `).join('')}
   </div>
 
-  <!-- Release Type Definitions -->
-  <div style="margin-top: 2rem; padding: 1.5rem; background: #0a1218; border-radius: 8px; border-left: 4px solid #e8702a;">
-    <h4 style="color: #f09030; margin-bottom: 1rem; font-size: 0.95rem;">📋 What Do Release Types Mean?</h4>
-    <div style="display: grid; gap: 0.75rem; font-size: 0.85rem; color: #7a95b0;">
-      <div>
-        <strong style="color: #f09030;">RBB</strong> — Released on Bail Bond
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Posted bail through bondsman. Costs money.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RPR / ROA</strong> — Released on Personal/Own Recognizance
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released on promise to appear. $0 bail.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RCC</strong> — Released Credit for Time Served
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Already served enough time. $0 bail.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RCD</strong> — Released Court Disposition
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Case resolved by judge. Charges may be dropped/settled.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">MIS</strong> — Mistaken Identity
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Wrong person arrested. Released immediately.</span>
-      </div>
-      <div>
-        <strong style="color: #f09030;">RTR</strong> — Released to Rehab/Treatment
-        <span style="color: #5a7590; display: block; font-size: 0.8rem; margin-top: 0.2rem;">Released to enter treatment program.</span>
-      </div>
-    </div>
-  </div>
 </div>` : ''}
 
     ${stats.avgTimeServedMins > 0 ? `
