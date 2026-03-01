@@ -2611,8 +2611,8 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Visit: http://localhost:${PORT}`);
 
-  // Auto-run roster check every 30 minutes
-  const RUN_INTERVAL_MS = 30 * 60 * 1000;
+  // Auto-run roster check — TEMP 1 min for testing (change back to 30 * 60 * 1000)
+  const RUN_INTERVAL_MS = 1 * 60 * 1000;
   const autoRun = () => {
     fetch(`http://localhost:${PORT}/api/run`)
       .then(r => r.text())
@@ -2620,7 +2620,7 @@ app.listen(PORT, () => {
       .catch(e => console.error(`[auto-run error] ${new Date().toISOString()} —`, e.message));
   };
   setInterval(autoRun, RUN_INTERVAL_MS);
-  console.log(`[auto-run] scheduled every 30 minutes`);
+  console.log(`[auto-run] scheduled every 1 minute (TEMP)`)
 });
 
 app.get('/api/debug/charge-lines', async (req, res) => {
