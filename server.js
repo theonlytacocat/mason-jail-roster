@@ -605,25 +605,25 @@ if (fs.existsSync(logFile)) {
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0e1520; color: #7a95b0; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #231F20; color: #B8B09A; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
     .container { width: 100%; max-width: 500px; padding: 1rem; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #b8b8b8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #EAEAEA; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .status { background: #080e18; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .status { background: #1A1718; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #1cffca; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #AD974F; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
-    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #1a3050; }
+    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #3A342E; }
     .stat:last-child { border-bottom: none; }
-    .stat-label { color: #7a95b0; }
+    .stat-label { color: #B8B09A; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #1a2d45; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #1a4a6e; }
-    .footer { text-align: center; color: #2d4a6a; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #5ecfb8; text-decoration: none; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #332E29; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn:hover { background: #4A4138; }
+    .footer { text-align: center; color: #6B6458; font-size: 0.875rem; margin-top: 1.5rem; }
+    a { color: #AD974F; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -658,7 +658,7 @@ if (fs.existsSync(logFile)) {
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #e8702a; color: #000000; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #AD974F; color: #000000; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">**NEW** 2-9-26 Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -893,7 +893,7 @@ app.get('/api/run', async (req, res) => {
           : "No changes detected.";
 
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#0e1520;color:#f09030;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#c45018;font-size:3rem;margin-bottom:1rem;}h1{color:#b8b8b8;margin-bottom:1rem;}p{color:#7a95b0;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#8E793E;font-size:3rem;margin-bottom:1rem;}h1{color:#EAEAEA;margin-bottom:1rem;}p{color:#B8B09A;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to Change Log...</p></div></body></html>";
 
@@ -901,7 +901,7 @@ app.get('/api/run', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/run:', error);
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#0e1520;color:#f09030;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#94a3b8;}a{color:#f09030;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#B8B09A;}a{color:#AD974F;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
       (error.message || "Unknown error") +
       '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
     res.send(html);
@@ -918,22 +918,22 @@ app.get('/legislative', (req, res) => {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; background: #0e1520; color: #f09030; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #231F20; color: #AD974F; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; }
-    .subtitle { color: #2d4a6a; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #c45018; text-decoration: none; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #EAEAEA; letter-spacing: -1px; }
+    .subtitle { color: #6B6458; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #8E793E; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #0e1a2a; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #4d6b8a; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content { background: #2A2523; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #8E793E; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
-    .content h3 { color: #f09030; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
-    .content p { margin-bottom: 0.75rem; color: #7a95b0; }
+    .content h3 { color: #AD974F; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
+    .content p { margin-bottom: 0.75rem; color: #B8B09A; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
-    .content li { margin-bottom: 0.5rem; color: #7a95b0; }
-    .update-date { color: #1a2d45; font-weight: bold; margin-bottom: 1rem; }
-    .content strong { color: #f09030; }
-    a { color: #c45018; }
+    .content li { margin-bottom: 0.5rem; color: #B8B09A; }
+    .update-date { color: #6B6458; font-weight: bold; margin-bottom: 1rem; }
+    .content strong { color: #AD974F; }
+    a { color: #8E793E; }
   </style>
 </head>
 <body>
@@ -1049,7 +1049,7 @@ app.get('/legislative', (req, res) => {
       <p><strong>GRAY WOLF RECLASSIFICATION</strong> - Downgrading from "endangered" to "sensitive" status.</p>
       <p><strong>DISCOVER PASS PRICE HIKE</strong> - Increasing from $30 to $45 for state parks access, would be the first increase in 14 years.</p>
 
-      <p style="margin-top: 2rem; color: #2d4a6a; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
+      <p style="margin-top: 2rem; color: #6B6458; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
     </div>
   </div>
 </body>
@@ -1122,8 +1122,11 @@ app.get('/api/history', (req, res) => {
       entry.released.map(r => '<li>' + r + '</li>').join('') +
       '</ul></div>' : '';
 
-    return '<div class="entry"><div class="entry-header">' + displayDate + '</div>' + 
-           bookedHtml + releasedHtml + '</div>';
+    const changesGrid = (bookedHtml && releasedHtml)
+      ? '<div class="changes-grid">' + bookedHtml + releasedHtml + '</div>'
+      : bookedHtml + releasedHtml;
+    return '<div class="entry"><div class="entry-header">' + displayDate + '</div>' +
+           changesGrid + '</div>';
   }).join('') : 
   '<p class="no-data">No changes recorded yet. Run the workflow to start monitoring.</p>';
 
@@ -1150,26 +1153,30 @@ app.get('/api/history', (req, res) => {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0e1520; color: #f09030; min-height: 100vh; padding: 2rem; }
-    .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #b8b8b8; letter-spacing: -1px; word-break: break-word; }
-    .subtitle { color: #2d4a6a; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #c45018; text-decoration: none; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #231F20; color: #AD974F; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #EAEAEA; letter-spacing: -1px; word-break: break-word; }
+    .subtitle { color: #6B6458; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #8E793E; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .entry { background: #080e18; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-    .entry.no-change-entry { background: #060c14; padding: 0.75rem; border-left: 3px solid #4674b9; }
-    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #f09030; border-bottom: 1px solid #1a3050; padding-bottom: 0.5rem; }
-    .changes { margin-top: 0.75rem; }
+    .entry { background: #1A1718; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry.no-change-entry { background: #121010; padding: 0.75rem; border-left: 3px solid #5C5248; }
+    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #AD974F; border-bottom: 1px solid #3A342E; padding-bottom: 0.5rem; }
+    .changes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+    .changes { }
     .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
-    .changes.booked h4 { color: #ff3fa5; }
-    .changes.released h4 { color: #5d7eaf; }
-    .changes.updated h4 { color: #ff3fa5; }
-    .changes ul { list-style: none; font-size: 8pt; color: #7a95b0; }
-    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #1a3050; }
+    .changes.booked { border-left: 3px solid #C4A55A; padding-left: 0.6rem; }
+    .changes.booked h4 { color: #C4A55A; }
+    .changes.released { border-left: 3px solid #8E793E; padding-left: 0.6rem; }
+    .changes.released h4 { color: #8E793E; }
+    .changes.updated { border-left: 3px solid #C4A55A; padding-left: 0.6rem; }
+    .changes.updated h4 { color: #C4A55A; }
+    .changes ul { list-style: none; font-size: 8pt; color: #B8B09A; }
+    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #3A342E; }
     .changes ul li:last-child { border-bottom: none; }
-    .no-changes { color: #2d4a6a; font-style: italic; }
-    .no-data { color: #2d4a6a; text-align: center; padding: 3rem; }
-    a { color: #c41877; }
+    .no-changes { color: #6B6458; font-style: italic; }
+    .no-data { color: #6B6458; text-align: center; padding: 3rem; }
+    a { color: #8E793E; }
   </style>
 </head>
 <body>
@@ -1666,12 +1673,12 @@ function getStatsHTML(stats) {
 
   // ADD THIS ↓↓↓
   const dataBanner = stats.dataCollectionStart ? `
-    <div style="background: #0e1a2a; border-left: 4px solid #e8702a; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
-      <p style="margin: 0; color: #d0c8b8;">
+    <div style="background: #2A2523; border-left: 4px solid #AD974F; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+      <p style="margin: 0; color: #EAEAEA;">
         📊 Data collection started: <strong>${stats.dataCollectionStart}</strong> 
         (${stats.daysOfData} days of tracking)
       </p>
-      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #7a95b0;">
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #B8B09A;">
         Statistics become more accurate as more data is collected over time.
       </p>
     </div>
@@ -1690,8 +1697,8 @@ function getStatsHTML(stats) {
     body { 
       font-family: Arial, sans-serif; 
       font-size: 9pt; 
-      background: #0e1520; 
-      color: #f09030; 
+      background: #231F20; 
+      color: #AD974F; 
       min-height: 100vh; 
       padding: 2rem; 
     }
@@ -1700,14 +1707,14 @@ function getStatsHTML(stats) {
       font-family: 'Pixel Digivolve', 'Courier New', monospace; 
       font-size: 2rem; 
       margin-bottom: 0.5rem; 
-      color: #b8b8b8; 
+      color: #EAEAEA; 
       letter-spacing: -1px; 
     }
-    .subtitle { color: #2d4a6a; margin-bottom: 2rem; }
+    .subtitle { color: #6B6458; margin-bottom: 2rem; }
     .back-link { 
       display: inline-block; 
       margin-bottom: 1.5rem; 
-      color: #c45018; 
+      color: #8E793E; 
       text-decoration: none; 
     }
     .back-link:hover { text-decoration: underline; }
@@ -1719,39 +1726,39 @@ function getStatsHTML(stats) {
       margin-bottom: 2rem; 
     }
     .stat-card { 
-      background: #080e18; 
+      background: #1A1718; 
       border-radius: 12px; 
       padding: 1.5rem; 
-      border-left: 4px solid #c45018;
+      border-left: 4px solid #8E793E;
     }
-    .stat-card.purple { border-left-color: #122040; }
-    .stat-card.blue { border-left-color: #c45018; }
-    .stat-card.orange { border-left-color: #e8702a; }
+    .stat-card.purple { border-left-color: #6B6458; }
+    .stat-card.blue { border-left-color: #8E793E; }
+    .stat-card.orange { border-left-color: #AD974F; }
     
     .stat-value { 
       font-size: 2.5rem; 
       font-weight: bold; 
-      color: #f09030; 
+      color: #AD974F; 
       margin-bottom: 0.25rem;
     }
     .stat-label { 
-      color: #2d4a6a; 
+      color: #6B6458; 
       font-size: 0.875rem; 
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
     
     .chart-container { 
-      background: #080e18; 
+      background: #1A1718; 
       border-radius: 12px; 
       padding: 1.5rem; 
       margin-bottom: 1rem; 
     }
-    .chart-title { 
-      color: #1a2d45; 
-      font-size: 1.1rem; 
-      font-weight: bold; 
-      margin-bottom: 1rem; 
+    .chart-title {
+      color: #AD974F;
+      font-size: 1.1rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
     }
     
     .bar-chart { margin-top: 1rem; }
@@ -1762,14 +1769,14 @@ function getStatsHTML(stats) {
     }
     .bar-label { 
       min-width: 200px; 
-      color: #7a95b0; 
+      color: #B8B09A; 
       font-size: 0.8rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
     .bar-fill { 
-      background: linear-gradient(90deg, #c45018, #f09030); 
+      background: linear-gradient(90deg, #8E793E, #AD974F); 
       height: 24px; 
       border-radius: 4px; 
       display: flex; 
@@ -1797,7 +1804,7 @@ function getStatsHTML(stats) {
     }
     .day-bar-fill { 
       width: 100%; 
-      background: linear-gradient(180deg, #122040, #1a2d45); 
+      background: linear-gradient(180deg, #8E793E, #AD974F);
       border-radius: 4px 4px 0 0;
       display: flex;
       align-items: flex-end;
@@ -1808,7 +1815,7 @@ function getStatsHTML(stats) {
       padding-bottom: 0.25rem;
     }
     .day-label { 
-      color: #2d4a6a; 
+      color: #6B6458; 
       font-size: 0.75rem; 
       margin-top: 0.5rem; 
     }
@@ -1820,7 +1827,7 @@ function getStatsHTML(stats) {
       margin-top: 1rem;
     }
     .release-type { 
-      background: #0a1218; 
+      background: #141112; 
       padding: 1rem; 
       border-radius: 8px; 
       text-align: center;
@@ -1828,10 +1835,10 @@ function getStatsHTML(stats) {
     .release-type-count { 
       font-size: 1.5rem; 
       font-weight: bold; 
-      color: #f09030; 
+      color: #AD974F; 
     }
     .release-type-label { 
-      color: #2d4a6a; 
+      color: #6B6458; 
       font-size: 0.75rem; 
       margin-top: 0.25rem;
     }
@@ -1845,13 +1852,13 @@ function getStatsHTML(stats) {
     }
     .time-bar {
       flex: 1;
-      background: linear-gradient(180deg, #c45018, #f09030);
+      background: linear-gradient(180deg, #8E793E, #AD974F);
       border-radius: 2px 2px 0 0;
       position: relative;
       min-width: 8px;
     }
     .time-bar:hover {
-      background: linear-gradient(180deg, #1a2d45, #122040);
+      background: linear-gradient(180deg, #AD974F, #8E793E);
     }
   </style>
 </head>
@@ -1906,7 +1913,7 @@ function getStatsHTML(stats) {
             </div>
           </div>
         `).join('')}
-        ${stats.commonCharges.length === 0 ? '<p style="color: #2d4a6a;">No charge data available yet</p>' : ''}
+        ${stats.commonCharges.length === 0 ? '<p style="color: #6B6458;">No charge data available yet</p>' : ''}
       </div>
     </div>
     
@@ -1933,7 +1940,7 @@ function getStatsHTML(stats) {
       .map(([code, count]) => `
       <div class="release-type">
         <div class="release-type-count">${count}</div>
-        <div style="font-size: 1rem; font-weight: bold; color: #f09030; margin: 0.25rem 0;">${code}</div>
+        <div style="font-size: 1rem; font-weight: bold; color: #AD974F; margin: 0.25rem 0;">${code}</div>
         <div class="release-type-label">${RELEASE_TYPE_NAMES[code] || code}</div>
       </div>
     `).join('')}
@@ -1945,17 +1952,17 @@ function getStatsHTML(stats) {
     <div class="chart-container">
       <div class="chart-title">Time Served Statistics (from PDF Data)</div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #f09030;">${formatMinutes(stats.avgTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
+        <div style="background: #141112; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #AD974F;">${formatMinutes(stats.avgTimeServedMins)}</div>
+          <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
         </div>
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #5ecfb8;">${formatMinutes(stats.minTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
+        <div style="background: #141112; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #AD974F;">${formatMinutes(stats.minTimeServedMins)}</div>
+          <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
         </div>
-        <div style="background: #0a1218; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #e8702a;">${formatMinutes(stats.maxTimeServedMins)}</div>
-          <div style="color: #2d4a6a; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
+        <div style="background: #141112; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #AD974F;">${formatMinutes(stats.maxTimeServedMins)}</div>
+          <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
         </div>
       </div>
     </div>` : ''}
@@ -1969,7 +1976,7 @@ function getStatsHTML(stats) {
           return stats.avgBailByCharge.map(item => `
             <div class="bar-item">
               <div class="bar-label">${item.charge}</div>
-              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #1a6e3c, #5ecfb8);">
+              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #1a6e3c, #AD974F);">
                 $${item.avgBail.toLocaleString()}
               </div>
             </div>
@@ -2217,18 +2224,18 @@ function getDeepStatsHTML(d) {
   function dayBar(days, max) {
     return Object.entries(days).map(([day, count]) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:4px;">
-        <span style="min-width:32px;color:#7a95b0;font-size:0.75rem;">${day}</span>
-        <div style="background:linear-gradient(90deg,#c45018,#f09030);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
-        <span style="color:#f09030;font-size:0.75rem;">${count}</span>
+        <span style="min-width:32px;color:#B8B09A;font-size:0.75rem;">${day}</span>
+        <div style="background:linear-gradient(90deg,#8E793E,#AD974F);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
+        <span style="color:#AD974F;font-size:0.75rem;">${count}</span>
       </div>`).join('');
   }
 
   function hourBar(hours, max) {
     return hours.map((count, hr) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2px;">
-        <span style="min-width:40px;color:#7a95b0;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
-        <div style="background:linear-gradient(90deg,#122040,#1a4a6e);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
-        <span style="color:#7a95b0;font-size:0.7rem;">${count}</span>
+        <span style="min-width:40px;color:#B8B09A;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
+        <div style="background:linear-gradient(90deg,#2A2523,#4A4138);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
+        <span style="color:#B8B09A;font-size:0.7rem;">${count}</span>
       </div>`).join('');
   }
 
@@ -2240,30 +2247,30 @@ function getDeepStatsHTML(d) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#090d14;color:#7a95b0;padding:2rem;min-height:100vh}
+    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#090d14;color:#B8B09A;padding:2rem;min-height:100vh}
     .wrap{max-width:1100px;margin:0 auto}
-    h1{font-size:1.4rem;color:#b8b8b8;margin-bottom:0.25rem;letter-spacing:-0.5px}
-    h2{font-size:0.85rem;color:#c45018;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #1a2d45;padding-bottom:0.4rem}
-    a{color:#c45018;text-decoration:none}
-    .subtitle{color:#2d4a6a;font-size:0.75rem;margin-bottom:2rem}
+    h1{font-size:1.4rem;color:#EAEAEA;margin-bottom:0.25rem;letter-spacing:-0.5px}
+    h2{font-size:0.85rem;color:#8E793E;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #332E29;padding-bottom:0.4rem}
+    a{color:#8E793E;text-decoration:none}
+    .subtitle{color:#6B6458;font-size:0.75rem;margin-bottom:2rem}
     table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
-    th{color:#2d4a6a;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #1a2d45;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
-    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0d1825;color:#7a95b0;vertical-align:top}
+    th{color:#6B6458;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #332E29;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
+    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0d1825;color:#B8B09A;vertical-align:top}
     tr:hover td{background:#0d1825}
-    .val{color:#f09030;font-weight:bold}
-    .dim{color:#2d4a6a}
+    .val{color:#AD974F;font-weight:bold}
+    .dim{color:#6B6458}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.75rem}
-    .card{background:#080e18;border-radius:8px;padding:1rem;border-left:3px solid #c45018}
-    .card .v{font-size:1.6rem;font-weight:bold;color:#f09030}
-    .card .l{color:#2d4a6a;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
+    .card{background:#1A1718;border-radius:8px;padding:1rem;border-left:3px solid #8E793E}
+    .card .v{font-size:1.6rem;font-weight:bold;color:#AD974F}
+    .card .l{color:#6B6458;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
     @media(max-width:700px){.two-col{grid-template-columns:1fr}}
-    .chip{display:inline-block;background:#0d1825;border:1px solid #1a3050;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#7a95b0}
+    .chip{display:inline-block;background:#0d1825;border:1px solid #3A342E;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#B8B09A}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="/api/status" style="font-size:0.75rem;color:#2d4a6a;">← status</a>
+  <a href="/api/status" style="font-size:0.75rem;color:#6B6458;">← status</a>
   <h1 style="margin-top:0.5rem;">Deep Analytics</h1>
   <p class="subtitle">Mason County Jail · ${total} releases in history · Unlisted</p>
 
@@ -2296,7 +2303,7 @@ function getDeepStatsHTML(d) {
     ${d.maxBailEntry ? `<div class="card" style="border-left-color:#6e3c1a">
       <div class="v" style="font-size:1.2rem;">${$(d.maxBailEntry.bailAmt || parseFloat((d.maxBailEntry.bail||'$0').replace(/[$,]/g,'')))}</div>
       <div class="l">Most Expensive Bail Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.maxBailEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.maxBailEntry.name}</div>
     </div>` : ''}
   </div>
 
@@ -2306,7 +2313,7 @@ function getDeepStatsHTML(d) {
     ${d.top10Bail.map((e, i) => `<tr>
       <td class="dim">${i+1}</td>
       <td class="val">${e.name}</td>
-      <td style="color:#1cffca;font-weight:bold;">${$(e.bailAmt)}</td>
+      <td style="color:#AD974F;font-weight:bold;">${$(e.bailAmt)}</td>
       <td><span class="chip">${e.releaseType || '?'}</span></td>
       <td class="dim">${e.releaseDateTime || '—'}</td>
       <td style="font-size:0.7rem;">${e.charges.length ? e.charges.join(', ') : '<span class="dim">—</span>'}</td>
@@ -2320,7 +2327,7 @@ function getDeepStatsHTML(d) {
     ${bailByChargeArr.map(r => `<tr>
       <td>${r.charge}</td>
       <td class="val">${$(r.avg)}</td>
-      <td style="color:#1cffca;">${$(r.max)}</td>
+      <td style="color:#AD974F;">${$(r.max)}</td>
       <td class="dim">${r.count}</td>
     </tr>`).join('')}
     ${bailByChargeArr.length === 0 ? '<tr><td colspan="4" class="dim">No data yet</td></tr>' : ''}
@@ -2354,23 +2361,23 @@ function getDeepStatsHTML(d) {
     <div class="card">
       <div class="v">${d.under24 + d.over24 > 0 ? pct(d.under24, d.under24+d.over24) : '—'}</div>
       <div class="l">Released in &lt;24 Hours</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#2d4a6a;">${d.under24} under / ${d.over24} over</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#6B6458;">${d.under24} under / ${d.over24} over</div>
     </div>
     ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMinMins)}</div>
       <div class="l">Shortest Stay Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMinEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.histMinEntry.name}</div>
     </div>` : ''}
     ${d.histMaxEntry ? `<div class="card" style="border-left-color:#6e1a1a">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMaxMins)}</div>
       <div class="l">Historical Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.histMaxEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.histMaxEntry.name}</div>
     </div>` : ''}
     ${d.currentLongest ? `<div class="card" style="border-left-color:#6e3c1a">
       <div class="v" style="font-size:1.2rem;">${d.currentLongest.days}d</div>
       <div class="l">Current Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#7a95b0;">${d.currentLongest.name}</div>
-      <div style="font-size:0.65rem;color:#2d4a6a;">In since ${d.currentLongest.bookDate}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.currentLongest.name}</div>
+      <div style="font-size:0.65rem;color:#6B6458;">In since ${d.currentLongest.bookDate}</div>
     </div>` : ''}
   </div>
 
@@ -2379,7 +2386,7 @@ function getDeepStatsHTML(d) {
     <tr><th>Name</th><th>Bookings</th><th>Charges</th></tr>
     ${d.frequentFlyers.map(f => `<tr>
       <td class="val">${f.name}</td>
-      <td style="color:#f09030;text-align:center;">${f.count}</td>
+      <td style="color:#AD974F;text-align:center;">${f.count}</td>
       <td style="font-size:0.7rem;">${f.charges.length ? f.charges.join(', ') : '<span class="dim">—</span>'}</td>
     </tr>`).join('')}
     ${d.frequentFlyers.length === 0 ? '<tr><td colspan="3" class="dim">No repeat bookings yet</td></tr>' : ''}
@@ -2388,11 +2395,11 @@ function getDeepStatsHTML(d) {
   <h2>Busiest Release Times (from 48hr PDF)</h2>
   <div class="two-col">
     <div>
-      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
+      <p style="color:#6B6458;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
       ${dayBar(d.relDays, maxRelDay)}
     </div>
     <div>
-      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
+      <p style="color:#6B6458;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
       ${hourBar(d.relHours, maxRelHour)}
     </div>
   </div>
@@ -2400,11 +2407,11 @@ function getDeepStatsHTML(d) {
   <h2>Busiest Booking Times (from live roster PDF)</h2>
   <div class="two-col">
     <div>
-      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
+      <p style="color:#6B6458;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Day of Week</p>
       ${dayBar(d.bookDays, maxBookDay)}
     </div>
     <div>
-      <p style="color:#2d4a6a;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
+      <p style="color:#6B6458;font-size:0.7rem;margin-bottom:0.5rem;text-transform:uppercase;">Hour of Day</p>
       ${hourBar(d.bookHours, maxBookHour)}
     </div>
   </div>
@@ -2534,12 +2541,12 @@ app.get('/api/admin/merge', (req, res) => {
   <title>Merge Old Logs</title>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial; background: #0e1520; color: #f09030; padding: 2rem; }
+    body { font-family: Arial; background: #231F20; color: #AD974F; padding: 2rem; }
     .container { max-width: 800px; margin: 0 auto; }
-    textarea { width: 100%; height: 400px; background: #080e18; color: #f09030; border: 1px solid #1a3050; padding: 1rem; font-family: monospace; font-size: 10pt; }
-    button { background: #c45018; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
-    button:hover { background: #f09030; }
-    .result { margin-top: 1rem; padding: 1rem; background: #080e18; border-radius: 8px; }
+    textarea { width: 100%; height: 400px; background: #1A1718; color: #AD974F; border: 1px solid #3A342E; padding: 1rem; font-family: monospace; font-size: 10pt; }
+    button { background: #8E793E; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
+    button:hover { background: #AD974F; }
+    .result { margin-top: 1rem; padding: 1rem; background: #1A1718; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -2569,7 +2576,7 @@ app.get('/api/admin/merge', (req, res) => {
       resultDiv.style.display = 'block';
       
       if (result.success) {
-        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #c45018;">View Stats Dashboard</a>';
+        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #8E793E;">View Stats Dashboard</a>';
         document.getElementById('logText').value = '';
       } else {
         resultDiv.innerHTML = '✗ Error: ' + result.error;
