@@ -618,7 +618,7 @@ if (fs.existsSync(logFile)) {
     .stats { display: grid; gap: 1rem; }
     .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #3A342E; }
     .stat:last-child { border-bottom: none; }
-    .stat-label { color: #B8B09A; }
+    .stat-label { color: #FFFFFF; }
     .stat-value { font-weight: 500; }
     .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #332E29; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #4A4138; }
@@ -893,7 +893,7 @@ app.get('/api/run', async (req, res) => {
           : "No changes detected.";
 
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#8E793E;font-size:3rem;margin-bottom:1rem;}h1{color:#EAEAEA;margin-bottom:1rem;}p{color:#B8B09A;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#8E793E;font-size:3rem;margin-bottom:1rem;}h1{color:#EAEAEA;margin-bottom:1rem;}p{color:#FFFFFF;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to Change Log...</p></div></body></html>";
 
@@ -901,7 +901,7 @@ app.get('/api/run', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/run:', error);
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#B8B09A;}a{color:#AD974F;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#231F20;color:#AD974F;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#FFFFFF;}a{color:#AD974F;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
       (error.message || "Unknown error") +
       '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
     res.send(html);
@@ -928,9 +928,9 @@ app.get('/legislative', (req, res) => {
     .content h2 { color: #8E793E; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
     .content h3 { color: #AD974F; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
-    .content p { margin-bottom: 0.75rem; color: #B8B09A; }
+    .content p { margin-bottom: 0.75rem; color: #FFFFFF; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
-    .content li { margin-bottom: 0.5rem; color: #B8B09A; }
+    .content li { margin-bottom: 0.5rem; color: #FFFFFF; }
     .update-date { color: #6B6458; font-weight: bold; margin-bottom: 1rem; }
     .content strong { color: #AD974F; }
     a { color: #8E793E; }
@@ -1171,7 +1171,7 @@ app.get('/api/history', (req, res) => {
     .changes.released h4 { color: #8E793E; }
     .changes.updated { border-left: 3px solid #C4A55A; padding-left: 0.6rem; }
     .changes.updated h4 { color: #C4A55A; }
-    .changes ul { list-style: none; font-size: 8pt; color: #B8B09A; }
+    .changes ul { list-style: none; font-size: 8pt; color: #FFFFFF; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #3A342E; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #6B6458; font-style: italic; }
@@ -1678,7 +1678,7 @@ function getStatsHTML(stats) {
         📊 Data collection started: <strong>${stats.dataCollectionStart}</strong> 
         (${stats.daysOfData} days of tracking)
       </p>
-      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #B8B09A;">
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #FFFFFF;">
         Statistics become more accurate as more data is collected over time.
       </p>
     </div>
@@ -1769,7 +1769,7 @@ function getStatsHTML(stats) {
     }
     .bar-label { 
       min-width: 200px; 
-      color: #B8B09A; 
+      color: #FFFFFF; 
       font-size: 0.8rem;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2224,7 +2224,7 @@ function getDeepStatsHTML(d) {
   function dayBar(days, max) {
     return Object.entries(days).map(([day, count]) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:4px;">
-        <span style="min-width:32px;color:#B8B09A;font-size:0.75rem;">${day}</span>
+        <span style="min-width:32px;color:#FFFFFF;font-size:0.75rem;">${day}</span>
         <div style="background:linear-gradient(90deg,#8E793E,#AD974F);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
         <span style="color:#AD974F;font-size:0.75rem;">${count}</span>
       </div>`).join('');
@@ -2233,9 +2233,9 @@ function getDeepStatsHTML(d) {
   function hourBar(hours, max) {
     return hours.map((count, hr) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2px;">
-        <span style="min-width:40px;color:#B8B09A;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
+        <span style="min-width:40px;color:#FFFFFF;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
         <div style="background:linear-gradient(90deg,#2A2523,#4A4138);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
-        <span style="color:#B8B09A;font-size:0.7rem;">${count}</span>
+        <span style="color:#FFFFFF;font-size:0.7rem;">${count}</span>
       </div>`).join('');
   }
 
@@ -2247,7 +2247,7 @@ function getDeepStatsHTML(d) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#090d14;color:#B8B09A;padding:2rem;min-height:100vh}
+    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#090d14;color:#FFFFFF;padding:2rem;min-height:100vh}
     .wrap{max-width:1100px;margin:0 auto}
     h1{font-size:1.4rem;color:#EAEAEA;margin-bottom:0.25rem;letter-spacing:-0.5px}
     h2{font-size:0.85rem;color:#8E793E;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #332E29;padding-bottom:0.4rem}
@@ -2255,7 +2255,7 @@ function getDeepStatsHTML(d) {
     .subtitle{color:#6B6458;font-size:0.75rem;margin-bottom:2rem}
     table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
     th{color:#6B6458;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #332E29;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
-    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0d1825;color:#B8B09A;vertical-align:top}
+    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0d1825;color:#FFFFFF;vertical-align:top}
     tr:hover td{background:#0d1825}
     .val{color:#AD974F;font-weight:bold}
     .dim{color:#6B6458}
@@ -2265,7 +2265,7 @@ function getDeepStatsHTML(d) {
     .card .l{color:#6B6458;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
     @media(max-width:700px){.two-col{grid-template-columns:1fr}}
-    .chip{display:inline-block;background:#0d1825;border:1px solid #3A342E;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#B8B09A}
+    .chip{display:inline-block;background:#0d1825;border:1px solid #3A342E;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#FFFFFF}
   </style>
 </head>
 <body>
@@ -2303,7 +2303,7 @@ function getDeepStatsHTML(d) {
     ${d.maxBailEntry ? `<div class="card" style="border-left-color:#6e3c1a">
       <div class="v" style="font-size:1.2rem;">${$(d.maxBailEntry.bailAmt || parseFloat((d.maxBailEntry.bail||'$0').replace(/[$,]/g,'')))}</div>
       <div class="l">Most Expensive Bail Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.maxBailEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.maxBailEntry.name}</div>
     </div>` : ''}
   </div>
 
@@ -2366,17 +2366,17 @@ function getDeepStatsHTML(d) {
     ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMinMins)}</div>
       <div class="l">Shortest Stay Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.histMinEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.histMinEntry.name}</div>
     </div>` : ''}
     ${d.histMaxEntry ? `<div class="card" style="border-left-color:#6e1a1a">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMaxMins)}</div>
       <div class="l">Historical Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.histMaxEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.histMaxEntry.name}</div>
     </div>` : ''}
     ${d.currentLongest ? `<div class="card" style="border-left-color:#6e3c1a">
       <div class="v" style="font-size:1.2rem;">${d.currentLongest.days}d</div>
       <div class="l">Current Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#B8B09A;">${d.currentLongest.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.currentLongest.name}</div>
       <div style="font-size:0.65rem;color:#6B6458;">In since ${d.currentLongest.bookDate}</div>
     </div>` : ''}
   </div>
