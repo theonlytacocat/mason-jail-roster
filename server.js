@@ -612,7 +612,7 @@ if (fs.existsSync(logFile)) {
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     .status { background: #1A1718; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #AD974F; border-radius: 50%; animation: pulse 2s infinite; }
+    .status-dot { width: 12px; height: 12px; background: #628A09; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
