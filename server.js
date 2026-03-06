@@ -652,9 +652,9 @@ if (fs.existsSync(logFile)) {
           <span class="stat-value">${viewCount.toLocaleString()}</span>
         </div>
       </div>
-      <a href="/api/run" class="run-btn">Run Check Now</a>
-      <a href="/api/history" class="run-btn" style="margin-top: 0.75rem;">Jail Bookings and Release Log</a>
+      <a href="/api/history" class="run-btn">Jail Bookings and Release Log</a>
       <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">Statistics Dashboard</a>
+      <a href="/api/run" class="run-btn" style="margin-top: 0.75rem;">Run Check Now</a>
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
