@@ -11,7 +11,14 @@
       "Bash(npx @railway/cli whoami)",
       "Bash(node --check server.js)",
       "Bash(git push)",
-      "Bash(railway logs)"
+      "Bash(railway logs)",
+      "Bash(wmic logicaldisk get name,description,size,freespace,volumename)",
+      "Bash(powershell -Command \"Get-PSDrive -PSProvider FileSystem | Select-Object Name, Root, Description, Used, Free | Format-Table -AutoSize\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \":*)",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\Alexa\\\\AppData\\\\Local\\\\Temp\\\\checksize.ps1\")",
+      "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\Alexa\\\\AppData\\\\Local\\\\Temp\\\\find_dupes.ps1\")",
+      "Bash(git add server.js fonts/FakeReceipt.otf)"
     ]
   }
 }
