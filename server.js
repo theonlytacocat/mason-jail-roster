@@ -1894,10 +1894,6 @@ function getStatsHTML(stats) {
         <div class="stat-value">${stats.avgPopulation}</div>
         <div class="stat-label">Avg Daily Population</div>
       </div>
-      <div class="stat-card orange">
-        <div class="stat-value">${stats.avgStayDays} days</div>
-        <div class="stat-label">Average Length of Stay</div>
-      </div>
     </div>
 
     <div class="chart-container">
