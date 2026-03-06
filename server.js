@@ -1151,27 +1151,29 @@ app.get('/api/history', (req, res) => {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
+    @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
     body { font-family: Arial, sans-serif; font-size: 8pt; background: #231F20; color: #AD974F; min-height: 100vh; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #EAEAEA; letter-spacing: -1px; word-break: break-word; }
-    .subtitle { color: #6B6458; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #8E793E; text-decoration: none; }
-    .back-link:hover { text-decoration: underline; }
+    h1 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 2.5rem; margin-bottom: 0.5rem; color: #EAEAEA; letter-spacing: 1px; word-break: break-word; }
+    .subtitle { color: #6B6458; margin-bottom: 1.5rem; }
+    .nav-buttons { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+    .nav-btn { flex: 1; padding: 0.65rem 1rem; background: #332E29; color: #EAEAEA; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 9pt; transition: background 0.15s; }
+    .nav-btn:hover { background: #4A4138; color: #EAEAEA; }
     .entry { background: #1A1718; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
     .entry.no-change-entry { background: #121010; padding: 0.75rem; border-left: 3px solid #5C5248; }
-    .entry-header { font-weight: 600; font-size: 10pt; margin-bottom: 0.75rem; color: #AD974F; border-bottom: 1px solid #3A342E; padding-bottom: 0.5rem; }
+    .entry-header { font-family: 'Fake Receipt', 'Courier New', monospace; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #AD974F; border-bottom: 1px solid #3A342E; padding-bottom: 0.5rem; }
     .changes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
     .changes { }
-    .changes h4 { font-size: 9pt; margin-bottom: 0.4rem; font-weight: bold; }
+    .changes h4 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 10pt; margin-bottom: 0.4rem; font-weight: bold; letter-spacing: 0.5px; }
     .changes.booked { border-left: 3px solid #C4A55A; padding-left: 0.6rem; }
     .changes.booked h4 { color: #C4A55A; }
     .changes.released { border-left: 3px solid #8E793E; padding-left: 0.6rem; }
     .changes.released h4 { color: #8E793E; }
     .changes.updated { border-left: 3px solid #C4A55A; padding-left: 0.6rem; }
     .changes.updated h4 { color: #C4A55A; }
-    .changes ul { list-style: none; font-size: 8pt; color: #FFFFFF; }
+    .changes ul { list-style: none; font-size: 8pt; color: #B8B09A; }
     .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #3A342E; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #6B6458; font-style: italic; }
@@ -1181,9 +1183,12 @@ app.get('/api/history', (req, res) => {
 </head>
 <body>
   <div class="container">
-    <a href="/api/status" class="back-link">← Back to System Check</a>
     <h1>Change History</h1>
     <p class="subtitle">Record of all Bookings and Releases, with newest first</p>
+    <div class="nav-buttons">
+      <a href="/api/status" class="nav-btn">← Main Page</a>
+      <a href="/api/stats" class="nav-btn">Statistics Dashboard →</a>
+    </div>
     ${entriesHtml}
   </div>
 </body>
