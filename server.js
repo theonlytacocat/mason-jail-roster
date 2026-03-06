@@ -940,116 +940,114 @@ app.get('/legislative', (req, res) => {
   <div class="container">
     <a href="/api/status" class="back-link">← Back to Jail Roster Monitor</a>
     <h1>Washington State Legislative Session</h1>
-    <p class="subtitle">2026 Session Updates and Bill Tracking</p>
-    
+    <p class="subtitle">2026 Session — Final Week Update</p>
+
     <div class="content">
-      <p class="update-date">Updates: 2/9/2026</p>
-      
-      <h2>Washington state legislature 2026 - what's actually going on</h2>
+      <p class="update-date">Updated: 3/6/2026</p>
+
+      <h2>Washington state legislature 2026 — final week, where things stand</h2>
 
       <h3>SESSION STATUS:</h3>
-      <ul>
-        <li>Day 27+ of 60-day session (started Jan 12, ends ~March 12)</li>
-        <li>First Policy Committee Cutoff: February 5 (PASSED)</li>
-        <li>House of Origin Fiscal Committee Cutoff: February 9 (TODAY)</li>
-        <li>House of Origin Floor Vote Cutoff: February 17</li>
-      </ul>
+      <p>Day 54 of 60. Session ends March 12, 2026. Final floor votes happening this week — anything that hasn't crossed chambers is almost certainly dead. Budget bills and anything tagged "necessary to implement the budget" (NTIB) are exempt from cutoffs and can move until the last day. Governor has until April 4 to sign or veto bills that land on his desk.</p>
 
-      <h3>POLICE & PUBLIC SAFETY:</h3>
-      <p><strong>BAN ON POLICE FACE COVERINGS (SB.5855) - PASSED SENATE</strong> - Would prohibit cops from wearing masks/balaclavas while interacting with public. Sparked by ice raids. Senate passed it Jan 28. Moving to House. Would take effect in June if signed.</p>
-      <p><strong>$100 MILLION POLICE HIRING GRANTS (SB.5060)</strong> - Covers 75% of new officer salaries for 36 months. Ferguson's priority. Cities must implement 0.1% sales tax or already have a similar tax to have access to funds.</p>
-      <p><strong>SHERIFF/POLICE CHIEF REQUIREMENTS (HB.1399/SB.5974)</strong> - New standards: minimum age would be 25, background checks to be performed, must maintain peace officer certification. Sheriffs union is PISSED, calling it unconstitutional.</p>
-      <p><strong>PUBLIC DEFENSE CRISIS (SB.5404)</strong> - Making the state actually fund public defenders. WA is one of only 2 states that doesn't fully fund them, leading to overworked defenders and constitutional violations.</p>
-      <p><strong>FLOCK LICENSE PLATE CAMERA REGULATION (SB.5550) - PASSED SENATE</strong> - Senate approved regulations for automated license plate readers Feb 4. Moving to House.</p>
-      <p><strong>NO SECRET POLICE ACT</strong> - Requiring law enforcement to be identifiable during arrests.</p>
-      <p><strong>BODY CAMERAS FOR ICE ENCOUNTERS (HB.2648) - ADVANCING</strong> - Passed House Community Safety Committee. Requires local police to turn on body cams when encountering federal agents doing immigration enforcement and report encounters to their agency.</p>
-      <p><strong>ICE HIRING BAN (HB.2641) - DEAD</strong> - Bill that would've prohibited hiring former federal immigration agents hired under Trump after Jan 20, 2025 died in committee Feb 5.</p>
+      <h3>POLICE &amp; PUBLIC SAFETY:</h3>
+      <p><strong>BAN ON POLICE FACE COVERINGS (SB 5855) PASSED BOTH CHAMBERS</strong> — Both chambers passed this in the final days of session. House passed 56-37 along party lines. Senate passed 30-18. Applies to state, local, and federal officers — though whether federal agents will comply is an open question. Ferguson has promised to sign it; takes effect immediately upon signature due to emergency clause.</p>
+      <p><strong>BAN ON FAKE BADGES / FALSE LAW ENFORCEMENT IMPERSONATION (SB 5876) PASSED BOTH CHAMBERS</strong> — Companion bill to the mask ban, also a Ferguson priority. Prohibits anyone who isn't a cop from making, possessing, or providing law enforcement insignia in a way that would make a reasonable person think they're an officer. Direct response to ICE activity. Ferguson vowed to sign it.</p>
+      <p><strong>$100 MILLION POLICE HIRING GRANTS (SB 5060) ADVANCING</strong> — Ferguson's priority. Covers 75% of new officer salaries for 36 months. Cities must implement a 0.1% sales tax or already have a similar tax to qualify.</p>
+      <p><strong>SHERIFF/POLICE CHIEF REQUIREMENTS (HB 1399/SB 5974) ADVANCING</strong> — Minimum age 25, background checks, must maintain peace officer certification. Sheriffs union is still pissed, calling it unconstitutional.</p>
+      <p><strong>PUBLIC DEFENSE CRISIS (SB 5404) ADVANCING</strong> — Making the state actually fund public defenders. WA is one of only 2 states that doesn't fully fund them, leading to overworked defenders and constitutional violations.</p>
+      <p><strong>FLOCK LICENSE PLATE CAMERA REGULATION (SB 5550 / ESSB 6002) ADVANCING</strong> — Passed the Senate. Scheduled for executive session in House Civil Rights &amp; Judiciary. Regulates automated license plate readers.</p>
+      <p><strong>NO SECRET POLICE ACT EFFECTIVELY ACCOMPLISHED</strong> — Covered by the mask ban above. Requiring law enforcement to be identifiable during arrests.</p>
+      <p><strong>BODY CAMERAS FOR ICE ENCOUNTERS (HB 2648) ADVANCING</strong> — Passed House Community Safety Committee. Requires local police to activate body cams when encountering federal agents doing immigration enforcement and report encounters to their agency.</p>
+      <p><strong>ICE HIRING BAN (HB 2641) DEAD</strong> — Died in committee Feb 5. Would've prohibited hiring former federal immigration agents hired under Trump after Jan 20, 2025.</p>
 
       <h3>GUN CONTROL:</h3>
-      <p><strong>PERMIT TO PURCHASE (HB.1163)</strong> - Requiring state permit before buying firearms, like a dozen other states have.</p>
-      <p><strong>EXPANDING GUN-FREE ZONES</strong> and setting <strong>BULK PURCHASE LIMITS</strong>.</p>
-      <p><strong>REQUIRING GUN STORAGE IN CARS/HOMES</strong>, as well as more <strong>REGULATIONS FOR GUN DEALERS</strong>.</p>
+      <p><strong>PERMIT TO PURCHASE (HB 1163)</strong> — Requiring a state permit before buying firearms, like a dozen other states.</p>
+      <p><strong>GUN-FREE ZONE EXPANSION + BULK PURCHASE LIMITS, GUN STORAGE REQUIREMENTS, GUN DEALER REGULATIONS</strong> — Still in play heading into the final stretch.</p>
 
-      <h3>SOCIAL MEDIA & CHILDREN:</h3>
-      <p><strong>ADDICTIVE FEEDS BAN (HB.1834/SB.5708) - ADVANCING</strong> - Attorney General Nick Brown's priority. Would ban addictive feeds for minors, prohibit push notifications overnight/during school hours. Modeled on California law that survived 9th Circuit challenge. Stalled in House in 2025 but has renewed momentum.</p>
-      <p><strong>PARENTAL CONSENT FOR SOCIAL MEDIA (SB.6111) - DEAD</strong> - Bill requiring parental consent for minors under 17 to create social media accounts died at first cutoff.</p>
-      <p><strong>CHILD INFLUENCER PROTECTIONS (HB.2400) - DEAD</strong> - Bill protecting children in monetized online content (family vlogs) died at first cutoff. Would've allowed young adults to request deletion of childhood videos.</p>
-      <p><strong>PORNOGRAPHY ACCESS RESTRICTIONS - DEAD</strong> - Bipartisan bill to restrict children's access to online pornography died at first cutoff.</p>
+      <h3>SOCIAL MEDIA &amp; CHILDREN:</h3>
+      <p><strong>ADDICTIVE FEEDS BAN (HB 1834/SB 5708) ADVANCING</strong> — AG Nick Brown's priority. Bans algorithmic addictive feeds for minors and blocks push notifications during overnight hours and school hours. Modeled on California law. Had renewed momentum after stalling in 2025. Still moving as of final week.</p>
+      <p><strong>PARENTAL CONSENT FOR SOCIAL MEDIA (SB 6111) DEAD</strong> — Died at first cutoff. Would've required parental consent for minors under 17 to create accounts.</p>
+      <p><strong>CHILD INFLUENCER PROTECTIONS (HB 2400) DEAD</strong> — Died at first cutoff. Would've protected kids in monetized family content and let young adults request deletion of childhood videos.</p>
+      <p><strong>PORNOGRAPHY ACCESS RESTRICTIONS DEAD</strong> — Bipartisan bill died at first cutoff.</p>
 
       <h3>EDUCATION:</h3>
-      <p><strong>PARENTAL RIGHTS INITIATIVES</strong> - Two super controversial initiatives coming that would give parents access to ALL school curriculum, allow parents to see mental health counseling records from school counselors. Often called a rewrite of last year's controversial HB.1296.</p>
-      <p><strong>HOMESCHOOL AGE REQUIREMENT (SB.6261) - DEAD</strong> - Would've lowered homeschool attestation requirement from age 8 to age 6. WA is only state that waits until age 8.</p>
+      <p><strong>PARENTAL RIGHTS INITIATIVES</strong> — Two controversial initiatives still in play. Would give parents access to all school curriculum and allow them to see school mental health counseling records. Controversial rewrite of last year's HB 1296.</p>
+      <p><strong>HOMESCHOOL AGE REQUIREMENT (SB 6261) DEAD</strong> — Died. Would've lowered homeschool attestation requirement from age 8 to age 6. WA is the only state that waits until age 8.</p>
 
       <h3>CANNABIS:</h3>
-      <p><strong>HOME GROW LEGISLATION (HB.1449/SB.6196) - ADVANCING</strong> - Senate Labor & Commerce passed home grow bill Feb 4. Allows adults 21+ to grow 6 plants per person, max 15 per household. Includes controversial amendment allowing local jurisdictions to ban home grow in residential zones. Moving to fiscal committee. WA is currently one of only 4 adult-use states that still criminalizes home grow (and the only one where it's a felony).</p>
-      <p><strong>LOCAL CANNABIS TAX (SB.6328) - REANIMATED</strong> - 2025 Republican bill scheduled for hearing Feb 5 in Senate Ways & Means. Would allow counties OR cities (not both) to impose up to 2% additional excise tax on retail cannabis sales for up to 7 years.</p>
-      <p><strong>CANNABIS HOSPITALITY EVENTS - ADVANCING</strong> - Referred to House Appropriations. Must advance by Feb 9 fiscal cutoff or be designated NTIB (necessary to implement budget).</p>
-      <p><strong>CANNABIS TAX OVERHAUL (HB.2433)</strong> - Would replace WA's 37% excise tax (highest in nation) with weight and THC potency-based rates.</p>
-      <p><strong>HIGH-THC CANNABIS TAX INCREASE (HB.2075)</strong> - Would increase excise tax specifically on high-THC products.</p>
+      <p><strong>HOME GROW LEGISLATION (SB 6204 / HB 2614) UNCERTAIN — FINAL WEEK</strong> — Senate Labor &amp; Commerce passed it. Allows adults 21+ to grow up to 6 plants per person, max 15 per household. Includes the Schoesler amendment letting local jurisdictions ban home grow in residential zones. Still alive as of the final week but hasn't crossed chambers yet. This is the 11th year in a row this has been attempted. WA is one of only 3 states to have legalized both medical and recreational cannabis while still criminalizing home grow — and the only one where it's a felony.</p>
+      <p><strong>LOCAL CANNABIS TAX (SB 6328)</strong> — Would allow counties or cities (not both) to impose up to 2% additional excise tax on retail cannabis sales for up to 7 years. Still alive in Ways &amp; Means.</p>
+      <p><strong>CANNABIS HOSPITALITY EVENTS ADVANCING</strong> — Referred to House Appropriations. Tagged as potentially NTIB (revenue-generating), which gives it cover to move until the end of session.</p>
+      <p><strong>CANNABIS TAX OVERHAUL (HB 2433)</strong> — Would replace WA's 37% excise tax (highest in the nation) with weight and THC potency-based rates. Industry groups vocally opposed, arguing it would actually raise taxes significantly on lower-cost products. Public hearing pulled from Senate Ways &amp; Means calendar in early Feb with no reschedule — likely dead or severely stalled.</p>
+      <p><strong>HIGH-THC CANNABIS TAX INCREASE (HB 2075)</strong> — Would increase excise tax specifically on high-THC products. Status unclear.</p>
 
-      <h3>TAXES AND BUDGETS:</h3>
-      <p><strong>MILLIONAIRE INCOME TAX</strong> - Nearly 10% tax on people making over $1 million/year, would raise $3 billion annually. super controversial since WA has never had an income tax and it might violate the state constitution. republicans threatening lawsuits.</p>
-      <p><strong>PAYROLL TAX ON HIGH EARNERS (HB.2100)</strong> - 5% tax on employers for employees making over $125k/year to fund "well Washington fund" for healthcare/education/human services.</p>
-      <p><strong>HIGHER EDUCATION FUNDING RESET</strong> - 10% tuition cuts for 3 years starting fall 2027, expanding Washington college grant eligibility.</p>
-      <p><strong>PAID PROTESTER TAX</strong> - Would tax temporary staffing agencies that provide "paid protesters" at protests.</p>
-      <p><strong>BULLION TAX REPEAL (HB.2093)</strong> - Republicans trying to eliminate the sales tax on gold/silver, saying it's driving coin shops out of business.</p>
-      <p><strong>REVERSING 2025 TAX INCREASES (HB.2101)</strong> - Rolling back recent tax hikes to keep investment local.</p>
+      <h3>TAXES &amp; BUDGET:</h3>
+      <p><strong>MILLIONAIRE INCOME TAX (SB 6346) TOUCH AND GO</strong> — 9.9% tax on income over $1 million. Would raise an estimated $3.7 billion annually starting in 2029. Passed the Senate 27-22 on Feb 16. Moving through the House with significant friction — a committee stripped a key corporate tax break, then tech leaders sent a letter urging Ferguson to pump the brakes. As of March 4, it still hadn't hit the House floor with just days left. Ferguson has said publicly he'll support it but only if revenue is earmarked for working-family tax relief, not the general fund. Republicans are already threatening lawsuits over the state constitution's income tax prohibition. Even optimists acknowledge this might spill into the 2027 long session.</p>
+      <p><strong>PAYROLL TAX ON HIGH EARNERS (HB 2100)</strong> — 5% tax on employers for employees making over $125k/year to fund the "Well Washington Fund" for healthcare, education, and human services.</p>
+      <p><strong>HIGHER EDUCATION FUNDING RESET</strong> — 10% tuition cuts for 3 years starting fall 2027, expanding Washington College Grant eligibility.</p>
+      <p><strong>PAID PROTESTER TAX</strong> — Would tax temporary staffing agencies that provide "paid protesters."</p>
+      <p><strong>BULLION TAX REPEAL (HB 2093)</strong> — Republicans trying to eliminate the sales tax on gold and silver, arguing it's driving coin shops out of business.</p>
+      <p><strong>REVERSING 2025 TAX INCREASES (HB 2101)</strong> — Rolling back recent tax hikes to keep investment local.</p>
 
-      <h3>ARTIFICIAL INTELLIGENCE - there are so many of them:</h3>
-      <p><strong>AI COMPANION CHATBOTS (SB.5984/HB.2225)</strong> - Regulating AI chatbots for minors after child suicides linked to AI. Prohibits romantic partnerships with minors, requires hourly notifications that it's not human. private right of action included. Tech industry is pushing back heavily on this.</p>
-      <p><strong>AI IN SCHOOLS (HB.2481/SB.5956)</strong> - Requiring human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline of students. Protecting kids from being flagged by gun detection AI that mistakes chips bags for weapons.</p>
-      <p><strong>REGULATIONS FOR AI:</strong> Use in therapy, specifically mental health treatment.</p>
-      <p><strong>HEALTH INSURANCE:</strong> Regulating AI insurance authorization decisions for medical procedures.</p>
-      <p><strong>TRAINING DATA TRANSPARENCY</strong> - Requiring disclosure of what data is used to train AI models.</p>
-      <p><strong>COLLECTIVE BARGAINING AROUND AI</strong> - Allowing unions to negotiate how AI is used in workplaces.</p>
-      <p><strong>GROCERY STORE AI SURVEILLANCE</strong> - Regulating facial recognition and surge pricing based on AI.</p>
+      <h3>ARTIFICIAL INTELLIGENCE:</h3>
+      <p><strong>AI COMPANION CHATBOTS (SB 5984 / HB 2225) ADVANCING — LIKELY TO PASS</strong> — Ferguson's priority. HB 2225 passed the House 69-28 on Feb 17. SB 5984 passed the Senate earlier and was in House committee executive session by Feb 24. Both advancing and likely to make it. Prohibits romantic AI relationships with minors, requires hourly notifications that it's not human, includes suicide prevention protocols and a private right of action. Tech industry pushing back hard.</p>
+      <p><strong>AI IN SCHOOLS (HB 2481/SB 5956) ADVANCING</strong> — SB 5956 was in House Education executive session. Requires human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline. Yes, there is actually AI flagging chips bags as weapons in school hallways.</p>
+      <p><strong>AI DEEPFAKES / DIGITAL LIKENESS BILL ADVANCING</strong> — Requiring developers to make tools available so people can tell when something is AI-generated. Also includes protections for people's AI-generated digital likeness. Crossed chambers.</p>
+      <p><strong>AI USE IN THERAPY / MENTAL HEALTH TREATMENT</strong> — Regulations for AI in mental health contexts still in play.</p>
+      <p><strong>HEALTH INSURANCE AI AUTHORIZATION</strong> — Regulating AI insurance authorization decisions for medical procedures.</p>
+      <p><strong>TRAINING DATA TRANSPARENCY</strong> — Requiring disclosure of what data is used to train AI models.</p>
+      <p><strong>COLLECTIVE BARGAINING AROUND AI</strong> — Allowing unions to negotiate how AI is used in workplaces.</p>
+      <p><strong>GROCERY STORE AI SURVEILLANCE</strong> — Regulating facial recognition and AI-based surge pricing.</p>
 
-      <h3>WILDFIRE & ENVIRONMENT:</h3>
-      <p><strong>WILDFIRE PREVENTION FUNDING:</strong> Fighting $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
-      <p><strong>CLEAN ENERGY GRID EXPANSION</strong>, as well as a <strong>SEMI TRUCK EMISSIONS CLIMATE PUSH</strong>.</p>
+      <h3>WILDFIRE &amp; ENVIRONMENT:</h3>
+      <p><strong>WILDFIRE PREVENTION FUNDING</strong> — Fighting a $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
+      <p><strong>CLEAN ENERGY GRID EXPANSION</strong> — Still in play, along with a semi truck emissions climate push.</p>
 
-      <h3>HOUSING & DEVELOPMENT:</h3>
-      <p><strong>COMMERCIAL TO RESIDENTIAL CONVERSION (SB.6026)</strong> - Governor's priority - allowing mixed-use and residential in commercial zones without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
-      <p><strong>SHORT-TERM RENTAL TAX (SB.5576)</strong> - Up to 4% excise tax on Airbnbs to fund affordable housing. Was statewide, amended to let local governments decide. <strong>Airbnb has pumped $4 million into PAC to kill it</strong> - spending 1/5 of what the tax would generate just to prevent local governments from having the option.</p>
-      <p><strong>PARKING REFORM</strong> - Already passed in 2025, now implementing rules reducing parking requirements that drive up housing costs.</p>
+      <h3>HOUSING &amp; DEVELOPMENT:</h3>
+      <p><strong>COMMERCIAL TO RESIDENTIAL CONVERSION (SB 6026) ADVANCING</strong> — Governor's priority. Requires local governments to allow mixed-use and residential in commercially zoned areas without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
+      <p><strong>SHORT-TERM RENTAL TAX (SB 5576)</strong> — Up to 4% excise tax on Airbnbs to fund affordable housing. Was statewide, amended to let local governments decide. Airbnb pumped $4 million into a PAC to kill it — they spent one-fifth of what the tax would generate just to stop local governments from having the option.</p>
+      <p><strong>SINGLE-FAMILY ZONING REFORM</strong> — Already passed in 2025, continuing to implement rules reducing parking requirements near transit that drive up housing costs.</p>
+      <p><strong>LIMITING BULK HOME BUYING (E2SSB 5496) ADVANCING</strong> — Would preserve homeownership options by limiting excessive home buying by certain entities (hedge funds and institutional buyers).</p>
 
-      <h3>IMMIGRATION AND LABOR:</h3>
-      <p><strong>IMMIGRANT WORKER PROTECTIONS (HB.2105/SB.5852)</strong> - Requiring employers to give workers notice if ice does an i-9 audit of legal work status.</p>
-      <p><strong>FARMWORKER COLLECTIVE BARGAINING (SB.6045/HB.2409)</strong> - Would bring farmworkers under Public Employment Relations Commission jurisdiction. Farmworkers have been excluded from National Labor Relations Act protections since 1935.</p>
-      <p><strong>MINIMUM WAGE $17.13/HOUR</strong> - Already in effect Jan 1, 2026. Highest in the nation. Some cities higher (Seattle $21.63, Seatac $20.74).</p>
-      <p><strong>32-HOUR WORKWEEK (HB.2611) - DEAD</strong> - Would've required overtime pay after 32 hours/week. Food, hospitality, and farm industries opposed. San Juan County implemented 32-hour week for county employees in 2023: 18% decrease in sick calls, 216% increase in job applications, $2 million saved.</p>
-      <p><strong>STRIKING WORKERS GET UNEMPLOYMENT</strong> - Already in effect. strikers can collect up to 6 weeks of unemployment benefits after strike starts.</p>
-      <p><strong>PAID FAMILY LEAVE EXPANSION</strong> - Job protection after only 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
-      <p><strong>WORKPLACE VIOLENCE PREVENTION</strong> - Healthcare facilities must investigate violence incidents promptly and update prevention plans annually.</p>
-      <p><strong>ISOLATED WORKER PROTECTIONS</strong> - Panic buttons and safety measures for janitors, housekeepers, security guards who work alone.</p>
+      <h3>IMMIGRATION &amp; LABOR:</h3>
+      <p><strong>IMMIGRANT WORKER PROTECTIONS (HB 2105/SB 5852) ADVANCING</strong> — Passed the Senate. Requires employers to give workers notice if ICE does an I-9 audit. Also prohibits school district and early learning employees from collecting data on students' or families' immigration status.</p>
+      <p><strong>FARMWORKER COLLECTIVE BARGAINING (SB 6045/HB 2409)</strong> — Would bring farmworkers under Public Employment Relations Commission jurisdiction. Farmworkers have been excluded from National Labor Relations Act protections since 1935.</p>
+      <p><strong>MINIMUM WAGE $17.13/HOUR ALREADY IN EFFECT</strong> — Took effect Jan 1, 2026. Highest in the nation. Some cities are higher: Seattle $21.63, SeaTac $20.74.</p>
+      <p><strong>32-HOUR WORKWEEK (HB 2611) DEAD</strong> — Would've required overtime after 32 hours per week. Food, hospitality, and farm industries opposed. San Juan County implemented a 32-hour week for county employees in 2023: 18% decrease in sick calls, 216% increase in job applications, $2 million saved.</p>
+      <p><strong>STRIKING WORKERS GET UNEMPLOYMENT ALREADY IN EFFECT</strong> — Strikers can collect up to 6 weeks of unemployment benefits after a strike starts.</p>
+      <p><strong>PAID FAMILY LEAVE EXPANSION</strong> — Job protection kicks in after only 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
+      <p><strong>WORKPLACE VIOLENCE PREVENTION</strong> — Healthcare facilities must investigate violence incidents promptly and update prevention plans annually.</p>
+      <p><strong>ISOLATED WORKER PROTECTIONS</strong> — Panic buttons and safety measures for janitors, housekeepers, and security guards who work alone.</p>
 
-      <h3>HEALTHCARE & VACCINES:</h3>
-      <p><strong>STATE VACCINE AUTHORITY (SB.5967/HB.2242)</strong> - Governor's priority. Allowing WA dept of health to make vaccine recommendations independent of cdc/federal government. Response to trump politicizing CDC, does NOT create new mandates.</p>
+      <h3>HEALTHCARE &amp; VACCINES:</h3>
+      <p><strong>STATE VACCINE AUTHORITY (SB 5967/HB 2242) ADVANCING</strong> — Ferguson's priority. Allows WA Dept of Health to make vaccine recommendations independent of the CDC. Direct response to Trump politicizing the CDC. Does NOT create new mandates.</p>
 
       <h3>ALREADY IN EFFECT:</h3>
-      <p><strong>MEDICAL DEBT CREDIT REPORTING BAN</strong> - Medical debt can't be reported to credit agencies.</p>
-      <p><strong>BLOOD TYPE ON DRIVER'S LICENSE (SB.5689)</strong> - Voluntary blood type info on state IDS.</p>
+      <p><strong>MEDICAL DEBT CREDIT REPORTING BAN IN EFFECT</strong> — Medical debt can no longer be reported to credit agencies.</p>
+      <p><strong>BLOOD TYPE ON DRIVER'S LICENSE (SB 5689) IN EFFECT</strong> — Voluntary blood type info on state IDs. WA is among the first states to offer this.</p>
+      <p><strong>NICOTINE/VAPE TAX IN EFFECT</strong> — 95% excise tax on all nicotine products including synthetic nicotine, vapes, and pouches. A $7 product now costs $15.06 after taxes.</p>
+      <p><strong>PLASTIC BAG FEE INCREASE IN EFFECT</strong> — Minimum charge raised from 8 cents to 12 cents per bag.</p>
+      <p><strong>CHILD SUPPORT REFORM IN EFFECT</strong> — Updated economic tables now cover incomes up to $50,000 combined per month, up from the old $12,000 cap.</p>
 
-      <h3>TRANSPORTATION & ROADS:</h3>
-      <p><strong>RECKLESS DRIVING REDEFINED (SB.5890)</strong> - 30+ mph over speed limit = reckless driving charge.</p>
-      <p><strong>RECKLESS INTERFERENCE WITH EMERGENCY OPERATIONS (HB.2203)</strong> - New driving offense for blocking emergency vehicles.</p>
+      <h3>TRANSPORTATION &amp; ROADS:</h3>
+      <p><strong>RECKLESS DRIVING REDEFINED (SB 5890)</strong> — 30+ mph over the speed limit = reckless driving charge.</p>
+      <p><strong>RECKLESS INTERFERENCE WITH EMERGENCY OPERATIONS (HB 2203) DEAD</strong> — New driving offense for blocking emergency vehicles passed the House but didn't make it through a Senate policy committee.</p>
 
       <h3>CRIMINAL JUSTICE:</h3>
-      <p><strong>POLITICAL AFFILIATION HATE CRIME (SB.5830)</strong> - Making it a Class C felony to assault someone based on their political beliefs.</p>
-      <p><strong>JUVENILE DETENTION OVERCROWDING</strong> - Allowing youth transfers to state prisons and community facilities in certain cases.</p>
-      <p><strong>EARLY RELEASE FOR YOUTH OFFENDERS</strong> - Allowing people convicted before age 18 to petition for early release at age 24.</p>
-      <p><strong>DUI LAB EXPANSION</strong> - Allowing more labs to perform toxicology tests to speed up cases.</p>
-
-      <h3>CONSUMER & BUSINESS ALREADY IN EFFECT:</h3>
-      <p><strong>NICOTINE/VAPE TAX</strong> - 95% excise tax on ALL nicotine products including synthetic nicotine, vapes, pouches. A $7 product now costs $15.06 after taxes.</p>
-      <p><strong>PLASTIC BAG FEE INCREASE</strong> - Minimum charge raised from 8 cents to 12 cents per bag.</p>
+      <p><strong>POLITICAL AFFILIATION HATE CRIME (SB 5830)</strong> — Makes it a Class C felony to assault someone based on their political beliefs.</p>
+      <p><strong>JUVENILE DETENTION OVERCROWDING</strong> — Allowing youth transfers to state prisons and community facilities in certain cases.</p>
+      <p><strong>EARLY RELEASE FOR YOUTH OFFENDERS</strong> — Allowing people convicted before age 18 to petition for early release at age 24.</p>
+      <p><strong>DUI LAB EXPANSION</strong> — Allowing more labs to perform toxicology tests to speed up DUI cases.</p>
+      <p><strong>LOWER BAC THRESHOLD</strong> — Lowering the drunk driving legal limit is in the mix this session.</p>
 
       <h3>RANDOMS:</h3>
-      <p><strong>DIAPER CHANGING STATIONS</strong> - Already in effect. Mandatory in all new/remodeled public buildings costing $15k+.</p>
-      <p><strong>GRAY WOLF RECLASSIFICATION</strong> - Downgrading from "endangered" to "sensitive" status.</p>
-      <p><strong>DISCOVER PASS PRICE HIKE</strong> - Increasing from $30 to $45 for state parks access, would be the first increase in 14 years.</p>
+      <p><strong>DIAPER CHANGING STATIONS IN EFFECT</strong> — Mandatory in all new or remodeled public buildings costing $15k+.</p>
+      <p><strong>GRAY WOLF RECLASSIFICATION</strong> — Downgrading from "endangered" to "sensitive" status.</p>
+      <p><strong>DISCOVER PASS PRICE HIKE</strong> — Increasing from $30 to $45 for state parks access; would be the first increase in 14 years.</p>
+      <p><strong>POSTHUMOUS CANDIDATE BALLOT REMOVAL DEAD</strong> — Would have allowed removal of deceased candidates from ballots after the filing deadline. Passed the House, didn't make it out of a Senate policy committee. Prompted by Tom Crowson, who died close enough to the primary that he nearly won posthumously.</p>
 
-      <p style="margin-top: 2rem; color: #6B6458; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a></p>
+      <p style="margin-top: 2rem; color: #6B6458; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a>. Session ends March 12, 2026.</p>
     </div>
   </div>
 </body>
