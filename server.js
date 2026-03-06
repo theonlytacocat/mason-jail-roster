@@ -1699,22 +1699,23 @@ function getStatsHTML(stats) {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
+    @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: Arial, sans-serif; 
-      font-size: 9pt; 
-      background: #231F20; 
-      color: #AD974F; 
-      min-height: 100vh; 
-      padding: 2rem; 
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 9pt;
+      background: #231F20;
+      color: #AD974F;
+      min-height: 100vh;
+      padding: 2rem;
     }
     .container { max-width: 1200px; margin: 0 auto; }
-    h1 { 
-      font-family: 'Pixel Digivolve', 'Courier New', monospace; 
-      font-size: 2rem; 
-      margin-bottom: 0.5rem; 
-      color: #EAEAEA; 
-      letter-spacing: -1px; 
+    h1 {
+      font-family: 'Fake Receipt', 'Courier New', monospace;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #EAEAEA;
+      letter-spacing: 1px;
     }
     .subtitle { color: #6B6458; margin-bottom: 2rem; }
     .back-link { 
@@ -1761,10 +1762,12 @@ function getStatsHTML(stats) {
       margin-bottom: 1rem; 
     }
     .chart-title {
+      font-family: 'Fake Receipt', 'Courier New', monospace;
       color: #AD974F;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 1rem;
+      letter-spacing: 0.5px;
     }
     
     .bar-chart { margin-top: 1rem; }
