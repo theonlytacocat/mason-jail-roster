@@ -1975,7 +1975,8 @@ function getStatsHTML(stats) {
       </div>
     </div>` : ''}
 
-    ${stats.avgBailByCharge.length > 0 ? `
+    ${ /* TODO: re-enable Average Bail by Charge Type in a few weeks (data still being collected via avgBailByCharge)
+    stats.avgBailByCharge.length > 0 ? `
     <div class="chart-container">
       <div class="chart-title">Average Bail by Charge Type</div>
       <div class="bar-chart">
@@ -1991,7 +1992,8 @@ function getStatsHTML(stats) {
           `).join('');
         })()}
       </div>
-    </div>` : ''}
+    </div>` : ''
+    */ ''}
 
   </div>
 </body>
