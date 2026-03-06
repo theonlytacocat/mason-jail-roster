@@ -1647,6 +1647,7 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
       minTimeServedMins,
       maxTimeServedMins,
       longestInmate,
+      longestCurrentMins: longestInmate ? Math.round(longestDays * 24 * 60) : 0,
     };
     
     res.send(getStatsHTML(stats));
@@ -1941,6 +1942,7 @@ function getStatsHTML(stats) {
   <div class="chart-title">Release Type Breakdown</div>
   <div class="release-types">
     ${Object.entries(stats.releaseTypes)
+      .filter(([code]) => Object.prototype.hasOwnProperty.call(RELEASE_TYPE_NAMES, code))
       .sort((a, b) => b[1] - a[1])
       .map(([code, count]) => `
       <div class="release-type">
@@ -1966,8 +1968,9 @@ function getStatsHTML(stats) {
           <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
         </div>
         <div style="background: #141112; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #AD974F;">${formatMinutes(stats.maxTimeServedMins)}</div>
-          <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Longest Recorded Stay</div>
+          <div style="font-size: 1.5rem; font-weight: bold; color: #AD974F;">${stats.longestCurrentMins > 0 ? formatMinutes(stats.longestCurrentMins) : 'N/A'}</div>
+          <div style="color: #6B6458; font-size: 0.75rem; margin-top: 0.25rem;">Longest Current Stay</div>
+          ${stats.longestInmate ? `<div style="color: #6B6458; font-size: 0.65rem; margin-top: 0.2rem;">${stats.longestInmate.name}</div>` : ''}
         </div>
       </div>
     </div>` : ''}
