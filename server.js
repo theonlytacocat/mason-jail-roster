@@ -2254,7 +2254,7 @@ function getDeepStatsHTML(d) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Courier New',monospace;font-size:8.5pt;background:#0E1410;color:#FFFFFF;padding:2rem;min-height:100vh}
+    body{font-family:'Liberation Sans',monospace;font-size:8.5pt;background:#0E1410;color:#FFFFFF;padding:2rem;min-height:100vh}
     .wrap{max-width:1100px;margin:0 auto}
     h1{font-size:1.4rem;color:#E5DDD0;margin-bottom:0.25rem;letter-spacing:-0.5px}
     h2{font-size:0.85rem;color:#8A7A68;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #2A3828;padding-bottom:0.4rem}
