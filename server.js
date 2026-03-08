@@ -1142,7 +1142,7 @@ app.get('/api/history', (req, res) => {
   gtag('config', 'G-380L7KND2L');
 </script>
 
-  <title>Change History - Mason County Jail Roster Monitor</title>
+  <title>Booked and Released Log - Mason County Jail Roster Monitor</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1181,7 +1181,7 @@ app.get('/api/history', (req, res) => {
 </head>
 <body>
   <div class="container">
-    <h1>Change History</h1>
+    <h1>Booked and Released Log</h1>
     <p class="subtitle">Record of all Bookings and Releases, with newest first</p>
     <div class="nav-buttons">
       <a href="/api/status" class="nav-btn">← Main Page</a>
