@@ -605,7 +605,7 @@ if (fs.existsSync(logFile)) {
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0D1A0F; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #070907; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
     .container { width: 100%; max-width: 500px; padding: 1rem; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #F0F0E8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
@@ -658,7 +658,7 @@ if (fs.existsSync(logFile)) {
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #C8C87A; color: #0D1A0F; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 6th 2026: Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #C8C87A; color: #070907; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 6th 2026: Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -893,7 +893,7 @@ app.get('/api/run', async (req, res) => {
           : "No changes detected.";
 
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#0D1A0F;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#6B7A2A;font-size:3rem;margin-bottom:1rem;}h1{color:#F0F0E8;margin-bottom:1rem;}p{color:#FFFFFF;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#070907;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#6B7A2A;font-size:3rem;margin-bottom:1rem;}h1{color:#F0F0E8;margin-bottom:1rem;}p{color:#FFFFFF;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to Change Log...</p></div></body></html>";
 
@@ -901,7 +901,7 @@ app.get('/api/run', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/run:', error);
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#0D1A0F;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#FFFFFF;}a{color:#C8C87A;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#070907;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#FFFFFF;}a{color:#C8C87A;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
       (error.message || "Unknown error") +
       '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
     res.send(html);
@@ -918,7 +918,7 @@ app.get('/legislative', (req, res) => {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #070907; color: #C8C87A; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: -1px; }
     .subtitle { color: #72807A; margin-bottom: 2rem; }
@@ -1152,7 +1152,7 @@ app.get('/api/history', (req, res) => {
     @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #070907; color: #C8C87A; min-height: 100vh; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
     h1 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 2.5rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: 1px; word-break: break-word; }
     .subtitle { color: #72807A; margin-bottom: 1.5rem; }
@@ -1708,7 +1708,7 @@ function getStatsHTML(stats) {
     body {
       font-family: Arial, sans-serif;
       font-size: 9pt;
-      background: #0D1A0F;
+      background: #070907;
       color: #C8C87A;
       min-height: 100vh;
       padding: 2rem;
@@ -2554,7 +2554,7 @@ app.get('/api/admin/merge', (req, res) => {
   <title>Merge Old Logs</title>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial; background: #0D1A0F; color: #C8C87A; padding: 2rem; }
+    body { font-family: Arial; background: #070907; color: #C8C87A; padding: 2rem; }
     .container { max-width: 800px; margin: 0 auto; }
     textarea { width: 100%; height: 400px; background: #152B17; color: #C8C87A; border: 1px solid #1E3522; padding: 1rem; font-family: monospace; font-size: 10pt; }
     button { background: #6B7A2A; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
