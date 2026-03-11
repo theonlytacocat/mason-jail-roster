@@ -605,25 +605,25 @@ if (fs.existsSync(logFile)) {
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #191D18; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0D1A0F; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
     .container { width: 100%; max-width: 500px; padding: 1rem; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #E5DDD0; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #F0F0E8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .status { background: #222C22; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .status { background: #152B17; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
     .status-dot { width: 12px; height: 12px; background: #22C55E; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     .status-title { font-weight: 600; }
     .stats { display: grid; gap: 1rem; }
-    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #283C2A; }
+    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #1E3522; }
     .stat:last-child { border-bottom: none; }
     .stat-label { color: #FFFFFF; }
     .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #2A3828; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #1C3320; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
     .run-btn:hover { background: #3A4E38; }
     .footer { text-align: center; color: #72807A; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #C1B09A; text-decoration: none; }
+    a { color: #C8C87A; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -658,7 +658,7 @@ if (fs.existsSync(logFile)) {
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #C1B09A; color: #191D18; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 6th 2026: Washington State Legislative Session News Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #C8C87A; color: #0D1A0F; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 6th 2026: Washington State Legislative Session News Update</a>
     </div>
   </div>
 </body>
@@ -893,7 +893,7 @@ app.get('/api/run', async (req, res) => {
           : "No changes detected.";
 
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#191D18;color:#C1B09A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#8A7A68;font-size:3rem;margin-bottom:1rem;}h1{color:#E5DDD0;margin-bottom:1rem;}p{color:#FFFFFF;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="3;url=/api/history"><style>body{font-family:sans-serif;background:#0D1A0F;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.success{color:#6B7A2A;font-size:3rem;margin-bottom:1rem;}h1{color:#F0F0E8;margin-bottom:1rem;}p{color:#FFFFFF;}</style></head><body><div class="container"><div class="success">✓</div><h1>Workflow Complete</h1><p>' +
       message +
       "</p><p>Redirecting to Change Log...</p></div></body></html>";
 
@@ -901,7 +901,7 @@ app.get('/api/run', async (req, res) => {
   } catch (error) {
     console.error('Error in /api/run:', error);
     const html =
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#191D18;color:#C1B09A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#FFFFFF;}a{color:#C1B09A;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:sans-serif;background:#0D1A0F;color:#C8C87A;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;}.container{text-align:center;padding:2rem;}.error{color:#ef4444;font-size:3rem;margin-bottom:1rem;}h1{color:#ef4444;margin-bottom:1rem;}p{color:#FFFFFF;}a{color:#C8C87A;}</style></head><body><div class="container"><div class="error">✗</div><h1>Error</h1><p>' +
       (error.message || "Unknown error") +
       '</p><p><a href="/api/status">Back to Status</a></p></div></body></html>';
     res.send(html);
@@ -918,22 +918,22 @@ app.get('/legislative', (req, res) => {
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; background: #191D18; color: #C1B09A; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #E5DDD0; letter-spacing: -1px; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: -1px; }
     .subtitle { color: #72807A; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #8A7A68; text-decoration: none; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #6B7A2A; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #2A3828; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #8A7A68; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content { background: #1C3320; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #6B7A2A; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
     .content h2:first-child { margin-top: 0; }
-    .content h3 { color: #C1B09A; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
+    .content h3 { color: #C8C87A; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
     .content p { margin-bottom: 0.75rem; color: #FFFFFF; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
     .content li { margin-bottom: 0.5rem; color: #FFFFFF; }
     .update-date { color: #72807A; font-weight: bold; margin-bottom: 1rem; }
-    .content strong { color: #C1B09A; }
-    a { color: #8A7A68; }
+    .content strong { color: #C8C87A; }
+    a { color: #6B7A2A; }
   </style>
 </head>
 <body>
@@ -1152,31 +1152,31 @@ app.get('/api/history', (req, res) => {
     @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #191D18; color: #C1B09A; min-height: 100vh; padding: 2rem; }
+    body { font-family: Arial, sans-serif; font-size: 8pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
-    h1 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 2.5rem; margin-bottom: 0.5rem; color: #E5DDD0; letter-spacing: 1px; word-break: break-word; }
+    h1 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 2.5rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: 1px; word-break: break-word; }
     .subtitle { color: #72807A; margin-bottom: 1.5rem; }
     .nav-buttons { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
-    .nav-btn { flex: 1; padding: 0.65rem 1rem; background: #2A3828; color: #E5DDD0; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 9pt; transition: background 0.15s; }
-    .nav-btn:hover { background: #3A4E38; color: #E5DDD0; }
-    .entry { background: #222C22; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-    .entry.no-change-entry { background: #0E1410; padding: 0.75rem; border-left: 3px solid #283C2A; }
-    .entry-header { font-family: 'Fake Receipt', 'Courier New', monospace; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #C1B09A; border-bottom: 1px solid #283C2A; padding-bottom: 0.5rem; }
+    .nav-btn { flex: 1; padding: 0.65rem 1rem; background: #1C3320; color: #F0F0E8; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 9pt; transition: background 0.15s; }
+    .nav-btn:hover { background: #3A4E38; color: #F0F0E8; }
+    .entry { background: #152B17; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry.no-change-entry { background: #0A1209; padding: 0.75rem; border-left: 3px solid #1E3522; }
+    .entry-header { font-family: 'Fake Receipt', 'Courier New', monospace; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #C8C87A; border-bottom: 1px solid #1E3522; padding-bottom: 0.5rem; }
     .changes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
     .changes { }
     .changes h4 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 10pt; margin-bottom: 0.4rem; font-weight: bold; letter-spacing: 0.5px; }
     .changes.booked { border-left: 3px solid #C8B88A; padding-left: 0.6rem; }
     .changes.booked h4 { color: #C8B88A; }
-    .changes.released { border-left: 3px solid #8A7A68; padding-left: 0.6rem; }
-    .changes.released h4 { color: #8A7A68; }
+    .changes.released { border-left: 3px solid #6B7A2A; padding-left: 0.6rem; }
+    .changes.released h4 { color: #6B7A2A; }
     .changes.updated { border-left: 3px solid #C8B88A; padding-left: 0.6rem; }
     .changes.updated h4 { color: #C8B88A; }
     .changes ul { list-style: none; font-size: 8pt; color: #B8AFA0; }
-    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #283C2A; }
+    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #1E3522; }
     .changes ul li:last-child { border-bottom: none; }
     .no-changes { color: #72807A; font-style: italic; }
     .no-data { color: #72807A; text-align: center; padding: 3rem; }
-    a { color: #8A7A68; }
+    a { color: #6B7A2A; }
   </style>
 </head>
 <body>
@@ -1683,8 +1683,8 @@ function getStatsHTML(stats) {
 
   // ADD THIS ↓↓↓
   const dataBanner = stats.dataCollectionStart ? `
-    <div style="background: #2A3828; border-left: 4px solid #C1B09A; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
-      <p style="margin: 0; color: #E5DDD0;">
+    <div style="background: #1C3320; border-left: 4px solid #C8C87A; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+      <p style="margin: 0; color: #F0F0E8;">
         📊 Data collection started: <strong>${stats.dataCollectionStart}</strong> 
         (${stats.daysOfData} days of tracking)
       </p>
@@ -1708,8 +1708,8 @@ function getStatsHTML(stats) {
     body {
       font-family: Arial, sans-serif;
       font-size: 9pt;
-      background: #191D18;
-      color: #C1B09A;
+      background: #0D1A0F;
+      color: #C8C87A;
       min-height: 100vh;
       padding: 2rem;
     }
@@ -1718,14 +1718,14 @@ function getStatsHTML(stats) {
       font-family: 'Fake Receipt', 'Courier New', monospace;
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: #E5DDD0;
+      color: #F0F0E8;
       letter-spacing: 1px;
     }
     .subtitle { color: #72807A; margin-bottom: 2rem; }
     .back-link { 
       display: inline-block; 
       margin-bottom: 1.5rem; 
-      color: #8A7A68; 
+      color: #6B7A2A; 
       text-decoration: none; 
     }
     .back-link:hover { text-decoration: underline; }
@@ -1737,19 +1737,19 @@ function getStatsHTML(stats) {
       margin-bottom: 2rem; 
     }
     .stat-card { 
-      background: #222C22; 
+      background: #152B17; 
       border-radius: 12px; 
       padding: 1.5rem; 
-      border-left: 4px solid #8A7A68;
+      border-left: 4px solid #6B7A2A;
     }
     .stat-card.purple { border-left-color: #72807A; }
-    .stat-card.blue { border-left-color: #8A7A68; }
-    .stat-card.orange { border-left-color: #C1B09A; }
+    .stat-card.blue { border-left-color: #6B7A2A; }
+    .stat-card.orange { border-left-color: #C8C87A; }
     
     .stat-value { 
       font-size: 2.5rem; 
       font-weight: bold; 
-      color: #C1B09A; 
+      color: #C8C87A; 
       margin-bottom: 0.25rem;
     }
     .stat-label { 
@@ -1760,14 +1760,14 @@ function getStatsHTML(stats) {
     }
     
     .chart-container { 
-      background: #222C22; 
+      background: #152B17; 
       border-radius: 12px; 
       padding: 1.5rem; 
       margin-bottom: 1rem; 
     }
     .chart-title {
       font-family: 'Fake Receipt', 'Courier New', monospace;
-      color: #C1B09A;
+      color: #C8C87A;
       font-size: 1.2rem;
       font-weight: bold;
       margin-bottom: 1rem;
@@ -1789,7 +1789,7 @@ function getStatsHTML(stats) {
       white-space: nowrap;
     }
     .bar-fill { 
-      background: linear-gradient(90deg, #8A7A68, #C1B09A); 
+      background: linear-gradient(90deg, #6B7A2A, #C8C87A); 
       height: 24px; 
       border-radius: 4px; 
       display: flex; 
@@ -1817,7 +1817,7 @@ function getStatsHTML(stats) {
     }
     .day-bar-fill { 
       width: 100%; 
-      background: linear-gradient(180deg, #8A7A68, #C1B09A);
+      background: linear-gradient(180deg, #6B7A2A, #C8C87A);
       border-radius: 4px 4px 0 0;
       display: flex;
       align-items: flex-end;
@@ -1840,7 +1840,7 @@ function getStatsHTML(stats) {
       margin-top: 1rem;
     }
     .release-type { 
-      background: #0E1410; 
+      background: #0A1209; 
       padding: 1rem; 
       border-radius: 8px; 
       text-align: center;
@@ -1848,7 +1848,7 @@ function getStatsHTML(stats) {
     .release-type-count { 
       font-size: 1.5rem; 
       font-weight: bold; 
-      color: #C1B09A; 
+      color: #C8C87A; 
     }
     .release-type-label { 
       color: #72807A; 
@@ -1865,13 +1865,13 @@ function getStatsHTML(stats) {
     }
     .time-bar {
       flex: 1;
-      background: linear-gradient(180deg, #8A7A68, #C1B09A);
+      background: linear-gradient(180deg, #6B7A2A, #C8C87A);
       border-radius: 2px 2px 0 0;
       position: relative;
       min-width: 8px;
     }
     .time-bar:hover {
-      background: linear-gradient(180deg, #C1B09A, #8A7A68);
+      background: linear-gradient(180deg, #C8C87A, #6B7A2A);
     }
   </style>
 </head>
@@ -1950,7 +1950,7 @@ function getStatsHTML(stats) {
       .map(([code, count]) => `
       <div class="release-type">
         <div class="release-type-count">${count}</div>
-        <div style="font-size: 1rem; font-weight: bold; color: #C1B09A; margin: 0.25rem 0;">${code}</div>
+        <div style="font-size: 1rem; font-weight: bold; color: #C8C87A; margin: 0.25rem 0;">${code}</div>
         <div class="release-type-label">${RELEASE_TYPE_NAMES[code] || code}</div>
       </div>
     `).join('')}
@@ -1962,16 +1962,16 @@ function getStatsHTML(stats) {
     <div class="chart-container">
       <div class="chart-title">Time Served Statistics (from PDF Data)</div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
-        <div style="background: #0E1410; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C1B09A;">${formatMinutes(stats.avgTimeServedMins)}</div>
+        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${formatMinutes(stats.avgTimeServedMins)}</div>
           <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
         </div>
-        <div style="background: #0E1410; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C1B09A;">${formatMinutes(stats.minTimeServedMins)}</div>
+        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${formatMinutes(stats.minTimeServedMins)}</div>
           <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
         </div>
-        <div style="background: #0E1410; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C1B09A;">${stats.longestCurrentMins > 0 ? formatMinutes(stats.longestCurrentMins) : 'N/A'}</div>
+        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${stats.longestCurrentMins > 0 ? formatMinutes(stats.longestCurrentMins) : 'N/A'}</div>
           <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Longest Current Stay</div>
           ${stats.longestInmate ? `<div style="color: #72807A; font-size: 0.65rem; margin-top: 0.2rem;">${stats.longestInmate.name}</div>` : ''}
         </div>
@@ -1988,7 +1988,7 @@ function getStatsHTML(stats) {
           return stats.avgBailByCharge.map(item => `
             <div class="bar-item">
               <div class="bar-label">${item.charge}</div>
-              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #4E5A58, #C1B09A);">
+              <div class="bar-fill" style="width: ${(item.avgBail / maxBail) * 300}px; background: linear-gradient(90deg, #4E5A58, #C8C87A);">
                 $${item.avgBail.toLocaleString()}
               </div>
             </div>
@@ -2238,8 +2238,8 @@ function getDeepStatsHTML(d) {
     return Object.entries(days).map(([day, count]) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:4px;">
         <span style="min-width:32px;color:#FFFFFF;font-size:0.75rem;">${day}</span>
-        <div style="background:linear-gradient(90deg,#8A7A68,#C1B09A);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
-        <span style="color:#C1B09A;font-size:0.75rem;">${count}</span>
+        <div style="background:linear-gradient(90deg,#6B7A2A,#C8C87A);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
+        <span style="color:#C8C87A;font-size:0.75rem;">${count}</span>
       </div>`).join('');
   }
 
@@ -2247,7 +2247,7 @@ function getDeepStatsHTML(d) {
     return hours.map((count, hr) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2px;">
         <span style="min-width:40px;color:#FFFFFF;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
-        <div style="background:linear-gradient(90deg,#2A3828,#3A4E38);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
+        <div style="background:linear-gradient(90deg,#1C3320,#3A4E38);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
         <span style="color:#FFFFFF;font-size:0.7rem;">${count}</span>
       </div>`).join('');
   }
@@ -2260,25 +2260,25 @@ function getDeepStatsHTML(d) {
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Liberation Sans',monospace;font-size:8.5pt;background:#0E1410;color:#FFFFFF;padding:2rem;min-height:100vh}
+    body{font-family:'Liberation Sans',monospace;font-size:8.5pt;background:#0A1209;color:#FFFFFF;padding:2rem;min-height:100vh}
     .wrap{max-width:1100px;margin:0 auto}
-    h1{font-size:1.4rem;color:#E5DDD0;margin-bottom:0.25rem;letter-spacing:-0.5px}
-    h2{font-size:0.85rem;color:#8A7A68;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #2A3828;padding-bottom:0.4rem}
-    a{color:#8A7A68;text-decoration:none}
+    h1{font-size:1.4rem;color:#F0F0E8;margin-bottom:0.25rem;letter-spacing:-0.5px}
+    h2{font-size:0.85rem;color:#6B7A2A;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #1C3320;padding-bottom:0.4rem}
+    a{color:#6B7A2A;text-decoration:none}
     .subtitle{color:#72807A;font-size:0.75rem;margin-bottom:2rem}
     table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
-    th{color:#72807A;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #2A3828;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
+    th{color:#72807A;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #1C3320;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
     td{padding:0.35rem 0.5rem;border-bottom:1px solid #0E1812;color:#FFFFFF;vertical-align:top}
     tr:hover td{background:#0E1812}
-    .val{color:#C1B09A;font-weight:bold}
+    .val{color:#C8C87A;font-weight:bold}
     .dim{color:#72807A}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.75rem}
-    .card{background:#222C22;border-radius:8px;padding:1rem;border-left:3px solid #8A7A68}
-    .card .v{font-size:1.6rem;font-weight:bold;color:#C1B09A}
+    .card{background:#152B17;border-radius:8px;padding:1rem;border-left:3px solid #6B7A2A}
+    .card .v{font-size:1.6rem;font-weight:bold;color:#C8C87A}
     .card .l{color:#72807A;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
     @media(max-width:700px){.two-col{grid-template-columns:1fr}}
-    .chip{display:inline-block;background:#0E1812;border:1px solid #283C2A;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#FFFFFF}
+    .chip{display:inline-block;background:#0E1812;border:1px solid #1E3522;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#FFFFFF}
   </style>
 </head>
 <body>
@@ -2326,7 +2326,7 @@ function getDeepStatsHTML(d) {
     ${d.top10Bail.map((e, i) => `<tr>
       <td class="dim">${i+1}</td>
       <td class="val">${e.name}</td>
-      <td style="color:#C1B09A;font-weight:bold;">${$(e.bailAmt)}</td>
+      <td style="color:#C8C87A;font-weight:bold;">${$(e.bailAmt)}</td>
       <td><span class="chip">${e.releaseType || '?'}</span></td>
       <td class="dim">${e.releaseDateTime || '—'}</td>
       <td style="font-size:0.7rem;">${e.charges.length ? e.charges.join(', ') : '<span class="dim">—</span>'}</td>
@@ -2340,7 +2340,7 @@ function getDeepStatsHTML(d) {
     ${bailByChargeArr.map(r => `<tr>
       <td>${r.charge}</td>
       <td class="val">${$(r.avg)}</td>
-      <td style="color:#C1B09A;">${$(r.max)}</td>
+      <td style="color:#C8C87A;">${$(r.max)}</td>
       <td class="dim">${r.count}</td>
     </tr>`).join('')}
     ${bailByChargeArr.length === 0 ? '<tr><td colspan="4" class="dim">No data yet</td></tr>' : ''}
@@ -2399,7 +2399,7 @@ function getDeepStatsHTML(d) {
     <tr><th>Name</th><th>Bookings</th><th>Charges</th></tr>
     ${d.frequentFlyers.map(f => `<tr>
       <td class="val">${f.name}</td>
-      <td style="color:#C1B09A;text-align:center;">${f.count}</td>
+      <td style="color:#C8C87A;text-align:center;">${f.count}</td>
       <td style="font-size:0.7rem;">${f.charges.length ? f.charges.join(', ') : '<span class="dim">—</span>'}</td>
     </tr>`).join('')}
     ${d.frequentFlyers.length === 0 ? '<tr><td colspan="3" class="dim">No repeat bookings yet</td></tr>' : ''}
@@ -2554,12 +2554,12 @@ app.get('/api/admin/merge', (req, res) => {
   <title>Merge Old Logs</title>
   <meta charset="utf-8">
   <style>
-    body { font-family: Arial; background: #191D18; color: #C1B09A; padding: 2rem; }
+    body { font-family: Arial; background: #0D1A0F; color: #C8C87A; padding: 2rem; }
     .container { max-width: 800px; margin: 0 auto; }
-    textarea { width: 100%; height: 400px; background: #222C22; color: #C1B09A; border: 1px solid #283C2A; padding: 1rem; font-family: monospace; font-size: 10pt; }
-    button { background: #8A7A68; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
-    button:hover { background: #C1B09A; }
-    .result { margin-top: 1rem; padding: 1rem; background: #222C22; border-radius: 8px; }
+    textarea { width: 100%; height: 400px; background: #152B17; color: #C8C87A; border: 1px solid #1E3522; padding: 1rem; font-family: monospace; font-size: 10pt; }
+    button { background: #6B7A2A; color: #fff; border: none; padding: 1rem 2rem; font-size: 1rem; cursor: pointer; border-radius: 8px; margin-top: 1rem; }
+    button:hover { background: #C8C87A; }
+    .result { margin-top: 1rem; padding: 1rem; background: #152B17; border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -2589,7 +2589,7 @@ app.get('/api/admin/merge', (req, res) => {
       resultDiv.style.display = 'block';
       
       if (result.success) {
-        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #8A7A68;">View Stats Dashboard</a>';
+        resultDiv.innerHTML = '✓ Success! Old logs merged. <a href="/api/stats" style="color: #6B7A2A;">View Stats Dashboard</a>';
         document.getElementById('logText').value = '';
       } else {
         resultDiv.innerHTML = '✗ Error: ' + result.error;
