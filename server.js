@@ -1879,7 +1879,7 @@ function getStatsHTML(stats) {
   <div class="container">
     <a href="/api/status" class="back-link">← Back to Status</a>
     <h1>Statistics Dashboard</h1>
-    <p class="subtitle">Mason County Jail Roster Analytics</p>
+    <p class="subtitle">Data from the Mason County Jail Roster</p>
     
     <div class="stats-grid">
       <div class="stat-card">
