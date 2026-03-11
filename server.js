@@ -1657,18 +1657,24 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
 });
 
 const RELEASE_TYPE_NAMES = {
-  RBB:  'Released on Bail Bond',
-  RPR:  'Released Personal Recognizance',
-  ROA:  'Released Own Recognizance',
-  RCB:  'Released Cash Bail',
-  RCC:  'Released Credit for Time Served',
-  RCD:  'Released Court Disposition',
-  MIS:  'Mistaken Identity',
-  RTR:  'Released to Rehab/Treatment',
-  RCT:  'Released Court Order',
-  RFTA: 'Released FTA / Dismissed',
-  RNCM: 'No Charges Filed',
-  RNHM: 'No Hold',
+  RBB:   'Released on Bail Bond',
+  RPR:   'Released Personal Recognizance',
+  ROA:   'Released Own Recognizance',
+  RCB:   'Released Cash Bail',
+  RCC:   'Released Credit for Time Served',
+  RCD:   'Released Court Disposition',
+  MIS:   'Mistaken Identity',
+  RTR:   'Released to Rehab/Treatment',
+  RCT:   'Released Court Order',
+  RFTA:  'Released FTA / Dismissed',
+  RNCM:  'No Charges Filed',
+  RNHM:  'No Hold',
+  RNF:   'Released — No Charges Filed',
+  RBM:   'Released by Magistrate',
+  RPA:   'Released — Prosecution Declined',
+  JRRPR: 'Jail Release Record — Personal Recognizance',
+  JRRCB: 'Jail Release Record — Cash Bail',
+  SRRPR: 'Sheriff Release Record — Personal Recognizance',
 };
 
 function getStatsHTML(stats) {
