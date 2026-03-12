@@ -685,6 +685,34 @@ function extractDateFromLine(line) {
   return new Date();
 }
 
+// Adding roster csv api endpoint 
+app.get('/api/roster.csv', async (req, res) => {
+try {
+  const response = await fetch(PDF_URL);
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  const result = await PDFParser(buffer);
+  const bookings = extractBookings(result.text);
+
+  const rows = [['Name', 'Booking Date', 'Release Date', 'Charges']];
+  for (const b of bookings.values()) {
+    rows.push([
+      b.name,
+      b.bookDate,
+      b.releaseDate,
+      b.charges.join(' | ')
+    ]);
+  }
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', 'attachment; filename="mason-county-roster.csv"');
+  res.send(csv);
+} catch (error) {
+  res.status(500).json({ error: error.message });
+}
+});
+
 // Run check
 app.get('/api/run', async (req, res) => {
   try {
