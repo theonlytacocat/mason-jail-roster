@@ -938,622 +938,214 @@ app.get('/api/run', async (req, res) => {
 // Legislative session page
 app.get('/legislative', (req, res) => {
   const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="en"><html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Washington State Legislative Session 2026</title>
+  <title>Washington State Legislative Session News</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      max-width: 860px;
-      margin: 0 auto;
-      padding: 20px;
-      background: #929c9c;
-      color: #222;
-    }
-    .back-link {
-      display: inline-block;
-      margin-bottom: 18px;
-      color: #555;
-      text-decoration: none;
-      font-size: 0.9em;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; font-size: 9pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: -1px; }
+    .subtitle { color: #6B7A5A; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #6B7A2A; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    h1 {
-      font-size: 1.6em;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      color: #666;
-      font-size: 0.95em;
-      margin-bottom: 6px;
-    }
-    .updated {
-      font-size: 0.85em;
-      color: #888;
-      margin-bottom: 24px;
-    }
+    .content { background: #1C3320; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { color: #6B7A2A; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content h2:first-child { margin-top: 0; }
+    .content h3 { color: #C8C87A; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
+    .content p { margin-bottom: 0.75rem; color: #F5F5F5; }
+    .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
+    .content li { margin-bottom: 0.5rem; color: #F5F5F5; }
+    .update-date { color: #6B7A5A; font-weight: bold; margin-bottom: 1rem; }
+    .content strong { color: #C8C87A; }
+    a { color: #6B7A2A; }
 
-    /* Session status box */
-    .session-status {
-      background: #1a1a2e;
-      color: #eee;
-      border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 28px;
-    }
-    .session-status .label {
-      font-size: 0.75em;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #aaa;
-      margin-bottom: 6px;
-    }
-    .session-status p {
-      margin: 0;
-      font-size: 0.95em;
-      line-height: 1.6;
-    }
-    .adjourned-badge {
-      display: inline-block;
-      background: #c0392b;
-      color: white;
-      font-size: 0.75em;
-      font-weight: bold;
-      padding: 2px 10px;
-      border-radius: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-    }
+    .badge { display: inline-block; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 3px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.5px; text-transform: uppercase; }
+    .badge-signed    { background: #1a6e3c; color: #a3f0c0; }
+    .badge-passed    { background: #2a4a1a; color: #b8e090; border: 1px solid #4a8a2a; }
+    .badge-awaiting  { background: #4a3a00; color: #f0d060; }
+    .badge-advancing { background: #1a3a4a; color: #80c8e0; }
+    .badge-dead      { background: #4a1a1a; color: #e08080; }
+    .badge-effect    { background: #0a2a1a; color: #80e0a0; border: 1px solid #2a6a3a; }
+    .badge-uncertain { background: #3a2a0a; color: #e0b860; }
 
-    /* Section headers */
-    h2 {
-      font-size: 1em;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: #444;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 6px;
-      margin-top: 32px;
-      margin-bottom: 14px;
-    }
-
-    /* Bill entries */
-    .bill {
-      background: white;
-      border-radius: 6px;
-      padding: 14px 16px;
-      margin-bottom: 10px;
-      border-left: 4px solid #ccc;
-    }
-    .bill-title {
-      font-weight: 600;
-      font-size: 0.95em;
-      margin-bottom: 5px;
-    }
-    .bill-title .bill-num {
-      color: #777;
-      font-weight: normal;
-      font-size: 0.9em;
-    }
-    .bill p {
-      margin: 0;
-      font-size: 0.88em;
-      color: #444;
-      line-height: 1.55;
-    }
-
-    /* Status badges */
-    .status {
-      display: inline-block;
-      font-size: 0.72em;
-      font-weight: bold;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      padding: 2px 9px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-    }
-    .status-signed       { background: #27ae60; color: white; border-left-color: #27ae60; }
-    .status-awaiting     { background: #2980b9; color: white; }
-    .status-passed       { background: #8e44ad; color: white; }
-    .status-dead         { background: #e74c3c; color: white; }
-    .status-in-effect    { background: #16a085; color: white; }
-    .status-unclear      { background: #e67e22; color: white; }
-
-    /* Border color by status */
-    .bill.signed     { border-left-color: #27ae60; }
-    .bill.awaiting   { border-left-color: #2980b9; }
-    .bill.passed     { border-left-color: #8e44ad; }
-    .bill.dead       { border-left-color: #e74c3c; }
-    .bill.in-effect  { border-left-color: #16a085; }
-    .bill.unclear    { border-left-color: #e67e22; }
-
-    footer {
-      margin-top: 40px;
-      font-size: 0.8em;
-      color: #999;
-      text-align: center;
-    }
-    footer a { color: #999; }
+    .session-adjourned { background: #0a1a0a; border: 1px solid #2a4a2a; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .session-adjourned .adj-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7A5A; margin-bottom: 4px; }
+    .session-adjourned p { color: #C8C87A; margin: 0; font-size: 0.9em; }
   </style>
 </head>
 <body>
+  <div class="container">
+    <a href="/api/status" class="back-link">← Back to Jail Roster Monitor</a>
+    <h1>Washington State Legislative Session</h1>
+    <p class="subtitle">2026 Session — Post-Adjournment Summary</p>
 
-  <a class="back-link" href="/">← Back to Jail Roster Monitor</a>
-
-  <h1>Washington State Legislative Session</h1>
-  <div class="subtitle">2026 Session — Post-Adjournment Summary</div>
-  <div class="updated">Updated: 3/13/2026</div>
-
-  <!-- SESSION STATUS -->
-  <div class="session-status">
-    <div class="label">Session Status</div>
-    <span class="adjourned-badge">Adjourned Sine Die</span>
-    <p>
-      The 2026 Washington State Legislature adjourned sine die at approximately 8:30 p.m. on March 12, 2026 — Day 60 of the 60-day session. The session closed with passage of the $79.4 billion supplemental operating budget, a landmark millionaire income tax, and late drama over a data center tax break that nearly forced a special session. Gov. Ferguson has until <strong>April 4, 2026</strong> to sign or veto bills. Bills neither signed nor vetoed become law automatically. Most new laws take effect <strong>June 11, 2026</strong> (90 days post-adjournment). Ferguson is expected to begin signing measures into law as early as this week.
-    </p>
-  </div>
-
-  <!-- POLICE & PUBLIC SAFETY -->
-  <h2>Police &amp; Public Safety</h2>
-
-  <div class="bill awaiting">
-    <div class="bill-title">Ban on Police Face Coverings <span class="bill-num">(SB 5855)</span></div>
-    <span class="status status-awaiting">Awaiting Signature</span>
-    <p>Passed both chambers. Ferguson has pledged to sign it. Prohibits state, local, and federal officers — including ICE agents — from wearing masks during routine public interactions, with limited exceptions for SWAT, PPE, and religious coverings. Will face legal challenges; California's similar law is already being contested by the DOJ.</p>
-  </div>
-
-  <div class="bill awaiting">
-    <div class="bill-title">Ban on Fake Badges / False Law Enforcement Impersonation <span class="bill-num">(SB 5876)</span></div>
-    <span class="status status-awaiting">Awaiting Signature</span>
-    <p>Companion bill to the mask ban. Passed both chambers. Prohibits anyone who isn't a law enforcement officer from making, possessing, or providing law enforcement insignia in a way that would make a reasonable person think they're an officer. Ferguson vowed to sign it.</p>
-  </div>
-
-  <div class="bill passed">
-    <div class="bill-title">$100 Million Police Hiring Grants <span class="bill-num">(SB 5060)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Ferguson's priority. Covers 75% of new officer salaries for 36 months. Cities must implement a 0.1% sales tax or already have a similar tax to qualify.</p>
-  </div>
-
-  <div class="bill unclear">
-    <div class="bill-title">Sheriff/Police Chief Requirements <span class="bill-num">(SB 5974)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Was advancing through the House in the final days. Minimum age 25, background checks, must maintain peace officer certification. Controversial — Republicans framed it as allowing an unelected state board to remove elected sheriffs.</p>
-  </div>
-
-  <div class="bill unclear">
-    <div class="bill-title">Public Defense Funding <span class="bill-num">(SB 5404)</span></div>
-    <span class="status status-unclear">Left on Table</span>
-    <p>Democratic leaders acknowledged after adjournment that funding public defense was among the pressing issues left unresolved for 2027. WA is one of only 2 states that doesn't fully fund public defenders.</p>
-  </div>
-
-  <div class="bill passed">
-    <div class="bill-title">Flock License Plate Camera Regulation <span class="bill-num">(ESSB 6002)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Regulates automated license plate readers. Passed the Senate and cleared the House Civil Rights &amp; Judiciary Committee before session end.</p>
-  </div>
-
-  <div class="bill unclear">
-    <div class="bill-title">Body Cameras for ICE Encounters <span class="bill-num">(HB 2648)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Had passed the House Community Safety Committee. Would require local police to activate body cams when encountering federal agents doing immigration enforcement.</p>
-  </div>
-
-  <div class="bill dead">
-    <div class="bill-title">ICE Court Orders / SAFE Act <span class="bill-num">(SB 5906)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Died at the March 7 opposite-chamber cutoff. Would have required ICE agents to get court approval before entering schools, health care facilities, early learning providers, and election offices.</p>
-  </div>
-
-  <div class="bill dead">
-    <div class="bill-title">ICE Hiring Ban <span class="bill-num">(HB 2641)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Died in committee Feb. 5. Would've prohibited hiring former federal immigration agents hired under Trump after Jan. 20, 2025.</p>
-  </div>
+    <div class="content">
+      <p class="update-date">Updated: 3/13/2026</p>
 
-  <!-- GUN CONTROL -->
-  <h2>Gun Control</h2>
+      <h2>Washington state legislature 2026 — adjourned</h2>
 
-  <div class="bill unclear">
-    <div class="bill-title">Permit to Purchase <span class="bill-num">(HB 1163)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would require a state permit before buying firearms, similar to a dozen other states. Final outcome not confirmed at press time.</p>
-  </div>
-
-  <div class="bill unclear">
-    <div class="bill-title">Gun-Free Zone Expansion, Bulk Purchase Limits, Storage Requirements, Dealer Regulations</div>
-    <span class="status status-unclear">Mixed Outcomes</span>
-    <p>Mixed results at the final cutoff. Some provisions may have survived. Full outcomes pending confirmation.</p>
-  </div>
-
-  <!-- SOCIAL MEDIA & CHILDREN -->
-  <h2>Social Media &amp; Children</h2>
-
-  <div class="bill passed">
-    <div class="bill-title">Addictive Feeds Ban <span class="bill-num">(HB 1834 / SB 5708)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>AG Nick Brown's priority. Bans algorithmic addictive feeds for minors and blocks push notifications during overnight and school hours. Modeled on California law.</p>
-  </div>
+      <div class="session-adjourned">
+        <div class="adj-label">Session Status — <span class="badge badge-dead">Adjourned Sine Die</span></div>
+        <p>The 2026 Washington State Legislature adjourned sine die at approximately 8:30 p.m. on March 12, 2026 — Day 60 of the 60-day session. The session closed with passage of the $79.4 billion supplemental operating budget, a landmark millionaire income tax, and late drama over a data center tax break that nearly forced a special session. Gov. Ferguson has until <strong>April 4, 2026</strong> to sign or veto bills. Bills neither signed nor vetoed become law automatically. Most new laws take effect <strong>June 11, 2026</strong> (90 days post-adjournment). Ferguson is expected to begin signing measures as early as this week.</p>
+      </div>
 
-  <div class="bill dead">
-    <div class="bill-title">Parental Consent for Social Media <span class="bill-num">(SB 6111)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Died at first cutoff. Would've required parental consent for minors under 17 to create accounts.</p>
-  </div>
+      <h3>POLICE &amp; PUBLIC SAFETY:</h3>
+      <p><strong>BAN ON POLICE FACE COVERINGS (SB 5855)</strong> <span class="badge badge-awaiting">Awaiting Signature</span> — Passed both chambers. Ferguson has pledged to sign it. Prohibits state, local, and federal officers — including ICE agents — from wearing masks during routine public interactions, with limited exceptions for SWAT, PPE, and religious coverings. Will face legal challenges; California's similar law is already being contested by the DOJ.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Child Influencer Protections <span class="bill-num">(HB 2400)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Died at first cutoff. Would've protected kids in monetized family content and let young adults request deletion of childhood videos.</p>
-  </div>
+      <p><strong>BAN ON FAKE BADGES / FALSE LAW ENFORCEMENT IMPERSONATION (SB 5876)</strong> <span class="badge badge-awaiting">Awaiting Signature</span> — Companion bill to the mask ban, also passed both chambers. Prohibits anyone who isn't a law enforcement officer from making, possessing, or providing law enforcement insignia in a way that would make a reasonable person think they're an officer. Ferguson vowed to sign it.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Pornography Access Restrictions</div>
-    <span class="status status-dead">Dead</span>
-    <p>Bipartisan bill died at first cutoff.</p>
-  </div>
+      <p><strong>$100 MILLION POLICE HIRING GRANTS (SB 5060)</strong> <span class="badge badge-passed">Passed</span> — Ferguson's priority. Covers 75% of new officer salaries for 36 months. Cities must implement a 0.1% sales tax or already have a similar tax to qualify.</p>
 
-  <!-- EDUCATION -->
-  <h2>Education</h2>
+      <p><strong>SHERIFF/POLICE CHIEF REQUIREMENTS (SB 5974)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Was moving through the House in the final days. Minimum age 25, background checks, must maintain peace officer certification. Controversial — Republicans framed it as allowing an unelected state board to effectively remove elected sheriffs.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Parental Rights Initiatives</div>
-    <span class="status status-unclear">Going to November Ballot</span>
-    <p>Two citizen-sponsored initiatives backed by Let's Go Washington were not taken up by the Legislature. They will appear on the November 2026 ballot: one barring transgender girls from girls' sports in schools, another seeking to restore a "Parent's Bill of Rights" that lawmakers adopted two years ago and scaled back last year.</p>
-  </div>
+      <p><strong>PUBLIC DEFENSE FUNDING (SB 5404)</strong> <span class="badge badge-uncertain">Left on Table</span> — Democratic leaders acknowledged after adjournment that funding public defense was among the pressing issues left unresolved for 2027. WA is one of only 2 states that doesn't fully fund public defenders, leading to overworked defenders and constitutional violations.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Isolation &amp; Restraint Ban in Special Education</div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Bans mechanical and chemical restraint and forced isolation of students receiving special education services. Staff physically holding a student is still permitted if not life-threatening. Schools cannot build new isolation rooms.</p>
-  </div>
+      <p><strong>FLOCK LICENSE PLATE CAMERA REGULATION (ESSB 6002)</strong> <span class="badge badge-passed">Passed</span> — Regulates automated license plate readers. Passed the Senate and cleared the House Civil Rights &amp; Judiciary Committee before session end.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Homeschool Age Requirement <span class="bill-num">(SB 6261)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Would've lowered homeschool attestation requirement from age 8 to age 6. WA is the only state that waits until age 8.</p>
-  </div>
+      <p><strong>BODY CAMERAS FOR ICE ENCOUNTERS (HB 2648)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Had passed the House Community Safety Committee. Would require local police to activate body cams when encountering federal agents doing immigration enforcement and report encounters to their agency.</p>
 
-  <!-- CANNABIS -->
-  <h2>Cannabis</h2>
+      <p><strong>ICE COURT ORDERS / SAFE ACT (SB 5906)</strong> <span class="badge badge-dead">Dead</span> — Died at the March 7 opposite-chamber cutoff. Would have required ICE agents to get court approval before entering schools, health care facilities, early learning providers, and election offices. Passed the House in amended form but stalled in the Senate.</p>
 
-  <div class="bill signed">
-    <div class="bill-title">Ryan's Law — Medical Cannabis Patient Protections</div>
-    <span class="status status-signed">Signed into Law</span>
-    <p>Signed by Gov. Ferguson on March 5, 2026 — the first cannabis bill signed into law this session. Takes effect June 11, 2026 (90 days post-adjournment).</p>
-  </div>
+      <p><strong>ICE HIRING BAN (HB 2641)</strong> <span class="badge badge-dead">Dead</span> — Died in committee Feb. 5. Would've prohibited hiring former federal immigration agents hired under Trump after Jan. 20, 2025.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Cannabis License Fee Increase</div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Increases annual cannabis license fees by $400. Passed both chambers in the final days of session.</p>
-  </div>
+      <h3>GUN CONTROL:</h3>
+      <p><strong>PERMIT TO PURCHASE (HB 1163)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would require a state permit before buying firearms, like a dozen other states. Final outcome not confirmed at press time.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Cannabis Producer Cooperatives <span class="bill-num">(HB 2681)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Needed a concurrence vote in the House on the final day. Outcome not confirmed at press time.</p>
-  </div>
+      <p><strong>GUN-FREE ZONE EXPANSION + BULK PURCHASE LIMITS, GUN STORAGE REQUIREMENTS, GUN DEALER REGULATIONS</strong> <span class="badge badge-uncertain">Mixed Outcomes</span> — Mixed results at the final cutoff. Some provisions may have survived. Full outcomes pending confirmation.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Home Grow Legalization <span class="bill-num">(SB 6204)</span></div>
-    <span class="status status-dead">Dead — 12th Consecutive Year Failed</span>
-    <p>Did not pass off the Senate floor before the Feb. 17 deadline. WA remains one of only three states to have legalized both medical and recreational cannabis while still criminalizing home grow — and the only one where it's a felony.</p>
-  </div>
+      <h3>SOCIAL MEDIA &amp; CHILDREN:</h3>
+      <p><strong>ADDICTIVE FEEDS BAN (HB 1834/SB 5708)</strong> <span class="badge badge-passed">Passed</span> — AG Nick Brown's priority. Bans algorithmic addictive feeds for minors and blocks push notifications during overnight hours and school hours. Modeled on California law.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Local Cannabis Tax <span class="bill-num">(SB 6328)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would allow counties or cities to impose up to a 2% additional excise tax on retail cannabis sales for up to 7 years.</p>
-  </div>
+      <p><strong>PARENTAL CONSENT FOR SOCIAL MEDIA (SB 6111)</strong> <span class="badge badge-dead">Dead</span> — Died at first cutoff. Would've required parental consent for minors under 17 to create accounts.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Cannabis Hospitality Events</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Was tagged as potentially NTIB (revenue-generating), giving it cover to move until the end of session. Outcome not confirmed.</p>
-  </div>
+      <p><strong>CHILD INFLUENCER PROTECTIONS (HB 2400)</strong> <span class="badge badge-dead">Dead</span> — Died at first cutoff. Would've protected kids in monetized family content and let young adults request deletion of childhood videos.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Cannabis Tax Overhaul <span class="bill-num">(HB 2433)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Would have replaced WA's 37% excise tax — highest in the nation — with weight and THC potency-based rates. Public hearing was pulled from the Senate Ways &amp; Means calendar in early February with no reschedule.</p>
-  </div>
+      <p><strong>PORNOGRAPHY ACCESS RESTRICTIONS</strong> <span class="badge badge-dead">Dead</span> — Bipartisan bill died at first cutoff.</p>
 
-  <!-- TAXES & BUDGET -->
-  <h2>Taxes &amp; Budget</h2>
+      <h3>EDUCATION:</h3>
+      <p><strong>PARENTAL RIGHTS INITIATIVES</strong> <span class="badge badge-uncertain">Going to November Ballot</span> — Legislature declined to consider two citizen-sponsored initiatives backed by Let's Go Washington. Both will appear on the November 2026 ballot: one barring transgender girls from girls' sports in schools, another seeking to restore a "Parent's Bill of Rights" that lawmakers adopted two years ago and scaled back last year.</p>
 
-  <div class="bill awaiting">
-    <div class="bill-title">Millionaire Income Tax <span class="bill-num">(SB 6346)</span></div>
-    <span class="status status-awaiting">Awaiting Signature — Ferguson to Sign</span>
-    <p>Passed the House on March 10 after one of the longest debates in state legislative history — nearly 25 hours of continuous floor debate. Passed the Senate on March 11. Imposes a 9.9% tax on individual income over $1 million starting Jan. 1, 2028. Revenue funds: expansion of Working Families Tax Credit to 460,000 additional households; tax relief for ~140,000 small businesses; exemption of diapers, hygiene products, and OTC medicines from sales tax; and free school breakfast and lunch for all K-12 students. Projected to raise ~$3.5 billion per year when fully in effect. Applies to less than 0.5% of Washingtonians. Lawsuits and a possible ballot referendum are expected — the bill challenges nearly 100 years of state tax policy and Supreme Court precedent.</p>
-  </div>
+      <p><strong>ISOLATION &amp; RESTRAINT BAN IN SPECIAL EDUCATION</strong> <span class="badge badge-passed">Passed</span> — Bans mechanical and chemical restraint and forced isolation of students receiving special education services. Staff physically holding a student is still permitted if not life-threatening. Schools cannot build new isolation rooms.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Supplemental Operating Budget — $79.4 Billion</div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Passed on the final evening of session, 54-43 in the House, then the Senate — entirely along party lines. Updates the $77.8 billion two-year budget covering July 1, 2025 to June 30, 2027. Balanced using one-time maneuvers, a significant rainy day fund withdrawal, and cuts to child care and education. The next budget cycle is expected to start in deficit unless the millionaire income tax survives legal challenges.</p>
-  </div>
+      <p><strong>HOMESCHOOL AGE REQUIREMENT (SB 6261)</strong> <span class="badge badge-dead">Dead</span> — Would've lowered homeschool attestation requirement from age 8 to age 6. WA is the only state that waits until age 8.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Data Center Tax Break Elimination <span class="bill-num">(SB 6231)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Passed the House 51-46 after significant late-session drama that nearly forced a special session. Eliminates one of two sales tax exemptions for data centers. Estimated to generate over $140 million every two years. Large tech companies and union labor both opposed it — data center construction is a major source of electrician jobs.</p>
-  </div>
+      <h3>CANNABIS:</h3>
+      <p><strong>RYAN'S LAW — Medical Cannabis Patient Protections</strong> <span class="badge badge-signed">Signed into Law</span> — Signed by Gov. Ferguson on March 5, 2026 — the first cannabis bill signed this session. Takes effect June 11, 2026.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Payroll Tax on High Earners <span class="bill-num">(HB 2100)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>5% tax on employers for employees earning over $125k/year to fund healthcare, education, and human services. Final outcome not confirmed.</p>
-  </div>
+      <p><strong>CANNABIS LICENSE FEE INCREASE</strong> <span class="badge badge-passed">Passed</span> — Increases annual cannabis license fees by $400. Passed both chambers in the final days of session. Awaiting signature.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Higher Education Funding / Tuition Cuts</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Proposed 10% tuition cuts for 3 years starting fall 2027, with expanded Washington College Grant eligibility.</p>
-  </div>
+      <p><strong>CANNABIS PRODUCER COOPERATIVES (HB 2681)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Needed a concurrence vote in the House on the final day. Outcome not confirmed.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Bullion Tax Repeal <span class="bill-num">(HB 2093)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Republican push to eliminate the sales tax on gold and silver, arguing it's driving coin shops out of business.</p>
-  </div>
+      <p><strong>HOME GROW LEGISLATION (SB 6204)</strong> <span class="badge badge-dead">Dead — 12th Consecutive Year</span> — Did not pass off the Senate floor before the Feb. 17 deadline. WA remains one of only three states to have legalized both medical and recreational cannabis while still criminalizing home grow, and the only one where it's a felony.</p>
 
-  <!-- ARTIFICIAL INTELLIGENCE -->
-  <h2>Artificial Intelligence</h2>
+      <p><strong>LOCAL CANNABIS TAX (SB 6328)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would allow counties or cities (not both) to impose up to 2% additional excise tax on retail cannabis sales for up to 7 years.</p>
 
-  <div class="bill awaiting">
-    <div class="bill-title">AI Companion Chatbot Regulations <span class="bill-num">(SB 5984 / HB 2225)</span></div>
-    <span class="status status-awaiting">Awaiting Signature</span>
-    <p>Ferguson's priority. Passed both chambers. Prohibits romantic AI relationships with minors, requires hourly notifications that the AI is not human, includes suicide prevention protocols, and creates a private right of action. Tech industry pushed back hard throughout the session.</p>
-  </div>
+      <p><strong>CANNABIS HOSPITALITY EVENTS</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Was tagged as potentially NTIB (revenue-generating), giving it cover to move until session end. Outcome not confirmed.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">AI in Schools <span class="bill-num">(HB 2481 / SB 5956)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would require human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline — including AI systems flagging chip bags as weapons in school hallways.</p>
-  </div>
+      <p><strong>CANNABIS TAX OVERHAUL (HB 2433)</strong> <span class="badge badge-dead">Dead</span> — Would have replaced WA's 37% excise tax (highest in the nation) with weight and THC potency-based rates. Public hearing pulled from Senate Ways &amp; Means calendar in early February with no reschedule.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">AI Deepfakes / Digital Likeness Bill</div>
-    <span class="status status-passed">Passed Both Chambers — Awaiting Signature</span>
-    <p>Requires developers to make tools available so people can tell when something is AI-generated. Includes protections for people's AI-generated digital likeness.</p>
-  </div>
+      <h3>TAXES &amp; BUDGET:</h3>
+      <p><strong>MILLIONAIRE INCOME TAX (SB 6346)</strong> <span class="badge badge-awaiting">Awaiting Signature</span> — Passed the House on March 10 after one of the longest floor debates in state legislative history — nearly 25 hours continuous. Passed the Senate on March 11. Imposes a 9.9% tax on individual income over $1 million starting Jan. 1, 2028. Revenue funds: expansion of Working Families Tax Credit to 460,000 additional households; tax relief for ~140,000 small businesses; exemption of diapers, hygiene products, and OTC medicines from sales tax; and free school breakfast and lunch for all K-12 students. Projected to raise ~$3.5 billion per year when fully in effect. Applies to less than 0.5% of Washingtonians. Lawsuits and a possible ballot referendum are expected — the bill challenges nearly 100 years of state tax policy and Supreme Court precedent. Ferguson intends to sign it.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Training Data Transparency</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would require disclosure of what data is used to train AI models.</p>
-  </div>
+      <p><strong>SUPPLEMENTAL OPERATING BUDGET — $79.4 BILLION</strong> <span class="badge badge-passed">Passed</span> — Passed on the final evening of session entirely along party lines. Updates the $77.8 billion two-year budget covering July 1, 2025 to June 30, 2027. Balanced using one-time maneuvers, a significant rainy day fund withdrawal, and cuts to child care and education. The next budget cycle is expected to start in deficit unless the millionaire income tax survives legal challenges.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Health Insurance AI Authorization</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would regulate AI-based insurance authorization decisions for medical procedures.</p>
-  </div>
+      <p><strong>DATA CENTER TAX BREAK ELIMINATION (SB 6231)</strong> <span class="badge badge-passed">Passed</span> — Passed the House 51-46 after significant late-session drama that nearly forced a special session. Eliminates one of two sales tax exemptions for data centers. Estimated to generate over $140 million every two years. Large tech companies and union electricians both opposed it.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Collective Bargaining Around AI</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would allow unions to negotiate how AI is used in workplaces.</p>
-  </div>
+      <p><strong>PAYROLL TAX ON HIGH EARNERS (HB 2100)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — 5% tax on employers for employees making over $125k/year to fund the "Well Washington Fund" for healthcare, education, and human services.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Grocery Store AI Surveillance</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would regulate facial recognition and AI-based surge pricing in grocery stores.</p>
-  </div>
+      <p><strong>HIGHER EDUCATION FUNDING RESET</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — 10% tuition cuts for 3 years starting fall 2027, expanding Washington College Grant eligibility.</p>
 
-  <!-- WILDFIRE & ENVIRONMENT -->
-  <h2>Wildfire &amp; Environment</h2>
+      <p><strong>BULLION TAX REPEAL (HB 2093)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Republicans pushing to eliminate the sales tax on gold and silver, arguing it's driving coin shops out of business.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Wildfire Prevention Funding</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Proposed $125 million per biennium for forest health, fighting a $60 million cut to wildfire resilience in the budget.</p>
-  </div>
+      <h3>ARTIFICIAL INTELLIGENCE:</h3>
+      <p><strong>AI COMPANION CHATBOTS (SB 5984 / HB 2225)</strong> <span class="badge badge-awaiting">Awaiting Signature</span> — Ferguson's priority. Both chambers passed it. Prohibits romantic AI relationships with minors, requires hourly notifications that it's not human, includes suicide prevention protocols and a private right of action. Tech industry pushed back hard throughout session.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Clean Energy Grid Expansion / Semi Truck Emissions</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Clean energy grid expansion and semi truck emissions climate legislation were still in play heading into the final days.</p>
-  </div>
+      <p><strong>AI IN SCHOOLS (HB 2481/SB 5956)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would require human oversight of AI systems in schools, addressing surveillance, risk scoring, and automated discipline. Yes, there is actually AI flagging chip bags as weapons in school hallways.</p>
 
-  <!-- HOUSING & DEVELOPMENT -->
-  <h2>Housing &amp; Development</h2>
+      <p><strong>AI DEEPFAKES / DIGITAL LIKENESS BILL</strong> <span class="badge badge-passed">Passed Both Chambers</span> — Requires developers to make tools available so people can tell when something is AI-generated. Also includes protections for people's AI-generated digital likeness.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Commercial to Residential Conversion <span class="bill-num">(SB 6026)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Governor's priority. Requires local governments to allow mixed-use and residential in commercially zoned areas without going through a rezoning process. Abandoned strip malls and shuttered big-box stores could become housing. Direct response to the statewide housing shortage.</p>
-  </div>
+      <p><strong>TRAINING DATA TRANSPARENCY</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would require disclosure of what data is used to train AI models.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Short-Term Rental Tax <span class="bill-num">(SB 5576)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Up to 4% excise tax on Airbnb-style rentals to fund affordable housing. Amended to let local governments decide. Airbnb pumped $4 million into a PAC fighting it — spending one-fifth of what the tax would generate annually just to kill the option for local governments.</p>
-  </div>
+      <p><strong>HEALTH INSURANCE AI AUTHORIZATION</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would regulate AI-based insurance authorization decisions for medical procedures.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Limiting Bulk Home Buying <span class="bill-num">(SB 5496)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Died at the March 7 opposite-chamber cutoff. Would have barred entities with an interest in more than 100 single-family homes from purchasing more. The proposed limit had already been raised from 25 to 50 to 100 homes over the course of negotiations. Passed the Senate but stalled in the House.</p>
-  </div>
+      <p><strong>COLLECTIVE BARGAINING AROUND AI</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would allow unions to negotiate how AI is used in workplaces.</p>
 
-  <!-- IMMIGRATION & LABOR -->
-  <h2>Immigration &amp; Labor</h2>
+      <p><strong>GROCERY STORE AI SURVEILLANCE</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would regulate facial recognition and AI-based surge pricing.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Immigrant Worker Protections <span class="bill-num">(HB 2105 / SB 5852)</span></div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Requires employers to give workers notice within 72 hours if ICE does an I-9 audit. Also prohibits school district and early learning employees from collecting data on students' or families' immigration status.</p>
-  </div>
+      <h3>WILDFIRE &amp; ENVIRONMENT:</h3>
+      <p><strong>WILDFIRE PREVENTION FUNDING</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Fighting a $60 million cut to wildfire resilience budget. $125 million per biennium for forest health.</p>
+      <p><strong>CLEAN ENERGY GRID EXPANSION</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Clean energy grid expansion and semi truck emissions climate legislation were still in play heading into the final days.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Farmworker Collective Bargaining <span class="bill-num">(SB 6045 / HB 2409)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would bring farmworkers under Public Employment Relations Commission jurisdiction. Farmworkers have been excluded from National Labor Relations Act protections since 1935.</p>
-  </div>
+      <h3>HOUSING &amp; DEVELOPMENT:</h3>
+      <p><strong>COMMERCIAL TO RESIDENTIAL CONVERSION (SB 6026)</strong> <span class="badge badge-passed">Passed</span> — Governor's priority. Requires local governments to allow mixed-use and residential in commercially zoned areas without rezoning. Abandoned strip malls and big-box stores could become housing.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Minimum Wage $17.13/Hour</div>
-    <span class="status status-in-effect">In Effect — Jan. 1, 2026</span>
-    <p>Highest statewide minimum wage in the nation. Some cities are higher: Seattle $21.63, SeaTac $20.74.</p>
-  </div>
+      <p><strong>SHORT-TERM RENTAL TAX (SB 5576)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Up to 4% excise tax on Airbnbs to fund affordable housing. Amended to let local governments decide. Airbnb pumped $4 million into a PAC to kill it — they spent one-fifth of what the tax would generate just to stop local governments from having the option.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">32-Hour Workweek <span class="bill-num">(HB 2611)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>Would've required overtime pay after 32 hours per week. Opposed by food, hospitality, and farm industries. For reference: San Juan County implemented a 32-hour week for county employees in 2023 — resulting in an 18% decrease in sick calls, a 216% increase in job applications, and $2 million saved.</p>
-  </div>
+      <p><strong>LIMITING BULK HOME BUYING (SB 5496)</strong> <span class="badge badge-dead">Dead</span> — Died at the March 7 opposite-chamber cutoff. Would have barred entities with an interest in more than 100 single-family homes from purchasing more. Passed the Senate but stalled in the House. The proposed limit had already been raised from 25 homes to 50 to 100 over the course of negotiations.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Striking Workers Unemployment Benefits</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Strikers can collect up to 6 weeks of unemployment benefits after a strike begins.</p>
-  </div>
+      <h3>IMMIGRATION &amp; LABOR:</h3>
+      <p><strong>IMMIGRANT WORKER PROTECTIONS (HB 2105/SB 5852)</strong> <span class="badge badge-passed">Passed</span> — Passed both chambers. Requires employers to give workers notice within 72 hours if ICE does an I-9 audit. Also prohibits school district and early learning employees from collecting data on students' or families' immigration status.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">Paid Family Leave Expansion</div>
-    <span class="status status-passed">Passed — Awaiting Signature</span>
-    <p>Job protection kicks in after only 180 days of employment (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
-  </div>
+      <p><strong>FARMWORKER COLLECTIVE BARGAINING (SB 6045/HB 2409)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Would bring farmworkers under Public Employment Relations Commission jurisdiction. Farmworkers have been excluded from National Labor Relations Act protections since 1935.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Workplace Violence Prevention — Healthcare</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would require healthcare facilities to investigate violence incidents promptly and update prevention plans annually.</p>
-  </div>
+      <p><strong>MINIMUM WAGE $17.13/HOUR</strong> <span class="badge badge-effect">In Effect</span> — Took effect Jan 1, 2026. Highest in the nation. Some cities are higher: Seattle $21.63, SeaTac $20.74.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Isolated Worker Protections</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would require panic buttons and safety measures for janitors, housekeepers, and security guards who work alone.</p>
-  </div>
+      <p><strong>32-HOUR WORKWEEK (HB 2611)</strong> <span class="badge badge-dead">Dead</span> — Would've required overtime after 32 hours per week. Food, hospitality, and farm industries opposed. San Juan County implemented a 32-hour week for county employees in 2023: 18% decrease in sick calls, 216% increase in job applications, $2 million saved.</p>
 
-  <!-- HEALTHCARE & VACCINES -->
-  <h2>Healthcare &amp; Vaccines</h2>
+      <p><strong>STRIKING WORKERS GET UNEMPLOYMENT</strong> <span class="badge badge-effect">In Effect</span> — Strikers can collect up to 6 weeks of unemployment benefits after a strike starts.</p>
 
-  <div class="bill passed">
-    <div class="bill-title">State Vaccine Authority <span class="bill-num">(SB 5967 / HB 2242)</span></div>
-    <span class="status status-passed">Passed Both Chambers — Awaiting Signature</span>
-    <p>Ferguson's priority. Allows the WA Dept. of Health to make vaccine recommendations independent of the CDC. A direct response to the Trump administration's politicization of the CDC. Does NOT create new vaccine mandates.</p>
-  </div>
+      <p><strong>PAID FAMILY LEAVE EXPANSION</strong> <span class="badge badge-passed">Passed</span> — Job protection kicks in after only 180 days (down from 12 months). Minimum leave reduced to 4 hours (from 8 hours).</p>
 
-  <!-- ALREADY IN EFFECT -->
-  <h2>Already in Effect</h2>
+      <p><strong>WORKPLACE VIOLENCE PREVENTION</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Healthcare facilities must investigate violence incidents promptly and update prevention plans annually.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Medical Debt Credit Reporting Ban</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Medical debt can no longer be reported to credit agencies in Washington state.</p>
-  </div>
+      <p><strong>ISOLATED WORKER PROTECTIONS</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Panic buttons and safety measures for janitors, housekeepers, and security guards who work alone.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Blood Type on Driver's License <span class="bill-num">(SB 5689)</span></div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Voluntary blood type information can now appear on state IDs. WA is among the first states to offer this.</p>
-  </div>
+      <h3>HEALTHCARE &amp; VACCINES:</h3>
+      <p><strong>STATE VACCINE AUTHORITY (SB 5967/HB 2242)</strong> <span class="badge badge-passed">Passed Both Chambers</span> — Ferguson's priority. Allows WA Dept of Health to make vaccine recommendations independent of the CDC. Direct response to Trump politicizing the CDC. Does NOT create new mandates.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Nicotine / Vape Tax Increase</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>95% excise tax on all nicotine products including synthetic nicotine, vapes, and pouches. A product that cost $7 now costs $15.06 after taxes.</p>
-  </div>
+      <h3>ALREADY IN EFFECT:</h3>
+      <p><strong>MEDICAL DEBT CREDIT REPORTING BAN</strong> <span class="badge badge-effect">In Effect</span> — Medical debt can no longer be reported to credit agencies.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Plastic Bag Fee Increase</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Minimum charge raised from 8 cents to 12 cents per bag.</p>
-  </div>
+      <p><strong>BLOOD TYPE ON DRIVER'S LICENSE (SB 5689)</strong> <span class="badge badge-effect">In Effect</span> — Voluntary blood type info on state IDs. WA is among the first states to offer this.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Child Support Reform</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Updated economic tables now cover incomes up to $50,000 combined per month, up from the old $12,000 cap.</p>
-  </div>
+      <p><strong>NICOTINE/VAPE TAX</strong> <span class="badge badge-effect">In Effect</span> — 95% excise tax on all nicotine products including synthetic nicotine, vapes, and pouches. A $7 product now costs $15.06 after taxes.</p>
 
-  <div class="bill in-effect">
-    <div class="bill-title">Diaper Changing Stations</div>
-    <span class="status status-in-effect">In Effect</span>
-    <p>Mandatory in all new or remodeled public buildings costing $15,000 or more.</p>
-  </div>
+      <p><strong>PLASTIC BAG FEE INCREASE</strong> <span class="badge badge-effect">In Effect</span> — Minimum charge raised from 8 cents to 12 cents per bag.</p>
 
-  <!-- TRANSPORTATION & ROADS -->
-  <h2>Transportation &amp; Roads</h2>
+      <p><strong>CHILD SUPPORT REFORM</strong> <span class="badge badge-effect">In Effect</span> — Updated economic tables now cover incomes up to $50,000 combined per month, up from the old $12,000 cap.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Reckless Driving Redefined <span class="bill-num">(SB 5890)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would define driving 30+ mph over the speed limit as a reckless driving charge.</p>
-  </div>
+      <p><strong>DIAPER CHANGING STATIONS</strong> <span class="badge badge-effect">In Effect</span> — Mandatory in all new or remodeled public buildings costing $15k+.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Reckless Interference with Emergency Operations <span class="bill-num">(HB 2203)</span></div>
-    <span class="status status-dead">Dead</span>
-    <p>New driving offense for blocking emergency vehicles. Passed the House but didn't make it through a Senate policy committee.</p>
-  </div>
+      <h3>TRANSPORTATION &amp; ROADS:</h3>
+      <p><strong>RECKLESS DRIVING REDEFINED (SB 5890)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — 30+ mph over the speed limit = reckless driving charge.</p>
 
-  <!-- CRIMINAL JUSTICE -->
-  <h2>Criminal Justice</h2>
+      <p><strong>RECKLESS INTERFERENCE WITH EMERGENCY OPERATIONS (HB 2203)</strong> <span class="badge badge-dead">Dead</span> — New driving offense for blocking emergency vehicles passed the House but didn't make it through a Senate policy committee.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Political Affiliation Hate Crime <span class="bill-num">(SB 5830)</span></div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would make it a Class C felony to assault someone based on their political beliefs.</p>
-  </div>
+      <h3>CRIMINAL JUSTICE:</h3>
+      <p><strong>POLITICAL AFFILIATION HATE CRIME (SB 5830)</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Makes it a Class C felony to assault someone based on their political beliefs.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Juvenile Detention Transfers</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would allow youth transfers to state prisons and community facilities in certain overcrowding cases.</p>
-  </div>
+      <p><strong>JUVENILE DETENTION OVERCROWDING</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Allowing youth transfers to state prisons and community facilities in certain cases.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Early Release for Youth Offenders</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would allow people convicted before age 18 to petition for early release at age 24.</p>
-  </div>
+      <p><strong>EARLY RELEASE FOR YOUTH OFFENDERS</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Allowing people convicted before age 18 to petition for early release at age 24.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">DUI Lab Expansion</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would allow more labs to perform toxicology tests to speed up DUI case processing.</p>
-  </div>
+      <p><strong>DUI LAB EXPANSION</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Allowing more labs to perform toxicology tests to speed up DUI cases.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Lower BAC Threshold</div>
-    <span class="status status-dead">Dead</span>
-    <p>Lowering the drunk driving legal limit from 0.08 to 0.05 did not advance this session.</p>
-  </div>
+      <p><strong>LOWER BAC THRESHOLD</strong> <span class="badge badge-dead">Dead</span> — Lowering the drunk driving legal limit from 0.08 to 0.05 did not advance this session.</p>
 
-  <!-- RANDOMS -->
-  <h2>Other</h2>
+      <h3>RANDOMS:</h3>
+      <p><strong>GRAY WOLF RECLASSIFICATION</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Downgrading from "endangered" to "sensitive" status.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Gray Wolf Reclassification</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would downgrade gray wolves from "endangered" to "sensitive" status in Washington.</p>
-  </div>
+      <p><strong>DISCOVER PASS PRICE HIKE</strong> <span class="badge badge-uncertain">Final Status Unclear</span> — Increasing from $30 to $45 for state parks access; would be the first increase in 14 years.</p>
 
-  <div class="bill unclear">
-    <div class="bill-title">Discover Pass Price Hike</div>
-    <span class="status status-unclear">Final Status Unclear</span>
-    <p>Would increase from $30 to $45 for state parks access — the first increase in 14 years.</p>
-  </div>
+      <p><strong>POSTHUMOUS CANDIDATE BALLOT REMOVAL</strong> <span class="badge badge-dead">Dead</span> — Would have allowed removal of deceased candidates from ballots after the filing deadline. Passed the House, didn't make it out of a Senate policy committee. Prompted by Tom Crowson, who died close enough to the primary that he nearly won posthumously.</p>
 
-  <div class="bill dead">
-    <div class="bill-title">Posthumous Candidate Ballot Removal</div>
-    <span class="status status-dead">Dead</span>
-    <p>Would have allowed removal of deceased candidates from ballots after the filing deadline. Passed the House but didn't make it out of a Senate policy committee. Prompted by Tom Crowson, who died close enough to the primary that he nearly won posthumously.</p>
+      <p style="margin-top: 2rem; color: #6B7A5A; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a>. Session adjourned sine die March 12, 2026. Governor action deadline: April 4, 2026.</p>
+    </div>
   </div>
-
-  <footer>
-    For full bill text and status, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a>. Session adjourned sine die March 12, 2026. Governor action deadline: April 4, 2026.
-  </footer>
-
 </body>
 </html>`;
   
