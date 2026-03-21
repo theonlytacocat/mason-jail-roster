@@ -2198,6 +2198,8 @@ app.get('/api/deepstats', async (req, res) => {
       if (normalizedType === 'BAIL') bailCount++;
       else if (normalizedType === 'PR') noBailCount++;
     }
+    bailLeaderboardRaw.sort((a, b) => b.bailAmt - a.bailAmt);
+    const top10Bail = bailLeaderboardRaw.slice(0, 10);
     
     // ── Per-charge correlations ───────────────────────────────────────────────
     const bailByCharge = {}, timeByCharge = {}, rtByCharge = {};
