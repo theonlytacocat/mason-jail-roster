@@ -2196,32 +2196,7 @@ app.get('/api/deepstats', async (req, res) => {
       if (normalizedType === 'BAIL') bailCount++;
       else if (normalizedType === 'PR') noBailCount++;
     }
-    let maxBail=0, maxBailEntry=null;
-    const bailLeaderboardRaw = [];
-
-    for (const e of history) {
-      const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
-      let rd = null;
-      if (e.releaseDateTime) {
-        const [dp] = e.releaseDateTime.split(' ');
-        const [m, d, y] = dp.split('/');
-        rd = new Date(2000 + parseInt(y), parseInt(m)-1, parseInt(d));
-      }
-      if (bail > 0) {
-        bailCount++;
-        if (rd) {
-          if (rd.toDateString() === todayStr) bailToday += bail;
-          if (rd >= weekAgo)    bailWeek  += bail;
-          if (rd >= monthStart) bailMonth += bail;
-          if (rd >= yearStart)  bailYTD   += bail;
-        }
-        if (bail > maxBail) { maxBail = bail; maxBailEntry = e; }
-        bailLeaderboardRaw.push({ ...e, bailAmt: bail, charges: nameToCharges.get(e.name) || [] });
-      } else { noBailCount++; }
-    }
-    bailLeaderboardRaw.sort((a, b) => b.bailAmt - a.bailAmt);
-    const top10Bail = bailLeaderboardRaw.slice(0, 10);
-
+    
     // ── Per-charge correlations ───────────────────────────────────────────────
     const bailByCharge = {}, timeByCharge = {}, rtByCharge = {};
     for (const e of history) {
