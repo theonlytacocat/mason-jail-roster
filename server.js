@@ -2173,8 +2173,6 @@ app.get('/api/deepstats', async (req, res) => {
     // ── Bail stats ────────────────────────────────────────────────────────────
     let bailToday=0, bailWeek=0, bailMonth=0, bailYTD=0;
     let bailCount=0, noBailCount=0;
-    let maxBail=0, maxBailEntry=null;
-    const bailLeaderboardRaw = [];
 
     for (const e of history) {
       const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
