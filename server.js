@@ -1411,7 +1411,7 @@ app.get('/api/stats', (req, res) => {
         if (chargesMatch) {
           const charges = chargesMatch[1].trim();
           if (charges && charges !== 'None listed') {
-            const chargeList = charges.split(',').map(c => c.trim());
+            const chargeList = charges.split(',').map(c => normalizeCharge(c.trim())).filter(Boolean);
             allCharges.push(...chargeList);
           }
         }
@@ -1446,7 +1446,7 @@ app.get('/api/stats', (req, res) => {
         if (chargesMatch) {
           const charges = chargesMatch[1].trim();
           if (charges && charges !== 'None listed' && charges !== 'Not Released') {
-            const chargeList = charges.split(',').map(c => c.trim());
+            const chargeList = charges.split(',').map(c => normalizeCharge(c.trim())).filter(Boolean);
             allCharges.push(...chargeList);
           }
         }
@@ -1568,7 +1568,7 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
         const nm = line.match(/BOOKED \| ([^|]+) \|/);
         const ch = line.match(/Charges:\s+(.+)/);
         if (nm && ch) {
-          const charges = ch[1].split(',').map(c => c.trim()).filter(c => c && c !== 'None listed');
+          const charges = ch[1].split(',').map(c => normalizeCharge(c.trim())).filter(c => c && c !== 'None listed');
           nameToCharges.set(nm[1].trim(), charges);
         }
       }
@@ -1751,6 +1751,25 @@ const avgStayDays = stayCount > 0 ? Math.round((totalStayHours / stayCount) / 24
     res.send('Error generating stats: ' + error.message);
   }
 });
+
+// Normalize release type codes into consolidated buckets
+function normalizeReleaseType(code) {
+  if (!code) return 'UNK';
+  const upper = code.toUpperCase().trim();
+  if (['RPR', 'ROA', 'JRRPR', 'SRRPR'].includes(upper)) return 'PR';
+  if (['RBB', 'RCB'].includes(upper)) return 'BAIL';
+  if (['RNHM', 'MIS'].includes(upper)) return 'NO_HOLD';
+  return upper;
+}
+
+// Normalize charge strings to collapse near-duplicates
+function normalizeCharge(charge) {
+  if (!charge) return '';
+  const c = charge.trim().toUpperCase();
+  if (/PROBATION.*(VIOL|VIO)|PAROLE.*(VIOL|VIO)/.test(c)) return 'PROBATION/PAROLE VIOLATION';
+  if (/^ASSAULT/.test(c) || /SIMPLE ASSAULT/.test(c)) return 'ASSAULT';
+  return charge.trim();
+}
 
 const RELEASE_TYPE_NAMES = {
   RBB:   'Released on Bail Bond',
@@ -2139,7 +2158,7 @@ app.get('/api/deepstats', async (req, res) => {
     // ── Release type stats ────────────────────────────────────────────────────
     const rtStats = {}; // code → { count, totalMins, totalBail, bailCount }
     for (const e of history) {
-      const code = e.releaseType || 'UNK';
+      const code = normalizeReleaseType(e.releaseType);
       if (!rtStats[code]) rtStats[code] = { count: 0, totalMins: 0, totalBail: 0, bailCount: 0 };
       rtStats[code].count++;
       const ts = (e.timeServed || '').match(/(\d+)d(\d+)h(\d+)m/);
@@ -2152,7 +2171,33 @@ app.get('/api/deepstats', async (req, res) => {
     }
 
     // ── Bail stats ────────────────────────────────────────────────────────────
-    let bailToday=0, bailWeek=0, bailMonth=0, bailYTD=0, bailCount=0, noBailCount=0;
+    let bailToday=0, bailWeek=0, bailMonth=0, bailYTD=0;
+    let bailCount=0, noBailCount=0;
+    let maxBail=0, maxBailEntry=null;
+    const bailLeaderboardRaw = [];
+
+    for (const e of history) {
+      const bail = parseFloat((e.bail || '$0').replace(/[$,]/g, ''));
+      const normalizedType = normalizeReleaseType(e.releaseType);
+      let rd = null;
+      if (e.releaseDateTime) {
+        const [dp] = e.releaseDateTime.split(' ');
+        const [m, d, y] = dp.split('/');
+        rd = new Date(2000 + parseInt(y), parseInt(m)-1, parseInt(d));
+      }
+      if (bail > 0) {
+        if (rd) {
+          if (rd.toDateString() === todayStr) bailToday += bail;
+          if (rd >= weekAgo)    bailWeek  += bail;
+          if (rd >= monthStart) bailMonth += bail;
+          if (rd >= yearStart)  bailYTD   += bail;
+        }
+        if (bail > maxBail) { maxBail = bail; maxBailEntry = e; }
+        bailLeaderboardRaw.push({ ...e, bailAmt: bail, charges: nameToCharges.get(e.name) || [] });
+      }
+      if (normalizedType === 'BAIL') bailCount++;
+      else if (normalizedType === 'PR') noBailCount++;
+    }
     let maxBail=0, maxBailEntry=null;
     const bailLeaderboardRaw = [];
 
@@ -2407,7 +2452,7 @@ function getDeepStatsHTML(d) {
     <div class="card" style="border-left-color:#6e1a1a"><div class="v">${d.noBailCount}</div><div class="l">Zero-Dollar Releases</div></div>
     <div class="card" style="border-left-color:#4a4a00">
       <div class="v">${d.bailCount + d.noBailCount > 0 ? pct(d.bailCount, d.bailCount + d.noBailCount) : '—'}</div>
-      <div class="l">Bail vs No-Bail Ratio</div>
+      <div class="l">Bail Bond vs PR Release Ratio</div>
     </div>
     ${d.maxBailEntry ? `<div class="card" style="border-left-color:#6e3c1a">
       <div class="v" style="font-size:1.2rem;">${$(d.maxBailEntry.bailAmt || parseFloat((d.maxBailEntry.bail||'$0').replace(/[$,]/g,'')))}</div>
