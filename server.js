@@ -631,6 +631,7 @@ if (fs.existsSync(logFile)) {
     <h1><span>Mason County Jail Roster Monitor</span></h1>
     <a href="/api/history" class="run-btn">Jail Bookings and Release Log</a>
     <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">Statistics Dashboard</a>
+    <a href="https://ksco-scraper-production.up.railway.app/" target="_blank" rel="noopener noreferrer" class="run-btn" style="margin-top: 0.75rem;">New: Visit Kitsap County Jail Monitor</a>
     <a href="/api/run" class="run-btn" style="margin-top: 0.75rem;">Run Check Now</a>
     <div class="status" style="margin-top: 1rem;">
       <div class="status-header">
