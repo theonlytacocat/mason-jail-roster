@@ -531,6 +531,20 @@ app.get('/api/debug/release-stats', async (req, res) => {
   }
 });
 
+// adding this so that i can view the raw data that my release stats are drawing from 
+app.get('/api/debug/release-history', (req, res) => {
+  try {
+    if (fs.existsSync(RELEASE_STATS_HISTORY_FILE)) {
+      const data = JSON.parse(fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8'));
+      res.json({ count: data.length, entries: data });
+    } else {
+      res.json({ message: 'No history file found' });
+    }
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 // Redirect root to status
 app.get('/', (req, res) => {
   res.redirect('/api/status');
