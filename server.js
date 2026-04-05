@@ -1780,10 +1780,17 @@ function normalizeReleaseType(code) {
 // Normalize charge strings to collapse near-duplicates
 function normalizeCharge(charge) {
   if (!charge) return '';
-  const c = charge.trim().toUpperCase();
-  if (/PROBATION.*(VIOL|VIO)|PAROLE.*(VIOL|VIO)/.test(c)) return 'PROBATION/PAROLE VIOLATION';
-  if (/^ASSAULT/.test(c) || /SIMPLE ASSAULT/.test(c)) return 'ASSAULT';
-  return charge.trim();
+  // Strip leading RCW codes (e.g. "46.61.021 DUI ALCOHOL OR DRUGS" → "DUI ALCOHOL OR DRUGS")
+  let c = charge.trim().replace(/^\d+\.\d+[\.\d]*\s+/, '').trim();
+  const u = c.toUpperCase();
+
+  if (/PROBATION.*(VIOL|VIO)|PAROLE.*(VIOL|VIO)/.test(u))                              return 'PROBATION VIOLATION';
+  if (/^ASSAULT|SIMPLE ASSAULT/.test(u))                                                 return 'ASSAULT';
+  if (/SIMPLE POSSESSION|^SIMPLE$/.test(u))                                              return 'DRUG POSSESSION';
+  if (/VIOLATION.*(NO.CONTACT|NCO)|NO.CONTACT.*(VIOL|VIO)|PROPECT|PROTECT.*ORDER|PROTECTION.*ORDER/.test(u)) return 'PROTECTION ORDER VIOLATION';
+  if (/FAILURE.TO.APPEAR|WARRANT.ARREST/.test(u))                                        return 'FAILURE TO APPEAR';
+
+  return c.trim();
 }
 
 const RELEASE_TYPE_NAMES = {
@@ -2156,7 +2163,7 @@ app.get('/api/deepstats', async (req, res) => {
             const name = nm[1].trim();
             bookedNamesList.push(name);
             if (ch && !nameToCharges.has(name)) {
-              const charges = ch[1].split(',').map(c => c.trim()).filter(c => c && c !== 'None listed');
+              const charges = ch[1].split(',').map(c => normalizeCharge(c.trim())).filter(c => c && c !== 'None listed');
               if (charges.length) nameToCharges.set(name, charges);
             }
           }
