@@ -627,13 +627,16 @@ if (fs.existsSync(logFile)) {
     h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #F5F0E8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .status { background: #1A3035; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-    .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-    .status-dot { width: 12px; height: 12px; background: #22C55E; border-radius: 50%; animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .status-title { font-weight: 600; color: #F5F0E8; }
-    .stats { display: grid; gap: 1rem; }
-    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #1E3840; }
+    .status { background: #1A3035; border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; }
+    .status summary { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; list-style: none; padding: 0.25rem 0; }
+    .status summary::-webkit-details-marker { display: none; }
+    .status-dot { width: 10px; height: 10px; background: #22C55E; border-radius: 50%; animation: pulse 2s infinite; flex-shrink: 0; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .status-title { font-weight: 600; color: #F5F0E8; font-size: 9pt; flex: 1; }
+    .status-chevron { color: #6A8A96; font-size: 0.7rem; margin-left: auto; transition: transform 0.2s; }
+    details.status[open] .status-chevron { transform: rotate(180deg); }
+    .stats { display: grid; gap: 0; margin-top: 0.75rem; border-top: 1px solid #1E3840; padding-top: 0.25rem; }
+    .stat { display: flex; justify-content: space-between; padding: 0.55rem 0; border-bottom: 1px solid #1E3840; }
     .stat:last-child { border-bottom: none; }
     .stat-label { color: #A8C4D0; }
     .stat-value { font-weight: 500; color: #F5F0E8; }
@@ -649,12 +652,12 @@ if (fs.existsSync(logFile)) {
     <a href="/api/history" class="run-btn">Jail Bookings and Release Log</a>
     <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">Statistics Dashboard</a>
     <a href="https://ksco-scraper-production.up.railway.app/" target="_blank" rel="noopener noreferrer" class="run-btn" style="margin-top: 0.75rem;">New: Visit Kitsap County Jail Monitor</a>
-    <a href="/api/run" class="run-btn" style="margin-top: 0.75rem;">Run Check Now</a>
-    <div class="status" style="margin-top: 1rem;">
-      <div class="status-header">
+    <details class="status" style="margin-top: 1rem;">
+      <summary>
         <div class="status-dot"></div>
         <span class="status-title">System Active</span>
-      </div>
+        <span class="status-chevron">▾</span>
+      </summary>
       <div class="stats">
         <div class="stat">
           <span class="stat-label">Last Check</span>
@@ -673,7 +676,7 @@ if (fs.existsSync(logFile)) {
           <span class="stat-value">${viewCount.toLocaleString()}</span>
         </div>
       </div>
-    </div>
+    </details>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
       <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #1A3035; color: #C4D8E6; border: 1px solid #0B607C; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 13th 2026: FINAL WA Legislative Session Update</a>
@@ -1222,26 +1225,49 @@ app.get('/api/history', (req, res) => {
     console.error('History parse error:', e);
   }
 
+  function buildInmateRow(line) {
+    const namePart = line.split(' | ')[0] || 'Unknown';
+    const timeMatch = line.match(/(?:Booked|Released):\s+(\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}:\d{2})/);
+    const time = timeMatch ? timeMatch[1] : '';
+    const chargesMatch = line.match(/Charges:\s+(.+)$/);
+    const charges = chargesMatch ? chargesMatch[1].trim() : '';
+    const timeServedMatch = line.match(/Time served:\s+([^|]+)/);
+    const timeServed = timeServedMatch ? timeServedMatch[1].trim() : '';
+    const bailMatch = line.match(/Bail Posted:\s+([^|]+)/);
+    const bail = bailMatch ? bailMatch[1].trim() : '';
+    const extra = [timeServed ? 'Served: ' + timeServed : '', bail ? 'Bail: ' + bail : ''].filter(Boolean).join(' · ');
+    return '<details class="inmate-row">' +
+      '<summary>' +
+      '<span class="inmate-name">' + namePart + '</span>' +
+      (time ? '<span class="inmate-time">' + time + '</span>' : '') +
+      '</summary>' +
+      '<div class="inmate-details-content">' +
+      (charges ? '<div class="inmate-charges">' + charges + '</div>' : '') +
+      (extra ? '<div class="inmate-extra">' + extra + '</div>' : '') +
+      '</div>' +
+      '</details>';
+  }
+
   const entriesHtml = entries.length > 0 ? entries.map(entry => {
     const [month, day, year] = entry.date.split('/');
     const displayDate = `${month}/${day}/20${year}`;
-    
-    const bookedHtml = entry.booked.length > 0 ? 
-      '<div class="changes booked"><h4>BOOKED (' + entry.booked.length + ')</h4><ul>' +
-      entry.booked.map(b => '<li>' + b + '</li>').join('') +
-      '</ul></div>' : '';
-      
+
+    const bookedHtml = entry.booked.length > 0 ?
+      '<div class="changes booked"><h4>BOOKED (' + entry.booked.length + ')</h4><div class="inmate-list">' +
+      entry.booked.map(b => buildInmateRow(b)).join('') +
+      '</div></div>' : '';
+
     const releasedHtml = entry.released.length > 0 ?
-      '<div class="changes released"><h4>RELEASED (' + entry.released.length + ')</h4><ul>' +
-      entry.released.map(r => '<li>' + r + '</li>').join('') +
-      '</ul></div>' : '';
+      '<div class="changes released"><h4>RELEASED (' + entry.released.length + ')</h4><div class="inmate-list">' +
+      entry.released.map(r => buildInmateRow(r)).join('') +
+      '</div></div>' : '';
 
     const changesGrid = (bookedHtml && releasedHtml)
       ? '<div class="changes-grid">' + bookedHtml + releasedHtml + '</div>'
       : bookedHtml + releasedHtml;
     return '<div class="entry"><div class="entry-header">' + displayDate + '</div>' +
            changesGrid + '</div>';
-  }).join('') : 
+  }).join('') :
   '<p class="no-data">No changes recorded yet. Run the workflow to start monitoring.</p>';
 
   const html = `<!DOCTYPE html>
@@ -1290,6 +1316,19 @@ app.get('/api/history', (req, res) => {
     .changes ul { list-style: none; font-size: 8pt; color: #A8C4D0; }
     .changes ul li { font-family: 'Fake Receipt', 'Courier New', monospace; padding: 0.2rem 0; border-bottom: 1px solid #1E3840; }
     .changes ul li:last-child { border-bottom: none; }
+    /* Collapseable inmate rows */
+    .inmate-list { font-size: 8pt; }
+    details.inmate-row { border-bottom: 1px solid #1E3840; }
+    details.inmate-row:last-child { border-bottom: none; }
+    details.inmate-row > summary { list-style: none; display: flex; align-items: baseline; gap: 0.5rem; padding: 0.3rem 0; cursor: pointer; user-select: none; }
+    details.inmate-row > summary::-webkit-details-marker { display: none; }
+    details.inmate-row > summary::before { content: '▸'; color: #6A8A96; font-size: 0.6rem; flex-shrink: 0; line-height: 1.6; }
+    details.inmate-row[open] > summary::before { content: '▾'; }
+    .inmate-name { font-family: 'Fake Receipt', 'Courier New', monospace; color: #F5F0E8; flex: 1; }
+    .inmate-time { color: #6A8A96; font-size: 7pt; white-space: nowrap; }
+    .inmate-details-content { padding: 0.3rem 0 0.5rem 1.1rem; font-size: 7.5pt; }
+    .inmate-charges { color: #A8C4D0; line-height: 1.5; }
+    .inmate-extra { color: #6A8A96; margin-top: 0.2rem; }
     .no-changes { color: #6A8A96; font-style: italic; }
     .no-data { color: #6A8A96; text-align: center; padding: 3rem; }
     a { color: #4B8FA8; }
