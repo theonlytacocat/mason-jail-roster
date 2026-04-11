@@ -616,28 +616,31 @@ if (fs.existsSync(logFile)) {
   <!-- build:9b75fde -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #070907; color: #ffffff; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 8pt; background: #152220; color: #C4D8E6; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 0.5rem; }
     .container { width: 100%; max-width: 500px; padding: 1rem; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #F0F0E8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
+    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 1.5rem; color: #F5F0E8; letter-spacing: -1px; overflow: hidden; white-space: nowrap; }
     h1 span { display: inline-block; animation: ticker 15s linear infinite; }
     @keyframes ticker { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
-    .status { background: #152B17; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+    .status { background: #1A3035; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
     .status-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
     .status-dot { width: 12px; height: 12px; background: #22C55E; border-radius: 50%; animation: pulse 2s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-    .status-title { font-weight: 600; }
+    .status-title { font-weight: 600; color: #F5F0E8; }
     .stats { display: grid; gap: 1rem; }
-    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #1E3522; }
+    .stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #1E3840; }
     .stat:last-child { border-bottom: none; }
-    .stat-label { color: #FFFFFF; }
-    .stat-value { font-weight: 500; }
-    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #1C3320; color: #fff; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .run-btn:hover { background: #3A4E38; }
-    .footer { text-align: center; color: #72807A; font-size: 0.875rem; margin-top: 1.5rem; }
-    a { color: #C8C87A; text-decoration: none; }
+    .stat-label { color: #A8C4D0; }
+    .stat-value { font-weight: 500; color: #F5F0E8; }
+    .run-btn { display: block; width: 100%; padding: 0.75rem; margin-top: 1rem; background: #1A3035; color: #C4D8E6; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-family: 'Inter', Arial, sans-serif; transition: background 0.15s; }
+    .run-btn:hover { background: #1D4A5C; color: #F5F0E8; }
+    .footer { text-align: center; color: #6A8A96; font-size: 0.875rem; margin-top: 1.5rem; }
+    a { color: #4B8FA8; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -673,7 +676,7 @@ if (fs.existsSync(logFile)) {
     </div>
     <div class="footer">
       <p style="margin-top: 0.5rem;">Monitoring <a href="https://hub.masoncountywa.gov/sheriff/reports/incustdy.pdf" target="_blank">Mason County Jail Roster</a></p>
-      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #FFEF00; color: #070907; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 13th 2026: FINAL WA Legislative Session Update</a>
+      <a href="/legislative" style="display: inline-block; margin-top: 1rem; padding: 0.5rem 1rem; background: #1A3035; color: #C4D8E6; border: 1px solid #0B607C; border-radius: 6px; text-decoration: none; font-size: 0.75rem;">March 13th 2026: FINAL WA Legislative Session Update</a>
     </div>
   </div>
 </body>
@@ -958,38 +961,40 @@ app.get('/legislative', (req, res) => {
   <title>Washington State Legislative Session News</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; font-size: 9pt; background: #0D1A0F; color: #C8C87A; min-height: 100vh; padding: 2rem; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 9pt; background: #152220; color: #C4D8E6; min-height: 100vh; padding: 2rem; }
     .container { max-width: 900px; margin: 0 auto; }
-    h1 { font-family: 'Pixel Digivolve', 'Courier New', monospace; font-size: 2rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: -1px; }
-    .subtitle { color: #6B7A5A; margin-bottom: 2rem; }
-    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #6B7A2A; text-decoration: none; }
+    h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 2rem; margin-bottom: 0.5rem; color: #F5F0E8; font-weight: 700; letter-spacing: -0.5px; }
+    .subtitle { color: #6A8A96; margin-bottom: 2rem; }
+    .back-link { display: inline-block; margin-bottom: 1.5rem; color: #4B8FA8; text-decoration: none; }
     .back-link:hover { text-decoration: underline; }
-    .content { background: #1C3320; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
-    .content h2 { color: #6B7A2A; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; }
+    .content { background: #1A3035; border-radius: 12px; padding: 2rem; margin-bottom: 1rem; line-height: 1.6; }
+    .content h2 { font-family: 'Playfair Display', Georgia, serif; color: #4B8FA8; margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 1.2rem; font-weight: 600; }
     .content h2:first-child { margin-top: 0; }
-    .content h3 { color: #C8C87A; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 1rem; }
-    .content p { margin-bottom: 0.75rem; color: #F5F5F5; }
+    .content h3 { font-family: 'Inter', Arial, sans-serif; color: #C4D8E6; margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .content p { margin-bottom: 0.75rem; color: #C4D8E6; }
     .content ul { margin-left: 1.5rem; margin-bottom: 1rem; }
-    .content li { margin-bottom: 0.5rem; color: #F5F5F5; }
-    .update-date { color: #6B7A5A; font-weight: bold; margin-bottom: 1rem; }
-    .content strong { color: #C8C87A; }
-    a { color: #6B7A2A; }
+    .content li { margin-bottom: 0.5rem; color: #C4D8E6; }
+    .update-date { color: #6A8A96; font-weight: bold; margin-bottom: 1rem; }
+    .content strong { color: #F5F0E8; }
+    a { color: #4B8FA8; }
 
     .badge { display: inline-block; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 3px; margin-left: 6px; vertical-align: middle; letter-spacing: 0.5px; text-transform: uppercase; }
-    .badge-signed    { background: #1a6e3c; color: #a3f0c0; }
-    .badge-passed    { background: #2a4a1a; color: #b8e090; border: 1px solid #4a8a2a; }
-    .badge-awaiting  { background: #4a3a00; color: #f0d060; }
-    .badge-advancing { background: #1a3a4a; color: #80c8e0; }
-    .badge-dead      { background: #4a1a1a; color: #e08080; }
-    .badge-effect    { background: #0a2a1a; color: #80e0a0; border: 1px solid #2a6a3a; }
-    .badge-uncertain { background: #3a2a0a; color: #e0b860; }
+    .badge-signed    { background: #0B3A2A; color: #5AAAA0; border: 1px solid #0B607C; }
+    .badge-passed    { background: #0B2A3A; color: #4B8FA8; border: 1px solid #0B607C; }
+    .badge-awaiting  { background: #3A3000; color: #E8D080; }
+    .badge-advancing { background: #0B2A3A; color: #C4D8E6; }
+    .badge-dead      { background: #3A1A1A; color: #E08080; }
+    .badge-effect    { background: #0B3035; color: #4BC4A8; border: 1px solid #0B607C; }
+    .badge-uncertain { background: #2A2A1A; color: #C8B860; }
 
-    .session-adjourned { background: #0a1a0a; border: 1px solid #2a4a2a; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
-    .session-adjourned .adj-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7A5A; margin-bottom: 4px; }
-    .session-adjourned p { color: #C8C87A; margin: 0; font-size: 0.9em; }
+    .session-adjourned { background: #0E1C1A; border: 1px solid #1E3840; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+    .session-adjourned .adj-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6A8A96; margin-bottom: 4px; }
+    .session-adjourned p { color: #C4D8E6; margin: 0; font-size: 0.9em; }
   </style>
 </head>
 <body>
@@ -1158,7 +1163,7 @@ app.get('/legislative', (req, res) => {
 
       <p><strong>POSTHUMOUS CANDIDATE BALLOT REMOVAL</strong> <span class="badge badge-dead">Dead</span> — Would have allowed removal of deceased candidates from ballots after the filing deadline. Passed the House, didn't make it out of a Senate policy committee. Prompted by Tom Crowson, who died close enough to the primary that he nearly won posthumously.</p>
 
-      <p style="margin-top: 2rem; color: #6B7A5A; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a>. Session adjourned sine die March 12, 2026. Governor action deadline: April 4, 2026.</p>
+      <p style="margin-top: 2rem; color: #6A8A96; font-style: italic;">For more information, visit <a href="https://leg.wa.gov" target="_blank">leg.wa.gov</a>. Session adjourned sine die March 12, 2026. Governor action deadline: April 4, 2026.</p>
     </div>
   </div>
 </body>
@@ -1258,36 +1263,36 @@ app.get('/api/history', (req, res) => {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { overflow-x: hidden; width: 100%; }
-    body { font-family: Arial, sans-serif; font-size: 8pt; background: #070907; color: #C8C87A; min-height: 100vh; padding: 2rem; }
+    body { font-family: 'Inter', Arial, sans-serif; font-size: 8pt; background: #152220; color: #C4D8E6; min-height: 100vh; padding: 2rem; }
     .container { max-width: 1100px; margin: 0 auto; }
-    h1 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 2.5rem; margin-bottom: 0.5rem; color: #F0F0E8; letter-spacing: 1px; word-break: break-word; }
-    .subtitle { color: #72807A; margin-bottom: 1.5rem; }
+    h1 { font-family: 'Playfair Display', Georgia, serif; font-size: 2.5rem; margin-bottom: 0.5rem; color: #F5F0E8; letter-spacing: -0.5px; word-break: break-word; font-weight: 700; }
+    .subtitle { color: #6A8A96; margin-bottom: 1.5rem; }
     .nav-buttons { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
-    .nav-btn { flex: 1; padding: 0.65rem 1rem; background: #1C3320; color: #F0F0E8; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 9pt; transition: background 0.15s; }
-    .nav-btn:hover { background: #3A4E38; color: #F0F0E8; }
-    .entry { background: #152B17; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
-    .entry.no-change-entry { background: #0A1209; padding: 0.75rem; border-left: 3px solid #1E3522; }
-    .entry-header { font-family: 'Fake Receipt', 'Courier New', monospace; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #C8C87A; border-bottom: 1px solid #1E3522; padding-bottom: 0.5rem; }
+    .nav-btn { flex: 1; padding: 0.65rem 1rem; background: #1A3035; color: #C4D8E6; text-align: center; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 9pt; transition: background 0.15s; }
+    .nav-btn:hover { background: #1D4A5C; color: #F5F0E8; }
+    .entry { background: #1A3035; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+    .entry.no-change-entry { background: #0E1C1A; padding: 0.75rem; border-left: 3px solid #1E3840; }
+    .entry-header { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #C4D8E6; border-bottom: 1px solid #1E3840; padding-bottom: 0.5rem; }
     .changes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
     .changes { }
-    .changes h4 { font-family: 'Fake Receipt', 'Courier New', monospace; font-size: 10pt; margin-bottom: 0.4rem; font-weight: bold; letter-spacing: 0.5px; }
-    .changes.booked { border-left: 3px solid #C8B88A; padding-left: 0.6rem; }
-    .changes.booked h4 { color: #C8B88A; }
-    .changes.released { border-left: 3px solid #6B7A2A; padding-left: 0.6rem; }
-    .changes.released h4 { color: #6B7A2A; }
-    .changes.updated { border-left: 3px solid #C8B88A; padding-left: 0.6rem; }
-    .changes.updated h4 { color: #C8B88A; }
-    .changes ul { list-style: none; font-size: 8pt; color: #B8AFA0; }
-    .changes ul li { padding: 0.2rem 0; border-bottom: 1px solid #1E3522; }
+    .changes h4 { font-family: 'Inter', Arial, sans-serif; font-size: 9pt; margin-bottom: 0.4rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
+    .changes.booked { border-left: 3px solid #4B8FA8; padding-left: 0.6rem; }
+    .changes.booked h4 { color: #4B8FA8; }
+    .changes.released { border-left: 3px solid #0B607C; padding-left: 0.6rem; }
+    .changes.released h4 { color: #5AAAC8; }
+    .changes.updated { border-left: 3px solid #4B8FA8; padding-left: 0.6rem; }
+    .changes.updated h4 { color: #4B8FA8; }
+    .changes ul { list-style: none; font-size: 8pt; color: #A8C4D0; }
+    .changes ul li { font-family: 'Fake Receipt', 'Courier New', monospace; padding: 0.2rem 0; border-bottom: 1px solid #1E3840; }
     .changes ul li:last-child { border-bottom: none; }
-    .no-changes { color: #72807A; font-style: italic; }
-    .no-data { color: #72807A; text-align: center; padding: 3rem; }
-    a { color: #6B7A2A; }
+    .no-changes { color: #6A8A96; font-style: italic; }
+    .no-data { color: #6A8A96; text-align: center; padding: 3rem; }
+    a { color: #4B8FA8; }
   </style>
 </head>
 <body>
@@ -1820,12 +1825,12 @@ function getStatsHTML(stats) {
 
   // ADD THIS ↓↓↓
   const dataBanner = stats.dataCollectionStart ? `
-    <div style="background: #1C3320; border-left: 4px solid #C8C87A; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
-      <p style="margin: 0; color: #F0F0E8;">
-        📊 Data collection started: <strong>${stats.dataCollectionStart}</strong> 
+    <div style="background: #1A3035; border-left: 4px solid #4B8FA8; padding: 1rem; margin-bottom: 1.5rem; border-radius: 4px;">
+      <p style="margin: 0; color: #F5F0E8;">
+        Data collection started: <strong>${stats.dataCollectionStart}</strong>
         (${stats.daysOfData} days of tracking)
       </p>
-      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #FFFFFF;">
+      <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #A8C4D0;">
         Statistics become more accurate as more data is collected over time.
       </p>
     </div>
@@ -1838,158 +1843,162 @@ function getStatsHTML(stats) {
   <title>Statistics Dashboard - Mason County Jail</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     @font-face { font-family: 'Fake Receipt'; src: url('/fonts/FakeReceipt.otf') format('opentype'); font-weight: normal; font-style: normal; }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Inter', Arial, sans-serif;
       font-size: 9pt;
-      background: #070907;
-      color: #C8C87A;
+      background: #152220;
+      color: #C4D8E6;
       min-height: 100vh;
       padding: 2rem;
     }
     .container { max-width: 1200px; margin: 0 auto; }
     h1 {
-      font-family: 'Fake Receipt', 'Courier New', monospace;
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: 2.5rem;
       margin-bottom: 0.5rem;
-      color: #F0F0E8;
-      letter-spacing: 1px;
+      color: #F5F0E8;
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
-    .subtitle { color: #72807A; margin-bottom: 2rem; }
-    .back-link { 
-      display: inline-block; 
-      margin-bottom: 1.5rem; 
-      color: #6B7A2A; 
-      text-decoration: none; 
+    .subtitle { color: #6A8A96; margin-bottom: 2rem; }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 1.5rem;
+      color: #4B8FA8;
+      text-decoration: none;
     }
     .back-link:hover { text-decoration: underline; }
-    
-    .stats-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-      gap: 1rem; 
-      margin-bottom: 2rem; 
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
     }
-    .stat-card { 
-      background: #152B17; 
-      border-radius: 12px; 
-      padding: 1.5rem; 
-      border-left: 4px solid #6B7A2A;
+    .stat-card {
+      background: #1A3035;
+      border-radius: 12px;
+      padding: 1.5rem;
+      border-left: 4px solid #0B607C;
     }
-    .stat-card.purple { border-left-color: #72807A; }
-    .stat-card.blue { border-left-color: #6B7A2A; }
-    .stat-card.orange { border-left-color: #C8C87A; }
-    
-    .stat-value { 
-      font-size: 2.5rem; 
-      font-weight: bold; 
-      color: #C8C87A; 
+    .stat-card.purple { border-left-color: #4B8FA8; }
+    .stat-card.blue { border-left-color: #0B607C; }
+    .stat-card.orange { border-left-color: #C4D8E6; }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: #C4D8E6;
       margin-bottom: 0.25rem;
+      font-family: 'Playfair Display', Georgia, serif;
     }
-    .stat-label { 
-      color: #72807A; 
-      font-size: 0.875rem; 
+    .stat-label {
+      color: #6A8A96;
+      font-size: 0.875rem;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
-    
-    .chart-container { 
-      background: #152B17; 
-      border-radius: 12px; 
-      padding: 1.5rem; 
-      margin-bottom: 1rem; 
+
+    .chart-container {
+      background: #1A3035;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
     }
     .chart-title {
-      font-family: 'Fake Receipt', 'Courier New', monospace;
-      color: #C8C87A;
+      font-family: 'Playfair Display', Georgia, serif;
+      color: #F5F0E8;
       font-size: 1.2rem;
-      font-weight: bold;
+      font-weight: 600;
       margin-bottom: 1rem;
-      letter-spacing: 0.5px;
     }
-    
+
     .bar-chart { margin-top: 1rem; }
-    .bar-item { 
-      display: flex; 
-      align-items: center; 
-      margin-bottom: 0.75rem; 
+    .bar-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
     }
-    .bar-label { 
-      min-width: 200px; 
-      color: #FFFFFF; 
+    .bar-label {
+      min-width: 200px;
+      color: #C4D8E6;
       font-size: 0.8rem;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    .bar-fill { 
-      background: linear-gradient(90deg, #6B7A2A, #C8C87A); 
-      height: 24px; 
-      border-radius: 4px; 
-      display: flex; 
-      align-items: center; 
-      padding: 0 0.5rem; 
-      color: #fff; 
-      font-weight: bold; 
+    .bar-fill {
+      background: linear-gradient(90deg, #0B607C, #4B8FA8);
+      height: 24px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding: 0 0.5rem;
+      color: #F5F0E8;
+      font-weight: bold;
       font-size: 0.75rem;
       min-width: 30px;
     }
-    
-    .day-chart { 
-      display: flex; 
-      gap: 0.5rem; 
-      align-items: flex-end; 
-      height: 200px; 
+
+    .day-chart {
+      display: flex;
+      gap: 0.5rem;
+      align-items: flex-end;
+      height: 200px;
       margin-top: 1rem;
     }
-    .day-bar { 
-      flex: 1; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
+    .day-bar {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: flex-end;
     }
-    .day-bar-fill { 
-      width: 100%; 
-      background: linear-gradient(180deg, #6B7A2A, #C8C87A);
+    .day-bar-fill {
+      width: 100%;
+      background: linear-gradient(180deg, #0B607C, #4B8FA8);
       border-radius: 4px 4px 0 0;
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      color: #fff;
+      color: #F5F0E8;
       font-size: 0.7rem;
       font-weight: bold;
       padding-bottom: 0.25rem;
     }
-    .day-label { 
-      color: #72807A; 
-      font-size: 0.75rem; 
-      margin-top: 0.5rem; 
+    .day-label {
+      color: #6A8A96;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
     }
-    
-    .release-types { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
-      gap: 1rem; 
+
+    .release-types {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
       margin-top: 1rem;
     }
-    .release-type { 
-      background: #0A1209; 
-      padding: 1rem; 
-      border-radius: 8px; 
+    .release-type {
+      background: #0E1C1A;
+      padding: 1rem;
+      border-radius: 8px;
       text-align: center;
     }
-    .release-type-count { 
-      font-size: 1.5rem; 
-      font-weight: bold; 
-      color: #C8C87A; 
+    .release-type-count {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #C4D8E6;
+      font-family: 'Playfair Display', Georgia, serif;
     }
-    .release-type-label { 
-      color: #72807A; 
-      font-size: 0.75rem; 
+    .release-type-label {
+      color: #6A8A96;
+      font-size: 0.75rem;
       margin-top: 0.25rem;
     }
 
@@ -2002,13 +2011,13 @@ function getStatsHTML(stats) {
     }
     .time-bar {
       flex: 1;
-      background: linear-gradient(180deg, #6B7A2A, #C8C87A);
+      background: linear-gradient(180deg, #0B607C, #4B8FA8);
       border-radius: 2px 2px 0 0;
       position: relative;
       min-width: 8px;
     }
     .time-bar:hover {
-      background: linear-gradient(180deg, #C8C87A, #6B7A2A);
+      background: linear-gradient(180deg, #4B8FA8, #C4D8E6);
     }
   </style>
 </head>
@@ -2099,18 +2108,18 @@ function getStatsHTML(stats) {
     <div class="chart-container">
       <div class="chart-title">Time Served Statistics (from PDF Data)</div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-top: 1rem;">
-        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${formatMinutes(stats.avgTimeServedMins)}</div>
-          <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
+        <div style="background: #0E1C1A; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C4D8E6; font-family: 'Playfair Display', Georgia, serif;">${formatMinutes(stats.avgTimeServedMins)}</div>
+          <div style="color: #6A8A96; font-size: 0.75rem; margin-top: 0.25rem;">Average Time Served</div>
         </div>
-        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${formatMinutes(stats.minTimeServedMins)}</div>
-          <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
+        <div style="background: #0E1C1A; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C4D8E6; font-family: 'Playfair Display', Georgia, serif;">${formatMinutes(stats.minTimeServedMins)}</div>
+          <div style="color: #6A8A96; font-size: 0.75rem; margin-top: 0.25rem;">Shortest Stay</div>
         </div>
-        <div style="background: #0A1209; padding: 1rem; border-radius: 8px; text-align: center;">
-          <div style="font-size: 1.5rem; font-weight: bold; color: #C8C87A;">${stats.longestCurrentMins > 0 ? formatMinutes(stats.longestCurrentMins) : 'N/A'}</div>
-          <div style="color: #72807A; font-size: 0.75rem; margin-top: 0.25rem;">Longest Current Stay</div>
-          ${stats.longestInmate ? `<div style="color: #72807A; font-size: 0.65rem; margin-top: 0.2rem;">${stats.longestInmate.name}</div>` : ''}
+        <div style="background: #0E1C1A; padding: 1rem; border-radius: 8px; text-align: center;">
+          <div style="font-size: 1.5rem; font-weight: bold; color: #C4D8E6; font-family: 'Playfair Display', Georgia, serif;">${stats.longestCurrentMins > 0 ? formatMinutes(stats.longestCurrentMins) : 'N/A'}</div>
+          <div style="color: #6A8A96; font-size: 0.75rem; margin-top: 0.25rem;">Longest Current Stay</div>
+          ${stats.longestInmate ? `<div style="color: #6A8A96; font-size: 0.65rem; margin-top: 0.2rem; font-family: 'Fake Receipt', monospace;">${stats.longestInmate.name}</div>` : ''}
         </div>
       </div>
     </div>` : ''}
@@ -2377,18 +2386,18 @@ function getDeepStatsHTML(d) {
   function dayBar(days, max) {
     return Object.entries(days).map(([day, count]) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:4px;">
-        <span style="min-width:32px;color:#FFFFFF;font-size:0.75rem;">${day}</span>
-        <div style="background:linear-gradient(90deg,#6B7A2A,#C8C87A);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
-        <span style="color:#C8C87A;font-size:0.75rem;">${count}</span>
+        <span style="min-width:32px;color:#C4D8E6;font-size:0.75rem;">${day}</span>
+        <div style="background:linear-gradient(90deg,#0B607C,#4B8FA8);height:18px;width:${Math.round((count/max)*260)}px;border-radius:3px;min-width:2px;"></div>
+        <span style="color:#C4D8E6;font-size:0.75rem;">${count}</span>
       </div>`).join('');
   }
 
   function hourBar(hours, max) {
     return hours.map((count, hr) => `
       <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:2px;">
-        <span style="min-width:40px;color:#FFFFFF;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
-        <div style="background:linear-gradient(90deg,#1C3320,#3A4E38);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
-        <span style="color:#FFFFFF;font-size:0.7rem;">${count}</span>
+        <span style="min-width:40px;color:#A8C4D0;font-size:0.7rem;">${String(hr).padStart(2,'0')}:00</span>
+        <div style="background:linear-gradient(90deg,#0E2A32,#1A4A5C);height:14px;width:${Math.round((count/max)*260)}px;border-radius:2px;min-width:2px;"></div>
+        <span style="color:#A8C4D0;font-size:0.7rem;">${count}</span>
       </div>`).join('');
   }
 
@@ -2398,32 +2407,35 @@ function getDeepStatsHTML(d) {
   <title>Deep Stats — Mason County Jail</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Liberation Sans',monospace;font-size:8.5pt;background:#0A1209;color:#FFFFFF;padding:2rem;min-height:100vh}
+    body{font-family:'Inter',Arial,sans-serif;font-size:8.5pt;background:#152220;color:#C4D8E6;padding:2rem;min-height:100vh}
     .wrap{max-width:1100px;margin:0 auto}
-    h1{font-size:1.4rem;color:#F0F0E8;margin-bottom:0.25rem;letter-spacing:-0.5px}
-    h2{font-size:0.85rem;color:#6B7A2A;text-transform:uppercase;letter-spacing:1px;margin:2rem 0 0.75rem;border-bottom:1px solid #1C3320;padding-bottom:0.4rem}
-    a{color:#6B7A2A;text-decoration:none}
-    .subtitle{color:#72807A;font-size:0.75rem;margin-bottom:2rem}
+    h1{font-family:'Playfair Display',Georgia,serif;font-size:1.6rem;color:#F5F0E8;margin-bottom:0.25rem;font-weight:700}
+    h2{font-family:'Playfair Display',Georgia,serif;font-size:0.95rem;color:#4B8FA8;font-weight:600;margin:2rem 0 0.75rem;border-bottom:1px solid #1E3840;padding-bottom:0.4rem}
+    a{color:#4B8FA8;text-decoration:none}
+    .subtitle{color:#6A8A96;font-size:0.75rem;margin-bottom:2rem}
     table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-top:0.5rem}
-    th{color:#72807A;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #1C3320;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
-    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0E1812;color:#FFFFFF;vertical-align:top}
-    tr:hover td{background:#0E1812}
-    .val{color:#C8C87A;font-weight:bold}
-    .dim{color:#72807A}
+    th{color:#6A8A96;text-align:left;padding:0.4rem 0.5rem;border-bottom:1px solid #1E3840;font-weight:normal;text-transform:uppercase;font-size:0.7rem;letter-spacing:0.5px}
+    td{padding:0.35rem 0.5rem;border-bottom:1px solid #0E1C1A;color:#C4D8E6;vertical-align:top}
+    tr:hover td{background:#1A3035}
+    .val{color:#F5F0E8;font-weight:bold;font-family:'Fake Receipt','Courier New',monospace}
+    .dim{color:#6A8A96}
     .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;margin-top:0.75rem}
-    .card{background:#152B17;border-radius:8px;padding:1rem;border-left:3px solid #6B7A2A}
-    .card .v{font-size:1.6rem;font-weight:bold;color:#C8C87A}
-    .card .l{color:#72807A;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
+    .card{background:#1A3035;border-radius:8px;padding:1rem;border-left:3px solid #0B607C}
+    .card .v{font-size:1.6rem;font-weight:bold;color:#C4D8E6;font-family:'Playfair Display',Georgia,serif}
+    .card .l{color:#6A8A96;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px;margin-top:0.15rem}
     .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
     @media(max-width:700px){.two-col{grid-template-columns:1fr}}
-    .chip{display:inline-block;background:#0E1812;border:1px solid #1E3522;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#FFFFFF}
+    .chip{display:inline-block;background:#0E1C1A;border:1px solid #1E3840;padding:1px 6px;border-radius:3px;font-size:0.7rem;margin:1px;color:#C4D8E6}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <a href="/api/status" style="font-size:0.75rem;color:#72807A;">← status</a>
+  <a href="/api/status" style="font-size:0.75rem;color:#4B8FA8;">← status</a>
   <h1 style="margin-top:0.5rem;">Deep Analytics</h1>
   <p class="subtitle">Mason County Jail · ${total} releases in history · Unlisted</p>
 
@@ -2447,16 +2459,16 @@ function getDeepStatsHTML(d) {
     <div class="card"><div class="v">${$(d.bailWeek)}</div><div class="l">Last 7 Days</div></div>
     <div class="card"><div class="v">${$(d.bailMonth)}</div><div class="l">This Month</div></div>
     <div class="card"><div class="v">${$(d.bailYTD)}</div><div class="l">Year to Date</div></div>
-    <div class="card" style="border-left-color:#1a6e3c"><div class="v">${d.bailCount}</div><div class="l">Paid Bail</div></div>
-    <div class="card" style="border-left-color:#6e1a1a"><div class="v">${d.noBailCount}</div><div class="l">Zero-Dollar Releases</div></div>
-    <div class="card" style="border-left-color:#4a4a00">
+    <div class="card" style="border-left-color:#0B7C5C"><div class="v">${d.bailCount}</div><div class="l">Paid Bail</div></div>
+    <div class="card" style="border-left-color:#7C1A1A"><div class="v">${d.noBailCount}</div><div class="l">Zero-Dollar Releases</div></div>
+    <div class="card" style="border-left-color:#2A4A5C">
       <div class="v">${d.bailCount + d.noBailCount > 0 ? pct(d.bailCount, d.bailCount + d.noBailCount) : '—'}</div>
       <div class="l">Bail Bond vs PR Release Ratio</div>
     </div>
-    ${d.maxBailEntry ? `<div class="card" style="border-left-color:#6e3c1a">
+    ${d.maxBailEntry ? `<div class="card" style="border-left-color:#5C3A1A">
       <div class="v" style="font-size:1.2rem;">${$(d.maxBailEntry.bailAmt || parseFloat((d.maxBailEntry.bail||'$0').replace(/[$,]/g,'')))}</div>
       <div class="l">Most Expensive Bail Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.maxBailEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#C4D8E6;font-family:'Fake Receipt','Courier New',monospace;">${d.maxBailEntry.name}</div>
     </div>` : ''}
   </div>
 
@@ -2516,21 +2528,21 @@ function getDeepStatsHTML(d) {
       <div class="l">Released in &lt;24 Hours</div>
       <div style="margin-top:0.4rem;font-size:0.7rem;color:#72807A;">${d.under24} under / ${d.over24} over</div>
     </div>
-    ${d.histMinEntry ? `<div class="card" style="border-left-color:#1a6e3c">
+    ${d.histMinEntry ? `<div class="card" style="border-left-color:#0B7C5C">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMinMins)}</div>
       <div class="l">Shortest Stay Ever</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.histMinEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#C4D8E6;font-family:'Fake Receipt','Courier New',monospace;">${d.histMinEntry.name}</div>
     </div>` : ''}
-    ${d.histMaxEntry ? `<div class="card" style="border-left-color:#6e1a1a">
+    ${d.histMaxEntry ? `<div class="card" style="border-left-color:#7C1A1A">
       <div class="v" style="font-size:1.2rem;">${formatMinutes(d.histMaxMins)}</div>
       <div class="l">Historical Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.histMaxEntry.name}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#C4D8E6;font-family:'Fake Receipt','Courier New',monospace;">${d.histMaxEntry.name}</div>
     </div>` : ''}
-    ${d.currentLongest ? `<div class="card" style="border-left-color:#6e3c1a">
+    ${d.currentLongest ? `<div class="card" style="border-left-color:#5C3A1A">
       <div class="v" style="font-size:1.2rem;">${d.currentLongest.days}d</div>
       <div class="l">Current Longest Stay</div>
-      <div style="margin-top:0.4rem;font-size:0.7rem;color:#FFFFFF;">${d.currentLongest.name}</div>
-      <div style="font-size:0.65rem;color:#72807A;">In since ${d.currentLongest.bookDate}</div>
+      <div style="margin-top:0.4rem;font-size:0.7rem;color:#C4D8E6;font-family:'Fake Receipt','Courier New',monospace;">${d.currentLongest.name}</div>
+      <div style="font-size:0.65rem;color:#6A8A96;">In since ${d.currentLongest.bookDate}</div>
     </div>` : ''}
   </div>
 
