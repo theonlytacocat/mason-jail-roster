@@ -1828,7 +1828,7 @@ function normalizeCharge(charge) {
   let c = charge.trim().replace(/^\d+\.\d+[\.\d]*\s+/, '').trim();
   const u = c.toUpperCase();
 
-  if (/PROBATION.*(VIOL|VIO)|PAROLE.*(VIOL|VIO)/.test(u))                              return 'PROBATION VIOLATION';
+  if (/^PROBATION$|PROBATION.*(VIOL|VIO)|PAROLE.*(VIOL|VIO)/.test(u))                   return 'PROBATION VIOLATION';
   if (/^ASSAULT|SIMPLE ASSAULT/.test(u))                                                 return 'ASSAULT';
   if (/SIMPLE POSSESSION|^SIMPLE$/.test(u))                                              return 'DRUG POSSESSION';
   if (/VIOLATION.*(NO.CONTACT|NCO)|NO.CONTACT.*(VIOL|VIO)|PROPECT|PROTECT.*ORDER|PROTECTION.*ORDER/.test(u)) return 'PROTECTION ORDER VIOLATION';
