@@ -1305,6 +1305,7 @@ app.get('/api/history', (req, res) => {
     .entry.no-change-entry { background: #0E1C1A; padding: 0.75rem; border-left: 3px solid #1E3840; }
     .entry-header { font-family: 'Playfair Display', Georgia, serif; font-weight: 600; font-size: 11pt; margin-bottom: 0.75rem; color: #C4D8E6; border-bottom: 1px solid #1E3840; padding-bottom: 0.5rem; }
     .changes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.75rem; }
+    @media (max-width: 600px) { .changes-grid { grid-template-columns: 1fr; } }
     .changes { }
     .changes h4 { font-family: 'Inter', Arial, sans-serif; font-size: 9pt; margin-bottom: 0.4rem; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; }
     .changes.booked { border-left: 3px solid #4B8FA8; padding-left: 0.6rem; }
