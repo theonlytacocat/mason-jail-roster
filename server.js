@@ -652,6 +652,7 @@ if (fs.existsSync(logFile)) {
     <a href="/api/history" class="run-btn">Jail Bookings and Release Log</a>
     <a href="/api/stats" class="run-btn" style="margin-top: 0.75rem;">Statistics Dashboard</a>
     <a href="https://theonlytacocat.github.io/ksco-scraper/" target="_blank" rel="noopener noreferrer" class="run-btn" style="margin-top: 0.75rem;">Visit Kitsap County Jail Monitor</a>
+    <a href="https://theonlytacocat.github.io/pierce-jail-roster/" target="_blank" rel="noopener noreferrer" class="run-btn" style="margin-top: 0.75rem;">Visit Pierce County Jail Monitor</a>
     <details class="status" style="margin-top: 1rem;">
       <summary>
         <div class="status-dot"></div>

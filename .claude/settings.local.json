@@ -18,7 +18,9 @@
       "Bash(powershell -ExecutionPolicy Bypass -Command \":*)",
       "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\Alexa\\\\AppData\\\\Local\\\\Temp\\\\checksize.ps1\")",
       "Bash(powershell -ExecutionPolicy Bypass -File \"C:\\\\Users\\\\Alexa\\\\AppData\\\\Local\\\\Temp\\\\find_dupes.ps1\")",
-      "Bash(git add server.js fonts/FakeReceipt.otf)"
+      "Bash(git add server.js fonts/FakeReceipt.otf)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(git add *)"
     ]
   }
 }
