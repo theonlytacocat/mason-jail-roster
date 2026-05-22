@@ -1835,6 +1835,8 @@ function normalizeCharge(charge) {
   if (/SIMPLE POSSESSION|^SIMPLE$/.test(u))                                              return 'DRUG POSSESSION';
   if (/VIOLATION.*(NO.CONTACT|NCO)|NO.CONTACT.*(VIOL|VIO)|PROPECT|PROTECT.*ORDER|PROTECTION.*ORDER/.test(u)) return 'PROTECTION ORDER VIOLATION';
   if (/FAILURE.TO.APPEAR|WARRANT.ARREST/.test(u))                                        return 'FAILURE TO APPEAR';
+  if (/SEX.*OFFENDER.*(FAIL|FAILURE).*REGISTER/.test(u))                                 return 'SEX OFFENDER FAIL TO REGISTER';
+  if (/STRONGARM/.test(u))                                                               return 'Robbery/Burglary (Strongarm)';
 
   return c.trim();
 }
@@ -2409,7 +2411,7 @@ function getDeepStatsHTML(d) {
 
   const timeByChargeArr = Object.entries(d.timeByCharge)
     .map(([charge, s]) => ({ charge, avgMins: Math.round(s.totalMins/s.count), count: s.count }))
-    .sort((a,b) => b.avgMins - a.avgMins).slice(0, 12);
+    .sort((a,b) => b.count - a.count);
 
   const rtByChargeArr = Object.entries(d.rtByCharge)
     .map(([charge, types]) => {
