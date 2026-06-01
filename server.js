@@ -340,6 +340,124 @@ app.get('/api/admin/fix-releases', (req, res) => {
   }
 });
 
+// Backfill time served for all historical entries using actual book date → release date.
+// Fixes both change_log.txt (display) and release_stats_history.json (stats calculations).
+app.get('/api/admin/backfill-time-served', (req, res) => {
+  try {
+    const logFile = path.join(STORAGE_DIR, 'change_log.txt');
+
+    const parseJailDate = (s) => {
+      try {
+        const parts = (s || '').trim().split(' ');
+        if (parts.length < 2) return null;
+        const [datePart, timePart] = parts;
+        const [m, d, y] = datePart.split('/').map(Number);
+        const [h, min, sec] = timePart.split(':').map(Number);
+        const year = y < 100 ? 2000 + y : y;
+        const dt = new Date(year, m - 1, d, h, min, sec);
+        return isNaN(dt.getTime()) ? null : dt;
+      } catch (e) { return null; }
+    };
+
+    // ── Step 1: Build name → [{bookDate, lineIdx}] from BOOKED entries ────────
+    const content = fs.readFileSync(logFile, 'utf-8');
+    const logLines = content.split('\n');
+    const bookMap = new Map();
+
+    for (let i = 0; i < logLines.length; i++) {
+      const m = logLines[i].match(/^BOOKED \| (.+?) \| Booked: (\d{1,2}\/\d{1,2}\/\d{2,4} \d{1,2}:\d{2}:\d{2})/);
+      if (!m) continue;
+      const name = m[1].trim();
+      const bookDate = m[2].trim();
+      if (!bookMap.has(name)) bookMap.set(name, []);
+      bookMap.get(name).push({ bookDate, lineIdx: i });
+    }
+
+    // Find the most recent booking for a name that occurred before a given release
+    const findBookDate = (name, releaseDateTime, releaseLineIdx) => {
+      const releaseDate = parseJailDate(releaseDateTime);
+      if (!releaseDate) return null;
+      const bookings = bookMap.get(name) || [];
+      let best = null, bestDate = null;
+      for (const b of bookings) {
+        if (releaseLineIdx !== null && b.lineIdx >= releaseLineIdx) continue;
+        const bd = parseJailDate(b.bookDate);
+        if (!bd || bd >= releaseDate) continue;
+        if (!bestDate || bd > bestDate) { best = b.bookDate; bestDate = bd; }
+      }
+      return best;
+    };
+
+    // ── Step 2: Fix RELEASED lines in change_log.txt ──────────────────────────
+    let logFixed = 0, logSkipped = 0;
+    const fixedLines = [...logLines];
+
+    for (let i = 0; i < logLines.length; i++) {
+      const line = logLines[i];
+      if (!line.startsWith('RELEASED | ')) continue;
+
+      const m = line.match(/^RELEASED \| (.+?) \| Released: (\d{1,2}\/\d{1,2}\/\d{2,4} \d{1,2}:\d{2}:\d{2})/);
+      if (!m) { logSkipped++; continue; }
+
+      const name = m[1].trim();
+      const releaseDateTime = m[2].trim();
+      const bookDate = findBookDate(name, releaseDateTime, i);
+      if (!bookDate) { logSkipped++; continue; }
+
+      const computed = computeTimeServed(bookDate, releaseDateTime);
+      if (!computed) { logSkipped++; continue; }
+
+      let newLine;
+      if (line.includes('| Time served:')) {
+        newLine = line.replace(/\| Time served: \S+/, '| Time served: ' + computed);
+      } else {
+        // Insert time served right after the release date/time
+        newLine = line.replace(
+          /(Released: \d{1,2}\/\d{1,2}\/\d{2,4} \d{1,2}:\d{2}:\d{2})(\s*\|)/,
+          '$1 | Time served: ' + computed + '$2'
+        );
+      }
+
+      if (newLine !== line) { fixedLines[i] = newLine; logFixed++; }
+      else logSkipped++;
+    }
+
+    fs.writeFileSync(logFile + '.backup-ts-' + Date.now(), content);
+    fs.writeFileSync(logFile, fixedLines.join('\n'));
+
+    // ── Step 3: Fix release_stats_history.json ────────────────────────────────
+    let histFixed = 0, histSkipped = 0;
+
+    if (fs.existsSync(RELEASE_STATS_HISTORY_FILE)) {
+      const rawHist = fs.readFileSync(RELEASE_STATS_HISTORY_FILE, 'utf-8');
+      const history = JSON.parse(rawHist);
+
+      for (const entry of history) {
+        const bookDate = findBookDate(entry.name, entry.releaseDateTime, null);
+        if (!bookDate) { histSkipped++; continue; }
+        const computed = computeTimeServed(bookDate, entry.releaseDateTime);
+        if (!computed) { histSkipped++; continue; }
+        entry.timeServed = computed;
+        histFixed++;
+      }
+
+      fs.writeFileSync(RELEASE_STATS_HISTORY_FILE + '.backup-ts-' + Date.now(), rawHist);
+      fs.writeFileSync(RELEASE_STATS_HISTORY_FILE, JSON.stringify(history, null, 2));
+    }
+
+    res.send(`<!DOCTYPE html><html><body style="font-family:monospace;background:#0a1a1f;color:#C4D8E6;padding:2rem;">
+      <h2>✓ Backfill Complete</h2>
+      <p><b>change_log.txt:</b> fixed ${logFixed} entries, skipped ${logSkipped}</p>
+      <p><b>release_stats_history.json:</b> fixed ${histFixed} entries, skipped ${histSkipped}</p>
+      <p style="color:#6A8A96;">Both files backed up before changes. Stats will reflect corrected times immediately.</p>
+      <a href="/api/stats" style="color:#4B8FA8;">→ View Stats</a> &nbsp;
+      <a href="/api/deepstats" style="color:#4B8FA8;">→ View Deep Stats</a>
+    </body></html>`);
+  } catch (e) {
+    res.status(500).send('Error: ' + e.message);
+  }
+});
+
 // this is where im putting the release stats debug endpoint
 app.get('/api/debug/release-pdf-raw', async (req, res) => {
   try {
