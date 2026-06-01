@@ -210,6 +210,36 @@ function extractBookings(rosterText) {
   return bookings;
 }
 
+// Compute actual time served from book date string → release date string.
+// Both dates are in "M/D/YY HH:MM:SS" or "MM/DD/YY HH:MM:SS" format.
+// We calculate this ourselves rather than trusting the PDF's own time-served field,
+// which tracks time in the current booking stint and can be far shorter than reality.
+function computeTimeServed(bookDateStr, releaseDateTimeStr) {
+  try {
+    const parseJailDate = (s) => {
+      const parts = s.trim().split(' ');
+      if (parts.length < 2) return null;
+      const [datePart, timePart] = parts;
+      const [m, d, y] = datePart.split('/').map(Number);
+      const [h, min, sec] = timePart.split(':').map(Number);
+      const year = y < 100 ? 2000 + y : y;
+      return new Date(year, m - 1, d, h, min, sec);
+    };
+    const booked = parseJailDate(bookDateStr);
+    const released = parseJailDate(releaseDateTimeStr);
+    if (!booked || !released || isNaN(booked) || isNaN(released)) return null;
+    const diffMs = released - booked;
+    if (diffMs <= 0) return null;
+    const totalMins = Math.floor(diffMs / 60000);
+    const days = Math.floor(totalMins / 1440);
+    const hours = Math.floor((totalMins % 1440) / 60);
+    const mins = totalMins % 60;
+    return `${days}d${hours}h${mins}m`;
+  } catch (e) {
+    return null;
+  }
+}
+
 // Format functions
 function formatBooked(b) {
   const chargeText = b.charges && b.charges.length > 0 ? b.charges.join(", ") : "None listed";
@@ -221,23 +251,34 @@ function formatReleased(b, stats, isPending = false) {
   if (releaseInfo) {
     const bailAmount = parseFloat(releaseInfo.bail.replace(/[$,]/g, ''));
     const bailText = bailAmount > 0 ? " | Bail Posted: " + releaseInfo.bail : "";
-    
+
+    // Compute time served from the roster's actual book date → PDF's release date/time.
+    // The PDF's own time-served field tracks time in the current stint only and is often wrong.
+    const computed = (b.bookDate && b.bookDate !== 'Unknown')
+      ? computeTimeServed(b.bookDate, releaseInfo.releaseDateTime)
+      : null;
+    const timeServedStr = computed || releaseInfo.timeServed;
+
     return {
-      text: b.name + " | Released: " + releaseInfo.releaseDateTime + 
-            " | Time served: " + releaseInfo.timeServed + 
+      text: b.name + " | Released: " + releaseInfo.releaseDateTime +
+            " | Time served: " + timeServedStr +
             bailText +
             " (" + releaseInfo.releaseType + ")" +
             " | Charges: " + chargeText,
       hasPendingDetails: false
     };
   }
-  
-  // No detailed release info available - use current date/time as detection time
+
+  // No match in release PDF — compute time served from book date to detection time.
   const now = new Date();
   const releaseDate = `${String(now.getMonth() + 1).padStart(2, '0')}/${String(now.getDate()).padStart(2, '0')}/${String(now.getFullYear()).slice(-2)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-  
+  const computedNoMatch = (b.bookDate && b.bookDate !== 'Unknown')
+    ? computeTimeServed(b.bookDate, releaseDate)
+    : null;
+  const timeServedSuffix = computedNoMatch ? ' | Time served: ' + computedNoMatch : '';
+
   return {
-    text: b.name + " | Released: " + releaseDate + " | Charges: " + chargeText,
+    text: b.name + " | Released: " + releaseDate + timeServedSuffix + " | Charges: " + chargeText,
     hasPendingDetails: false
   };
 }
@@ -845,7 +886,8 @@ app.get('/api/run', async (req, res) => {
         updatedReleases.push({
           name: pending.name,
           details: releaseInfo,
-          charges: pending.bookingData.charges
+          charges: pending.bookingData.charges,
+          bookDate: pending.bookingData.bookDate
         });
       } else {
         // Still waiting for details
@@ -922,9 +964,13 @@ app.get('/api/run', async (req, res) => {
         updatedReleases.map(r => {
           const bailAmount = parseFloat(r.details.bail.replace(/[$,]/g, ''));
           const bailText = bailAmount > 0 ? " | Bail Posted: " + r.details.bail : "";
-          
-          return "  ✓ " + r.name + " | Released: " + r.details.releaseDateTime + 
-            " | Time served: " + r.details.timeServed + 
+          const computed = (r.bookDate && r.bookDate !== 'Unknown')
+            ? computeTimeServed(r.bookDate, r.details.releaseDateTime)
+            : null;
+          const timeServedStr = computed || r.details.timeServed;
+
+          return "  ✓ " + r.name + " | Released: " + r.details.releaseDateTime +
+            " | Time served: " + timeServedStr +
             bailText +
             " (" + r.details.releaseType + ")" +
             " | Charges: " + (r.charges.join(", ") || "None listed");
